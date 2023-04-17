@@ -1,0 +1,89 @@
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+[project]
+name = "variantplanner"
+description = "A tool kit to manage many variant on desktop computer"
+authors = [{name = "Pierre Marijon", email = "pierre.marijon-ext@aphp.fr"}]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.7"
+keywords = []
+dynamic = ["version"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Documentation",
+    "Topic :: Software Development",
+    "Topic :: Utilities",
+    "Typing :: Typed",
+]
+dependencies = [
+    "polars>=0.17.3",
+    "click>=8.1.3",
+]
+
+[project.urls]
+Homepage = "https://natir.github.io/variantplanner"
+Documentation = "https://natir.github.io/variantplanner"
+Changelog = "https://natir.github.io/variantplanner/changelog"
+Repository = "https://github.com/natir/variantplanner"
+Issues = "https://github.com/natir/variantplanner/issues"
+Discussions = "https://github.com/natir/variantplanner/discussions"
+Gitter = "https://gitter.im/variantplanner/community"
+Funding = "https://github.com/sponsors/natir"
+
+[project.scripts]
+variantplanner = "variantplanner.cli:main"
+
+[tool.pdm]
+version = {source = "scm"}
+
+[tool.pdm.build]
+package-dir = "src"
+editable-backend = "editables"
+
+[tool.pdm.dev-dependencies]
+duty = ["duty>=0.10"]
+docs = [
+    "black>=23.1",
+    "mkdocs>=1.3",
+    "mkdocs-coverage>=0.2",
+    "mkdocs-gen-files>=0.3",
+    "mkdocs-literate-nav>=0.4",
+    "mkdocs-material>=7.3",
+    "mkdocs-section-index>=0.3",
+    "mkdocstrings[python]>=0.18",
+    "markdown-callouts>=0.2",
+    "markdown-exec>=0.5",
+    "toml>=0.10",
+]
+maintain = [
+    "black>=23.1",
+    "blacken-docs>=1.13",
+    "git-changelog>=1.0",
+]
+quality = [
+    "ruff>=0.0.246",
+]
+tests = [
+    "pytest>=6.2",
+    "pytest-cov>=3.0",
+    "pytest-randomly>=3.10",
+    "pytest-xdist>=2.4",
+]
+typing = [
+    "mypy>=0.910",
+    "types-markdown>=3.3",
+    "types-toml>=0.10",
+]
+security = ["safety>=2"]
