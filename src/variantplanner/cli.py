@@ -25,13 +25,14 @@ import click
 # project import
 
 
-@click.group()
+@click.group(name="variantplanner")
 @click.option("-t", "--threads", help="Number of threads usable", default=1, type=click.IntRange(0), show_default=True)
 @click.option("-v", "--verbose", help="Verbosity level", count=True, type=click.IntRange(0, 5))
 def main(threads: int, verbose: int) -> None:
     """Run VariantPlanner."""
     logging.basicConfig(
-        format="%(asctime)s - %(name)s:%(levelname)s: %(message)s",
+        style="{",
+        format="{asctime} - {name}:{levelname}: {message}",
         encoding="utf-8",
         level=(5 - verbose) * 10,  # Python choose a bad logging levels order
         stream=sys.stderr,
