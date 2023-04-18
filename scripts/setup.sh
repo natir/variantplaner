@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-PYTHON_VERSIONS="${PYTHON_VERSIONS-3.7 3.8 3.9 3.10 3.11}"
+PYTHON_VERSIONS="${PYTHON_VERSIONS-3.9 3.10 3.11}"
 
 if ! command -v pdm &>/dev/null; then
     if ! command -v pipx &>/dev/null; then
@@ -14,7 +14,7 @@ if ! pdm self list 2>/dev/null | grep -q pdm-multirun; then
 fi
 
 if [ -n "${PYTHON_VERSIONS}" ]; then
-    pdm multirun -vi ${PYTHON_VERSIONS// /,} pdm install
+    pdm multirun -vi ${PYTHON_VERSIONS// /,} pdm install -d
 else
     pdm install
 fi

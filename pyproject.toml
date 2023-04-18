@@ -8,7 +8,7 @@ description = "A tool kit to manage many variant on desktop computer"
 authors = [{name = "Pierre Marijon", email = "pierre.marijon-ext@aphp.fr"}]
 license = {text = "MIT"}
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.9"
 keywords = []
 dynamic = ["version"]
 classifiers = [
@@ -17,8 +17,6 @@ classifiers = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -38,9 +36,6 @@ Documentation = "https://natir.github.io/variantplanner"
 Changelog = "https://natir.github.io/variantplanner/changelog"
 Repository = "https://github.com/natir/variantplanner"
 Issues = "https://github.com/natir/variantplanner/issues"
-Discussions = "https://github.com/natir/variantplanner/discussions"
-Gitter = "https://gitter.im/variantplanner/community"
-Funding = "https://github.com/sponsors/natir"
 
 [project.scripts]
 variantplanner = "variantplanner.cli:main"

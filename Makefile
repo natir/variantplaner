@@ -40,7 +40,7 @@ setup:
 
 .PHONY: check
 check:
-	@pdm multirun duty check-quality check-types check-docs
+	@PDM_MULTIRUN_VERSIONS="3.9 3.10 3.11" pdm multirun duty check-quality check-types check-docs
 	@$(DUTY) check-dependencies check-api
 
 .PHONY: $(BASIC_DUTIES)
@@ -49,4 +49,4 @@ $(BASIC_DUTIES):
 
 .PHONY: $(QUALITY_DUTIES)
 $(QUALITY_DUTIES):
-	@pdm multirun duty $@ $(call args,$@)
+	@PDM_MULTIRUN_VERSIONS="3.9 3.10 3.11" pdm multirun duty $@ $(call args,$@)
