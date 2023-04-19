@@ -12,7 +12,7 @@
 #   there's no `variantplanner.__main__` in `sys.modules`.
 
 # std import
-from __future__ import annotations as annotations_
+from __future__ import annotations
 
 import logging
 import os
@@ -121,7 +121,7 @@ def merge(inputs_path: pathlib.Path, merge: pathlib.Path) -> None:
     type=click.Path(writable=True, path_type=pathlib.Path),
     required=True,
 )
-def annotations(ctx: click.Context, input_path: pathlib.Path, output_path: pathlib.Path) -> None:
+def annotations_main(ctx: click.Context, input_path: pathlib.Path, output_path: pathlib.Path) -> None:
     """Convert an annotation variation file in parquet."""
     logger = logging.getLogger("annotations")
 
@@ -130,7 +130,7 @@ def annotations(ctx: click.Context, input_path: pathlib.Path, output_path: pathl
     logger.debug(f"parameter: {input_path=} {output_path=}")
 
 
-@annotations.command("vcf")
+@annotations_main.command("vcf")
 @click.pass_context
 @click.option(
     "-i",
@@ -151,7 +151,7 @@ def annotations_vcf(ctx: click.Context, info: list[str]) -> None:
     logger.debug(f"parameter: {input_path=} {output_path=} {info=}")
 
 
-@annotations.command("csv")
+@annotations_main.command("csv")
 @click.pass_context
 @click.option(
     "-c",
@@ -207,6 +207,22 @@ def annotations_csv(
     logger.debug(
         f"parameter: {input_path=} {output_path=} {chromosome=} {position=} {reference=} {alternative=} {info=}",
     )
+
+    from variantplanner.io import csv
+
+    lf = csv.into_lazyframe(
+        input_path,
+        chromosome,
+        position,
+        reference,
+        alternative,
+        info,
+        separator=",",
+    )
+
+    lf.sink_parquet(output_path)
+
+    logging.info("end of annontations csv")
 
 
 ############
