@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 # 3rd party import
-import pytest
 from click.testing import CliRunner
 
 # project import
@@ -37,7 +36,7 @@ Commands:
     )
 
 
-def test_show_help(capsys: pytest.CaptureFixture) -> None:
+def test_show_help() -> None:
     """Call cli '--help'."""
     runner = CliRunner(mix_stderr=False)
     result = runner.invoke(cli.main, ["--help"])
@@ -63,7 +62,7 @@ Commands:
     )
 
 
-def test_show_help_annotations(capsys: pytest.CaptureFixture) -> None:
+def test_show_help_annotations() -> None:
     """Call cli 'annotations --help'."""
     runner = CliRunner(mix_stderr=False)
     result = runner.invoke(cli.main, ["annotations", "--help"])
@@ -88,7 +87,7 @@ Commands:
     )
 
 
-def test_show_help_merge(capsys: pytest.CaptureFixture) -> None:
+def test_show_help_merge() -> None:
     """Call cli 'merge --help'."""
     runner = CliRunner(mix_stderr=False)
     result = runner.invoke(cli.main, ["merge", "--help"])
@@ -108,7 +107,7 @@ Options:
     )
 
 
-def test_show_help_metadata(capsys: pytest.CaptureFixture) -> None:
+def test_show_help_metadata() -> None:
     """Call cli 'metadata --help'."""
     runner = CliRunner(mix_stderr=False)
     result = runner.invoke(cli.main, ["metadata", "--help"])
@@ -133,7 +132,7 @@ Commands:
     )
 
 
-def test_show_help_vcf2parquet(capsys: pytest.CaptureFixture) -> None:
+def test_show_help_vcf2parquet() -> None:
     """Call cli 'vcf2parquet --help'."""
     runner = CliRunner()
     result = runner.invoke(cli.main, ["-vvvvv", "vcf2parquet", "--help"])
