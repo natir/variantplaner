@@ -3,6 +3,7 @@
 # std import
 from __future__ import annotations
 
+import logging
 import re
 import typing
 
@@ -19,6 +20,8 @@ from variantplanner.exception import NotAVCFError
 MINIMAL_COL_NUMBER: int = 8
 SAMPLE_COL_BEGIN: int = 9
 
+logger = logging.getLogger("io.vcf")
+
 
 def info2expr(input_path: pathlib.Path, select_info: set[str] | None) -> list[polars.Expr]:
     """Read vcf header to generate a list of polars.Expr to extract info.
@@ -29,6 +32,10 @@ def info2expr(input_path: pathlib.Path, select_info: set[str] | None) -> list[po
 
     Returns:
         List of polars expr to parse info columns.
+
+    Raises:
+        NotAVCFError: If a line not starts with '#'
+        NotAVCFError: If all line not start by '#CHR'
     """
     info_re = re.compile(
         r"ID=(?P<id>([A-Za-z_][0-9A-Za-z_.]*|1000G)),Number=(?P<number>[ARG0-9\.]+),Type=(?P<type>Integer|Float|String)",
@@ -67,7 +74,7 @@ def info2expr(input_path: pathlib.Path, select_info: set[str] | None) -> list[po
 
                 expressions.append(local_expr.alias(search["id"]))
 
-    raise NotAVCFError
+    raise NotAVCFError(input_path)
 
 
 def sample_index(input_path: pathlib.Path) -> dict[str, int] | None:
@@ -78,6 +85,10 @@ def sample_index(input_path: pathlib.Path) -> dict[str, int] | None:
 
     Returns:
         Map that associate a sample name to is sample index.
+
+    Raises:
+        NotAVCFError: If a line not starts with '#'
+        NotAVCFError: If all line not start by '#CHR'
     """
     with open(input_path) as fh:
         for line in fh:
@@ -88,9 +99,9 @@ def sample_index(input_path: pathlib.Path) -> dict[str, int] | None:
 
                 return {sample: i for (i, sample) in enumerate(split_line[SAMPLE_COL_BEGIN:])}
             if not line.startswith("#"):
-                raise NotAVCFError
+                raise NotAVCFError(input_path)
 
-    raise NotAVCFError
+    raise NotAVCFError(input_path)
 
 
 def __column_name(input_path: pathlib.Path) -> list[str]:
@@ -118,9 +129,9 @@ def __column_name(input_path: pathlib.Path) -> list[str]:
 
                 return cols_name
             if not line.startswith("#"):
-                raise NotAVCFError
+                raise NotAVCFError(input_path)
 
-    raise NotAVCFError
+    raise NotAVCFError(input_path)
 
 
 def into_lazyframe(input_path: pathlib.Path) -> polars.LazyFrame:
@@ -130,7 +141,7 @@ def into_lazyframe(input_path: pathlib.Path) -> polars.LazyFrame:
         input_path: Path to vcf file.
 
     Returns:
-        A lazyframe that containt vcf information.
+        A lazyframe that containt vcf information ('chr', 'pos', 'vid', 'ref', 'alt', 'qual', 'filter', 'info', ['format'], ['genotypes',…], 'id').
     """
     lf = polars.scan_csv(
         input_path,
@@ -141,7 +152,7 @@ def into_lazyframe(input_path: pathlib.Path) -> polars.LazyFrame:
         ignore_errors=True,
     )
 
-    lf = lf.rename({f"column_{i}": name for (i, name) in enumerate(__column_name(input_path))})
+    lf = lf.rename({f"column_{i}": name for (i, name) in enumerate(__column_name(input_path), start=1)})
 
     lf = normalization.chromosome2integer(lf)
 

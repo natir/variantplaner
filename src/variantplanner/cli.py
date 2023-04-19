@@ -23,6 +23,7 @@ import sys
 import click
 
 # project import
+from variantplanner import io, manipulation, exception
 
 
 @click.group(name="variantplanner")
@@ -74,6 +75,25 @@ def vcf2parquet(input_path: pathlib.Path, variants: pathlib.Path, genotypes: pat
     logger = logging.getLogger("vcf2parquet")
 
     logger.debug(f"parameter: {input_path=} {variants=} {genotypes=}")
+
+    try:
+        lf = io.vcf.into_lazyframe(input_path)
+    except exception.NotAVCFError as error:
+        logger.error(error)
+        sys.exit(1)
+
+
+    manipulation.extract_variants(lf).sink_parquet(variants)
+    logger.info(f"finish write {variants}")
+
+    if genotypes:
+        try:
+            manipulation.extract_genotypes(lf).sink_parquet(genotypes)
+        except exception.NoGenotypeError as error:
+            logger.error(error)
+            sys.exit(2)
+
+    logger.info(f"finish write {genotypes}")
 
 
 #########

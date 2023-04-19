@@ -3,10 +3,20 @@
 # std import
 from __future__ import annotations
 
+import logging
+
 # 3rd party import
 import polars
 
+from variantplanner.exception import NoGenotypeError
+from variantplanner.io.vcf import MINIMAL_COL_NUMBER
+
 # project import
+
+
+LF_COL_NB_NO_GENOTYPE = MINIMAL_COL_NUMBER + 1
+
+logger = logging.getLogger("manipulation")
 
 
 def extract_variants(lf: polars.LazyFrame) -> polars.LazyFrame:
@@ -39,9 +49,15 @@ def extract_genotypes(lf: polars.LazyFrame) -> polars.LazyFrame:
 
     Returns:
         A lazyframe with genotype information (id, sample, gt, ad, db, gq)
+
+    Raises:
+        NoGenotypeError: If number of column in lf indicate no format or genotype (9)
     """
-    # Select genotype columns
-    lf = lf.select(["id", "format", *lf.columns[9:]])
+    if len(lf.columns) <= LF_COL_NB_NO_GENOTYPE:
+        raise NoGenotypeError
+
+    # Select genotype columns (side effect last columns are format, [genotypes,…] and id)
+    lf = lf.select([*lf.columns[MINIMAL_COL_NUMBER:]])
 
     # Clean bad variant
     lf = lf.filter(polars.col("format").str.starts_with("GT:AD:DP:GQ"))
@@ -62,7 +78,6 @@ def extract_genotypes(lf: polars.LazyFrame) -> polars.LazyFrame:
             [
                 polars.col("id"),
                 polars.col("variable").alias("sample"),
-                polars.col("value").str.replace_all(r"\.", "0"),
             ],
         )
     )
@@ -84,23 +99,23 @@ def extract_genotypes(lf: polars.LazyFrame) -> polars.LazyFrame:
             .str.split(":")
             .arr.get(col_index["AD"])
             .str.split(",")
-            .arr.eval(polars.element().str.parse_int(10).cast(polars.UInt16))
+            .arr.eval(polars.element().str.parse_int(10, strict=False).cast(polars.UInt16))
             .alias("ad"),
             # dp column
             polars.col("value")
             .str.split(":")
             .arr.get(col_index["DP"])
-            .str.parse_int(10)
+            .str.parse_int(10, strict=False)
             .cast(polars.UInt16)
             .alias("dp"),
             # gq column
             polars.col("value")
             .str.split(":")
             .arr.get(col_index["GQ"])
-            .str.parse_int(10)
+            .str.parse_int(10, strict=False)
             .cast(polars.UInt16)
             .alias("gq"),
         ],
     )
 
-    return genotypes.filter(polars.col("gt") == 0)
+    return genotypes.filter(polars.col("gt") != 0)
