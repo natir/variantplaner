@@ -23,19 +23,19 @@ import sys
 import click
 
 # project import
-from variantplanner import io, manipulation, exception
+from variantplanner import exception, io, manipulation
 
 
 @click.group(name="variantplanner")
 @click.option("-t", "--threads", help="Number of threads usable", default=1, type=click.IntRange(0), show_default=True)
-@click.option("-v", "--verbose", help="Verbosity level", count=True, type=click.IntRange(0, 5))
+@click.option("-v", "--verbose", help="Verbosity level", count=True, type=click.IntRange(0, 4))
 def main(threads: int, verbose: int) -> None:
     """Run VariantPlanner."""
     logging.basicConfig(
         style="{",
         format="{asctime} - {name}:{levelname}: {message}",
         encoding="utf-8",
-        level=(5 - verbose) * 10,  # Python choose a bad logging levels order
+        level=(4 - verbose) * 10,  # Python choose a bad logging levels order
         stream=sys.stderr,
     )
 
@@ -78,10 +78,9 @@ def vcf2parquet(input_path: pathlib.Path, variants: pathlib.Path, genotypes: pat
 
     try:
         lf = io.vcf.into_lazyframe(input_path)
-    except exception.NotAVCFError as error:
-        logger.error(error)
+    except exception.NotAVCFError:
+        logger.exception("")
         sys.exit(1)
-
 
     manipulation.extract_variants(lf).sink_parquet(variants)
     logger.info(f"finish write {variants}")
@@ -89,8 +88,8 @@ def vcf2parquet(input_path: pathlib.Path, variants: pathlib.Path, genotypes: pat
     if genotypes:
         try:
             manipulation.extract_genotypes(lf).sink_parquet(genotypes)
-        except exception.NoGenotypeError as error:
-            logger.error(error)
+        except exception.NoGenotypeError:
+            logger.exception("")
             sys.exit(2)
 
     logger.info(f"finish write {genotypes}")
