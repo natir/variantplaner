@@ -1,4 +1,4 @@
-target-version = "py37"
+target-version = "py39"
 line-length = 132
 exclude = [
     "fixtures",
@@ -70,6 +70,7 @@ ignore = [
     "PLR0915",  # Too many statements
     "SLF001", # Private member accessed
     "TRY003",  # Avoid specifying long messages outside the exception class
+    "ICN001",  # Don't short polars name in import
 ]
 
 [per-file-ignores]

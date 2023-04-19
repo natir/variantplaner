@@ -3,20 +3,18 @@
 from __future__ import annotations
 
 import re
-import sys
+import typing
+from importlib.metadata import PackageNotFoundError, metadata
 from itertools import chain
 from pathlib import Path
 from textwrap import dedent
-from typing import Mapping, cast
+
+if typing.TYPE_CHECKING:
+    from collections.abc import Mapping
 
 import toml
 from jinja2 import StrictUndefined
 from jinja2.sandbox import SandboxedEnvironment
-
-if sys.version_info < (3, 8):
-    from importlib_metadata import PackageNotFoundError, metadata
-else:
-    from importlib.metadata import PackageNotFoundError, metadata
 
 project_dir = Path(".")
 pyproject = toml.load(project_dir / "pyproject.toml")
@@ -33,10 +31,10 @@ def _get_license(pkg_name: str) -> str:
         data = metadata(pkg_name)
     except PackageNotFoundError:
         return "?"
-    license_name = cast(dict, data).get("License", "").strip()
+    license_name = typing.cast(dict, data).get("License", "").strip()
     multiple_lines = bool(license_name.count("\n"))
     if multiple_lines or not license_name or license_name == "UNKNOWN":
-        for header, value in cast(dict, data).items():
+        for header, value in typing.cast(dict, data).items():
             if header == "Classifier" and value.startswith("License ::"):
                 license_name = value.rsplit("::", 1)[1].strip()
     return license_name or "?"
