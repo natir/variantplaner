@@ -18,9 +18,9 @@ DATA_DIR = pathlib.Path(__file__).parent / "data"
 
 def test_extract_variants() -> None:
     """Check extract variants."""
-    truth = polars.read_parquet(DATA_DIR / "good.variants.parquet")
+    truth = polars.read_parquet(DATA_DIR / "no_info.variants.parquet")
 
-    df = io.vcf.into_lazyframe(DATA_DIR / "good.vcf")
+    df = io.vcf.into_lazyframe(DATA_DIR / "no_info.vcf")
 
     lf = manipulation.extract_variants(df.lazy())
 
@@ -29,9 +29,9 @@ def test_extract_variants() -> None:
 
 def test_extract_genotypes() -> None:
     """Check extract genotypes."""
-    truth = polars.read_parquet(DATA_DIR / "good.genotypes.parquet")
+    truth = polars.read_parquet(DATA_DIR / "no_info.genotypes.parquet")
 
-    df = io.vcf.into_lazyframe(DATA_DIR / "good.vcf")
+    df = io.vcf.into_lazyframe(DATA_DIR / "no_info.vcf")
 
     lf = manipulation.extract_genotypes(df.lazy())
 
