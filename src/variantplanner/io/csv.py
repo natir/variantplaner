@@ -8,7 +8,7 @@ import typing
 # 3rd party import
 import polars
 
-if typing.TYPE_CHECKING:
+if typing.TYPE_CHECKING:  # pragma: no cover
     import pathlib
     import sys
     from collections.abc import Sequence
