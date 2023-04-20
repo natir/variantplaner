@@ -30,7 +30,7 @@ from variantplanner import exception, io, manipulation, structuration
 @click.group(name="variantplanner")
 @click.option("-t", "--threads", help="Number of threads usable", default=1, type=click.IntRange(0), show_default=True)
 @click.option("-v", "--verbose", help="Verbosity level", count=True, type=click.IntRange(0, 4))
-def main(threads: int, verbose: int) -> None:
+def main(threads: int = 1, verbose: int = 0) -> None:
     """Run VariantPlanner."""
     logging.basicConfig(
         style="{",
@@ -121,6 +121,7 @@ def vcf2parquet(input_path: pathlib.Path, variants: pathlib.Path, genotypes: pat
     help="Number of bytes used to build chunk of merge file",
     type=click.IntRange(0),
     show_default=True,
+    default=10_000_000_000,
 )
 def merge(inputs_path: list[pathlib.Path], merge_path: pathlib.Path, bytes_memory_limit: int = 10_000_000_000) -> None:
     """Merge multiple variants parquet file in one.
@@ -242,6 +243,12 @@ def annotations_vcf(ctx: click.Context, info: set[str] | None = None, rename_id:
     help="List of columns that are kept if this list is empty all columns are kept",
     type=str,
 )
+@click.option(
+    "-s",
+    "--separator",
+    help="Single byte character to use as delimiter in the file",
+    type=str,
+)
 def annotations_csv(
     ctx: click.Context,
     chromosome: str,
@@ -249,6 +256,7 @@ def annotations_csv(
     reference: str,
     alternative: str,
     info: list[str],
+    separator: str = ",",
 ) -> None:
     """Convert an annotated csv in parquet."""
     logger = logging.getLogger("annotations-vcf")
@@ -269,7 +277,7 @@ def annotations_csv(
         reference,
         alternative,
         info,
-        separator=",",
+        separator=separator,
     )
 
     lf.sink_parquet(output_path)
@@ -325,6 +333,13 @@ def metadata_json(ctx: click.Context, fields: list[str]) -> None:
 
     logger.debug(f"parameter: {input_path=} {output_path=} {fields=}")
 
+    lf = polars.read_ndjson(input_path)
+
+    if fields:
+        lf = lf.select(fields)
+
+    lf.write_parquet(output_path)
+
 
 @metadata.command("csv")
 @click.pass_context
@@ -335,7 +350,15 @@ def metadata_json(ctx: click.Context, fields: list[str]) -> None:
     help="List of columns that are kept if this list is empty all columns are kept",
     type=str,
 )
-def metadata_csv(ctx: click.Context, columns: list[str]) -> None:
+@click.option(
+    "-s",
+    "--separator",
+    help="Single byte character to use as delimiter in the file",
+    type=str,
+    default=",",
+    show_default=True,
+)
+def metadata_csv(ctx: click.Context, columns: list[str], separator: str = ",") -> None:
     """Convert an metadata csv in parquet."""
     logger = logging.getLogger("metadata-csv")
 
@@ -345,3 +368,10 @@ def metadata_csv(ctx: click.Context, columns: list[str]) -> None:
     output_path = ctx.obj["output_path"]
 
     logger.debug(f"parameter: {input_path=} {output_path=} {columns=}")
+
+    lf = polars.scan_csv(input_path, separator=separator)
+
+    if columns:
+        lf = lf.select(columns)
+
+    lf.sink_parquet(output_path)
