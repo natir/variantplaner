@@ -1,0 +1,50 @@
+##fileformat=VCFv4.2
+##FILTER=<ID=PASS,Description="All filters passed">
+##FILTER=<ID=LowQual,Description="Low quality">
+##FILTER=<ID=base_qual,Description="alt median base quality">
+##FILTER=<ID=clustered_events,Description="Clustered events observed in the tumor">
+##FILTER=<ID=contamination,Description="contamination">
+##FILTER=<ID=duplicate,Description="evidence for alt allele is overrepresented by apparent duplicates">
+##FILTER=<ID=fragment,Description="abs(ref - alt) median fragment length">
+##FILTER=<ID=germline,Description="Evidence indicates this site is germline, not somatic">
+##FILTER=<ID=haplotype,Description="Variant near filtered variant on same haplotype.">
+##FILTER=<ID=low_allele_frac,Description="Allele fraction is below specified threshold">
+##FILTER=<ID=map_qual,Description="ref - alt median mapping quality">
+##FILTER=<ID=multiallelic,Description="Site filtered because too many alt alleles pass tumor LOD">
+##FILTER=<ID=n_ratio,Description="Ratio of N to alt exceeds specified ratio">
+##FILTER=<ID=normal_artifact,Description="artifact_in_normal">
+##FILTER=<ID=numt_chimera,Description="NuMT variant with too many ALT reads originally from autosome">
+##FILTER=<ID=numt_novel,Description="Alt depth is below expected coverage of NuMT in autosome">
+##FILTER=<ID=orientation,Description="orientation bias detected by the orientation bias mixture model">
+##FILTER=<ID=panel_of_normals,Description="Blacklisted site in panel of normals">
+##FILTER=<ID=position,Description="median distance of alt variants from end of reads">
+##FILTER=<ID=slippage,Description="Site filtered due to contraction of short tandem repeat region">
+##FILTER=<ID=strand_bias,Description="Evidence for alt allele comes from one read direction only">
+##FILTER=<ID=strict_strand,Description="Evidence for alt allele is not represented in both directions">
+##FILTER=<ID=weak_evidence,Description="Mutation does not meet likelihood threshold">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+1	10146	.	AC	A	160.6	.	.
+1	10440	.	CCCCTAA	C	221.6	.	.
+1	10492	.	C	T	68.6	.	.
+1	13273	.	G	C	630.03	map_qual	.
+1	100876	.	T	C	80.6	.	.
+2	47115652	.	C	CT	407.06	base_qual	.
+2	47117927	.	TA	T	571.6	clustered_events	.
+2	47117929	.	TA	T	571.6	clustered_events	.
+2	47117930	.	A	T	415.01	clustered_events	.
+2	47117930	.	A	*	415.01	.	.
+20	45688093	.	C	A	191.6	.	.
+20	45698591	.	A	C	1225.03	.	.
+20	45698966	.	TA	T	591.03	.	.
+20	45704687	.	C	CT	.	multiallelic;slippage	.
+20	45704687	.	CT	C	.	multiallelic;normal_artifact;slippage	.GT:AD:DP
+X	84984502	.	C	T	3153.03	PASS	.
+X	84984522	.	A	C	3120.03	PASS	.
+X	84985094	.	A	T	3353.03	.	.
+X	84985558	.	G	C	2827.03	.	.
+X	84986454	.	G	C	2383.03	.	.
+MT	15326	.	A	G	135524	PASS	.
+MT	15693	.	T	C	144034	base_qual	.
+MT	16134	.	C	T	159292	PASS	.
+MT	16356	.	T	C	120712	PASS	.
+MT	16519	.	T	C	93796	PASS	.
