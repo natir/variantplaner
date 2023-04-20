@@ -5,10 +5,10 @@ from __future__ import annotations
 
 import pathlib
 
-import polars
-
 # 3rd party import
 import pytest
+import polars
+import polars.testing
 
 # project import
 from variantplanner import exception, io, manipulation
@@ -18,24 +18,24 @@ DATA_DIR = pathlib.Path(__file__).parent / "data"
 
 def test_extract_variants() -> None:
     """Check extract variants."""
-    truth = polars.read_parquet(DATA_DIR / "no_info.variants.parquet")
+    truth = polars.scan_parquet(DATA_DIR / "no_info.variants.parquet")
 
     df = io.vcf.into_lazyframe(DATA_DIR / "no_info.vcf")
 
     lf = manipulation.extract_variants(df.lazy())
 
-    assert truth.frame_equal(lf.collect())
+    polars.testing.assert_frame_equal(truth, lf)
 
 
 def test_extract_genotypes() -> None:
     """Check extract genotypes."""
-    truth = polars.read_parquet(DATA_DIR / "no_info.genotypes.parquet")
+    truth = polars.scan_parquet(DATA_DIR / "no_info.genotypes.parquet")
 
     df = io.vcf.into_lazyframe(DATA_DIR / "no_info.vcf")
 
     lf = manipulation.extract_genotypes(df.lazy())
 
-    assert truth.frame_equal(lf.collect())
+    polars.testing.assert_frame_equal(truth, lf)
 
 
 def test_extract_genotypes_without_genotypes() -> None:
