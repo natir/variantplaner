@@ -24,7 +24,7 @@ import click
 import polars
 
 # project import
-from variantplanner import exception, io, manipulation
+from variantplanner import exception, io, manipulation, structuration
 
 
 @click.group(name="variantplanner")
@@ -110,16 +110,28 @@ def vcf2parquet(input_path: pathlib.Path, variants: pathlib.Path, genotypes: pat
 )
 @click.option(
     "-m",
-    "--merge",
+    "--merge-path",
     help="Path where merged variants will be written",
     type=click.Path(writable=True, path_type=pathlib.Path),
     required=True,
 )
-def merge(inputs_path: pathlib.Path, merge: pathlib.Path) -> None:
-    """Merge multiple variants parquet file in one."""
+@click.option(
+    "-b",
+    "--bytes-memory-limit",
+    help="Number of bytes used to build chunk of merge file",
+    type=click.IntRange(0),
+    show_default=True,
+)
+def merge(inputs_path: list[pathlib.Path], merge_path: pathlib.Path, bytes_memory_limit: int = 10_000_000_000) -> None:
+    """Merge multiple variants parquet file in one.
+
+    If you set TMPDIR, TEMP or TMP environment variable you can control where temp file is create.
+    """
     logger = logging.getLogger("merge")
 
-    logger.debug(f"parameter: {inputs_path=} {merge=}")
+    logger.debug(f"parameter: {inputs_path=} {merge_path=} {bytes_memory_limit}")
+
+    structuration.merge_variant.parquet(inputs_path, merge_path, bytes_memory_limit)
 
 
 ###############
@@ -250,9 +262,7 @@ def annotations_csv(
         f"parameter: {input_path=} {output_path=} {chromosome=} {position=} {reference=} {alternative=} {info=}",
     )
 
-    from variantplanner.io import csv
-
-    lf = csv.into_lazyframe(
+    lf = io.csv.into_lazyframe(
         input_path,
         chromosome,
         position,
