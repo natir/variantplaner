@@ -121,7 +121,7 @@ def __column_name(input_path: pathlib.Path) -> list[str]:
     with open(input_path) as fh:
         for line in fh:
             if line.startswith("#CHR"):
-                split_line = line.split("\t")
+                split_line = line.strip().split("\t")
                 cols_name = ["chr", "pos", "vid", "ref", "alt", "qual", "filter", "info"]
                 if len(split_line) > MINIMAL_COL_NUMBER:
                     cols_name.append("format")
