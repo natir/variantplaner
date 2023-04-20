@@ -23,7 +23,7 @@ SAMPLE_COL_BEGIN: int = 9
 logger = logging.getLogger("io.vcf")
 
 
-def info2expr(input_path: pathlib.Path, select_info: set[str] | None) -> list[polars.Expr]:
+def info2expr(input_path: pathlib.Path, select_info: set[str] | None = None) -> list[polars.Expr]:
     """Read vcf header to generate a list of polars.Expr to extract info.
 
     Args:
@@ -53,6 +53,9 @@ def info2expr(input_path: pathlib.Path, select_info: set[str] | None) -> list[po
         for line in fh:
             if line.startswith("#CHROM"):
                 return expressions
+
+            if not line.startswith("##INFO"):
+                continue
 
             if (search := info_re.search(line)) and (not select_info or search["id"] in select_info):
                 regex = rf"{search['id']}="

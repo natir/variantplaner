@@ -1,50 +1,50 @@
-##fileformat=VCFv4.2
-##FILTER=<ID=PASS,Description="All filters passed">
-##FILTER=<ID=LowQual,Description="Low quality">
-##FILTER=<ID=base_qual,Description="alt median base quality">
-##FILTER=<ID=clustered_events,Description="Clustered events observed in the tumor">
-##FILTER=<ID=contamination,Description="contamination">
-##FILTER=<ID=duplicate,Description="evidence for alt allele is overrepresented by apparent duplicates">
-##FILTER=<ID=fragment,Description="abs(ref - alt) median fragment length">
-##FILTER=<ID=germline,Description="Evidence indicates this site is germline, not somatic">
-##FILTER=<ID=haplotype,Description="Variant near filtered variant on same haplotype.">
-##FILTER=<ID=low_allele_frac,Description="Allele fraction is below specified threshold">
-##FILTER=<ID=map_qual,Description="ref - alt median mapping quality">
-##FILTER=<ID=multiallelic,Description="Site filtered because too many alt alleles pass tumor LOD">
-##FILTER=<ID=n_ratio,Description="Ratio of N to alt exceeds specified ratio">
-##FILTER=<ID=normal_artifact,Description="artifact_in_normal">
-##FILTER=<ID=numt_chimera,Description="NuMT variant with too many ALT reads originally from autosome">
-##FILTER=<ID=numt_novel,Description="Alt depth is below expected coverage of NuMT in autosome">
-##FILTER=<ID=orientation,Description="orientation bias detected by the orientation bias mixture model">
-##FILTER=<ID=panel_of_normals,Description="Blacklisted site in panel of normals">
-##FILTER=<ID=position,Description="median distance of alt variants from end of reads">
-##FILTER=<ID=slippage,Description="Site filtered due to contraction of short tandem repeat region">
-##FILTER=<ID=strand_bias,Description="Evidence for alt allele comes from one read direction only">
-##FILTER=<ID=strict_strand,Description="Evidence for alt allele is not represented in both directions">
-##FILTER=<ID=weak_evidence,Description="Mutation does not meet likelihood threshold">
+##fileformat=VCFv4.1
+##fileDate=2023-04-10
+##source=ClinVar
+##reference=GRCh38
+##ID=<Description="ClinVar Variation ID">
+##INFO=<ID=AF_ESP,Number=1,Type=Float,Description="allele frequencies from GO-ESP">
+##INFO=<ID=AF_EXAC,Number=1,Type=Float,Description="allele frequencies from ExAC">
+##INFO=<ID=AF_TGP,Number=1,Type=Float,Description="allele frequencies from TGP">
+##INFO=<ID=ALLELEID,Number=1,Type=Integer,Description="the ClinVar Allele ID">
+##INFO=<ID=CLNDN,Number=.,Type=String,Description="ClinVar's preferred disease name for the concept specified by disease identifiers in CLNDISDB">
+##INFO=<ID=CLNDNINCL,Number=.,Type=String,Description="For included Variant : ClinVar's preferred disease name for the concept specified by disease identifiers in CLNDISDB">
+##INFO=<ID=CLNDISDB,Number=.,Type=String,Description="Tag-value pairs of disease database name and identifier, e.g. OMIM:NNNNNN">
+##INFO=<ID=CLNDISDBINCL,Number=.,Type=String,Description="For included Variant: Tag-value pairs of disease database name and identifier, e.g. OMIM:NNNNNN">
+##INFO=<ID=CLNHGVS,Number=.,Type=String,Description="Top-level (primary assembly, alt, or patch) HGVS expression.">
+##INFO=<ID=CLNREVSTAT,Number=.,Type=String,Description="ClinVar review status for the Variation ID">
+##INFO=<ID=CLNSIG,Number=.,Type=String,Description="Clinical significance for this single variant; multiple values are separated by a vertical bar">
+##INFO=<ID=CLNSIGCONF,Number=.,Type=String,Description="Conflicting clinical significance for this single variant; multiple values are separated by a vertical bar">
+##INFO=<ID=CLNSIGINCL,Number=.,Type=String,Description="Clinical significance for a haplotype or genotype that includes this variant. Reported as pairs of VariationID:clinical significance; multiple values are separated by a vertical bar">
+##INFO=<ID=CLNVC,Number=1,Type=String,Description="Variant type">
+##INFO=<ID=CLNVCSO,Number=1,Type=String,Description="Sequence Ontology id for variant type">
+##INFO=<ID=CLNVI,Number=.,Type=String,Description="the variant's clinical sources reported as tag-value pairs of database and variant identifier">
+##INFO=<ID=DBVARID,Number=.,Type=String,Description="nsv accessions from dbVar for the variant">
+##INFO=<ID=GENEINFO,Number=1,Type=String,Description="Gene(s) for the variant reported as gene symbol:gene id. The gene symbol and id are delimited by a colon (:) and each pair is delimited by a vertical bar (|)">
+##INFO=<ID=MC,Number=.,Type=String,Description="comma separated list of molecular consequence in the form of Sequence Ontology ID|molecular_consequence">
+##INFO=<ID=ORIGIN,Number=.,Type=String,Description="Allele origin. One or more of the following values may be added: 0 - unknown; 1 - germline; 2 - somatic; 4 - inherited; 8 - paternal; 16 - maternal; 32 - de-novo; 64 - biparental; 128 - uniparental; 256 - not-tested; 512 - tested-inconclusive; 1073741824 - other">
+##INFO=<ID=RS,Number=.,Type=String,Description="dbSNP ID (i.e. rs number)">
 #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
-1	10146	.	AC	A	160.6	.	.
-1	10440	.	CCCCTAA	C	221.6	.	.
-1	10492	.	C	T	68.6	.	.
-1	13273	.	G	C	630.03	map_qual	.
-1	100876	.	T	C	80.6	.	.
-2	47115652	.	C	CT	407.06	base_qual	.
-2	47117927	.	TA	T	571.6	clustered_events	.
-2	47117929	.	TA	T	571.6	clustered_events	.
-2	47117930	.	A	T	415.01	clustered_events	.
-2	47117930	.	A	*	415.01	.	.
-20	45688093	.	C	A	191.6	.	.
-20	45698591	.	A	C	1225.03	.	.
-20	45698966	.	TA	T	591.03	.	.
-20	45704687	.	C	CT	.	multiallelic;slippage	.
-20	45704687	.	CT	C	.	multiallelic;normal_artifact;slippage	.GT:AD:DP
-X	84984502	.	C	T	3153.03	PASS	.
-X	84984522	.	A	C	3120.03	PASS	.
-X	84985094	.	A	T	3353.03	.	.
-X	84985558	.	G	C	2827.03	.	.
-X	84986454	.	G	C	2383.03	.	.
-MT	15326	.	A	G	135524	PASS	.
-MT	15693	.	T	C	144034	base_qual	.
-MT	16134	.	C	T	159292	PASS	.
-MT	16356	.	T	C	120712	PASS	.
-MT	16519	.	T	C	93796	PASS	.
+1	69134	2205837	A	G	.	.	ALLELEID=2193183;CLNDISDB=MeSH:D030342,MedGen:C0950123;CLNDN=Inborn_genetic_diseases;CLNHGVS=NC_000001.11:g.69134A>G;CLNREVSTAT=criteria_provided,_single_submitter;CLNSIG=Likely_benign;CLNVC=single_nucleotide_variant;CLNVCSO=SO:0001483;GENEINFO=OR4F5:79501;MC=SO:0001583|missense_variant;ORIGIN=1
+1	69581	2252161	C	G	.	.	ALLELEID=2238986;CLNDISDB=MeSH:D030342,MedGen:C0950123;CLNDN=Inborn_genetic_diseases;CLNHGVS=NC_000001.11:g.69581C>G;CLNREVSTAT=criteria_provided,_single_submitter;CLNSIG=Uncertain_significance;CLNVC=single_nucleotide_variant;CLNVCSO=SO:0001483;GENEINFO=OR4F5:79501;MC=SO:0001583|missense_variant;ORIGIN=1
+1	69682	2396347	G	A	.	.	ALLELEID=2386655;CLNDISDB=MeSH:D030342,MedGen:C0950123;CLNDN=Inborn_genetic_diseases;CLNHGVS=NC_000001.11:g.69682G>A;CLNREVSTAT=criteria_provided,_single_submitter;CLNSIG=Uncertain_significance;CLNVC=single_nucleotide_variant;CLNVCSO=SO:0001483;GENEINFO=OR4F5:79501;MC=SO:0001583|missense_variant;ORIGIN=1
+1	69769	2288999	T	C	.	.	ALLELEID=2278803;CLNDISDB=MeSH:D030342,MedGen:C0950123;CLNDN=Inborn_genetic_diseases;CLNHGVS=NC_000001.11:g.69769T>C;CLNREVSTAT=criteria_provided,_single_submitter;CLNSIG=Uncertain_significance;CLNVC=single_nucleotide_variant;CLNVCSO=SO:0001483;GENEINFO=OR4F5:79501;MC=SO:0001583|missense_variant;ORIGIN=1
+1	69995	2351346	G	C	.	.	ALLELEID=2333177;CLNDISDB=MeSH:D030342,MedGen:C0950123;CLNDN=Inborn_genetic_diseases;CLNHGVS=NC_000001.11:g.69995G>C;CLNREVSTAT=criteria_provided,_single_submitter;CLNSIG=Uncertain_significance;CLNVC=single_nucleotide_variant;CLNVCSO=SO:0001483;GENEINFO=OR4F5:79501;MC=SO:0001583|missense_variant;ORIGIN=1
+1	925946	1924157	C	G	.	.	ALLELEID=1983057;CLNDISDB=MedGen:CN517202;CLNDN=not_provided;CLNHGVS=NC_000001.11:g.925946C>G;CLNREVSTAT=criteria_provided,_single_submitter;CLNSIG=Uncertain_significance;CLNVC=single_nucleotide_variant;CLNVCSO=SO:0001483;GENEINFO=SAMD11:148398;MC=SO:0001583|missense_variant;ORIGIN=1
+1	925952	1019397	G	A	.	.	ALLELEID=1003021;CLNDISDB=MedGen:CN517202;CLNDN=not_provided;CLNHGVS=NC_000001.11:g.925952G>A;CLNREVSTAT=criteria_provided,_single_submitter;CLNSIG=Uncertain_significance;CLNVC=single_nucleotide_variant;CLNVCSO=SO:0001483;GENEINFO=SAMD11:148398;MC=SO:0001583|missense_variant;ORIGIN=1;RS=1640863258
+1	925956	1543320	C	T	.	.	ALLELEID=1632777;CLNDISDB=MedGen:CN517202;CLNDN=not_provided;CLNHGVS=NC_000001.11:g.925956C>T;CLNREVSTAT=criteria_provided,_single_submitter;CLNSIG=Likely_benign;CLNVC=single_nucleotide_variant;CLNVCSO=SO:0001483;GENEINFO=SAMD11:148398;MC=SO:0001819|synonymous_variant;ORIGIN=1
+1	925961	2069387	A	T	.	.	ALLELEID=2129477;CLNDISDB=MedGen:CN517202;CLNDN=not_provided;CLNHGVS=NC_000001.11:g.925961A>T;CLNREVSTAT=criteria_provided,_single_submitter;CLNSIG=Uncertain_significance;CLNVC=single_nucleotide_variant;CLNVCSO=SO:0001483;GENEINFO=SAMD11:148398;MC=SO:0001583|missense_variant;ORIGIN=1
+1	925969	1648427	C	T	.	.	ALLELEID=1600580;CLNDISDB=MedGen:CN517202;CLNDN=not_provided;CLNHGVS=NC_000001.11:g.925969C>T;CLNREVSTAT=criteria_provided,_single_submitter;CLNSIG=Likely_benign;CLNVC=single_nucleotide_variant;CLNVCSO=SO:0001483;GENEINFO=SAMD11:148398;MC=SO:0001583|missense_variant;ORIGIN=1
+1	925976	1362713	T	C	.	.	ALLELEID=1396033;CLNDISDB=MeSH:D030342,MedGen:C0950123|MedGen:CN517202;CLNDN=Inborn_genetic_diseases|not_provided;CLNHGVS=NC_000001.11:g.925976T>C;CLNREVSTAT=criteria_provided,_multiple_submitters,_no_conflicts;CLNSIG=Uncertain_significance;CLNVC=single_nucleotide_variant;CLNVCSO=SO:0001483;GENEINFO=SAMD11:148398;MC=SO:0001583|missense_variant;ORIGIN=1
+1	925980	1936488	C	T	.	.	ALLELEID=1986319;CLNDISDB=MedGen:CN517202;CLNDN=not_provided;CLNHGVS=NC_000001.11:g.925980C>T;CLNREVSTAT=criteria_provided,_single_submitter;CLNSIG=Likely_benign;CLNVC=single_nucleotide_variant;CLNVCSO=SO:0001483;GENEINFO=SAMD11:148398;MC=SO:0001819|synonymous_variant;ORIGIN=1
+1	925986	1568423	C	T	.	.	ALLELEID=1570515;CLNDISDB=MedGen:CN517202;CLNDN=not_provided;CLNHGVS=NC_000001.11:g.925986C>T;CLNREVSTAT=criteria_provided,_single_submitter;CLNSIG=Likely_benign;CLNVC=single_nucleotide_variant;CLNVCSO=SO:0001483;GENEINFO=SAMD11:148398;MC=SO:0001819|synonymous_variant;ORIGIN=1
+1	926003	1365270	C	T	.	.	ALLELEID=1502313;CLNDISDB=MedGen:CN517202;CLNDN=not_provided;CLNHGVS=NC_000001.11:g.926003C>T;CLNREVSTAT=criteria_provided,_single_submitter;CLNSIG=Uncertain_significance;CLNVC=single_nucleotide_variant;CLNVCSO=SO:0001483;GENEINFO=SAMD11:148398;MC=SO:0001583|missense_variant;ORIGIN=1
+1	926010	1632958	G	T	.	.	ALLELEID=1545352;CLNDISDB=MedGen:CN517202;CLNDN=not_provided;CLNHGVS=NC_000001.11:g.926010G>T;CLNREVSTAT=criteria_provided,_single_submitter;CLNSIG=Likely_benign;CLNVC=single_nucleotide_variant;CLNVCSO=SO:0001483;GENEINFO=SAMD11:148398;MC=SO:0001819|synonymous_variant;ORIGIN=1
+1	926014	1377425	G	A	.	.	ALLELEID=1473095;CLNDISDB=MedGen:CN517202;CLNDN=not_provided;CLNHGVS=NC_000001.11:g.926014G>A;CLNREVSTAT=criteria_provided,_single_submitter;CLNSIG=Uncertain_significance;CLNVC=single_nucleotide_variant;CLNVCSO=SO:0001483;GENEINFO=SAMD11:148398;MC=SO:0001575|splice_donor_variant;ORIGIN=1
+1	926018	1979359	G	A	.	.	ALLELEID=2034738;CLNDISDB=MedGen:CN517202;CLNDN=not_provided;CLNHGVS=NC_000001.11:g.926018G>A;CLNREVSTAT=criteria_provided,_single_submitter;CLNSIG=Uncertain_significance;CLNVC=single_nucleotide_variant;CLNVCSO=SO:0001483;GENEINFO=SAMD11:148398;MC=SO:0001627|intron_variant;ORIGIN=1
+1	926025	1555362	G	A	.	.	ALLELEID=1550067;CLNDISDB=MedGen:CN517202;CLNDN=not_provided;CLNHGVS=NC_000001.11:g.926025G>A;CLNREVSTAT=criteria_provided,_single_submitter;CLNSIG=Likely_benign;CLNVC=single_nucleotide_variant;CLNVCSO=SO:0001483;GENEINFO=SAMD11:148398;MC=SO:0001627|intron_variant;ORIGIN=1
+1	926026	2089674	G	A	.	.	ALLELEID=2155344;CLNDISDB=MedGen:CN517202;CLNDN=not_provided;CLNHGVS=NC_000001.11:g.926026G>A;CLNREVSTAT=criteria_provided,_single_submitter;CLNSIG=Likely_benign;CLNVC=single_nucleotide_variant;CLNVCSO=SO:0001483;GENEINFO=SAMD11:148398;MC=SO:0001627|intron_variant;ORIGIN=1
+1	926027	1561208	C	T	.	.	ALLELEID=1641615;CLNDISDB=MedGen:CN517202;CLNDN=not_provided;CLNHGVS=NC_000001.11:g.926027C>T;CLNREVSTAT=criteria_provided,_single_submitter;CLNSIG=Likely_benign;CLNVC=single_nucleotide_variant;CLNVCSO=SO:0001483;GENEINFO=SAMD11:148398;MC=SO:0001627|intron_variant;ORIGIN=1
+1	926029	1624593	C	T	.	.	ALLELEID=1629212;CLNDISDB=MedGen:CN517202;CLNDN=not_provided;CLNHGVS=NC_000001.11:g.926029C>T;CLNREVSTAT=criteria_provided,_single_submitter;CLNSIG=Likely_benign;CLNVC=single_nucleotide_variant;CLNVCSO=SO:0001483;GENEINFO=SAMD11:148398;MC=SO:0001627|intron_variant;ORIGIN=1
+1	930136	1541757	T	C	.	.	ALLELEID=1631640;CLNDISDB=MedGen:CN517202;CLNDN=not_provided;CLNHGVS=NC_000001.11:g.930136T>C;CLNREVSTAT=criteria_provided,_single_submitter;CLNSIG=Likely_benign;CLNVC=single_nucleotide_variant;CLNVCSO=SO:0001483;GENEINFO=SAMD11:148398;MC=SO:0001627|intron_variant;ORIGIN=1
+1	930136	1658573	TCTC	T	.	.	ALLELEID=1563949;CLNDISDB=MedGen:CN517202;CLNDN=not_provided;CLNHGVS=NC_000001.11:g.930139CCT[1];CLNREVSTAT=criteria_provided,_single_submitter;CLNSIG=Likely_benign;CLNVC=Microsatellite;CLNVCSO=SO:0000289;GENEINFO=SAMD11:148398;MC=SO:0001627|intron_variant;ORIGIN=1
