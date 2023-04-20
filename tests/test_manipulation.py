@@ -6,9 +6,9 @@ from __future__ import annotations
 import pathlib
 
 # 3rd party import
-import pytest
 import polars
 import polars.testing
+import pytest
 
 # project import
 from variantplanner import exception, io, manipulation

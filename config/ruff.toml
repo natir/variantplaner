@@ -96,6 +96,7 @@ ban-relative-imports = "all"
 
 [isort]
 known-first-party = ["variantplanner"]
+known-third-party = ["polars", "click", "typing-extensions"]
 
 [pydocstyle]
 convention = "google"
