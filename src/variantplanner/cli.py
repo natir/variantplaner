@@ -21,6 +21,7 @@ import sys
 
 # 3rd party import
 import click
+import polars
 
 # project import
 from variantplanner import exception, io, manipulation
@@ -128,10 +129,11 @@ def merge(inputs_path: pathlib.Path, merge: pathlib.Path) -> None:
 @click.pass_context
 @click.option(
     "-i",
-    "--input-path",
+    "--input-paths",
     help="Path to input file",
     type=click.Path(exists=True, dir_okay=False, readable=True, allow_dash=True, path_type=pathlib.Path),
     required=True,
+    multiple=True,
 )
 @click.option(
     "-o",
@@ -140,13 +142,13 @@ def merge(inputs_path: pathlib.Path, merge: pathlib.Path) -> None:
     type=click.Path(writable=True, path_type=pathlib.Path),
     required=True,
 )
-def annotations_main(ctx: click.Context, input_path: pathlib.Path, output_path: pathlib.Path) -> None:
+def annotations_main(ctx: click.Context, input_paths: list[pathlib.Path], output_path: pathlib.Path) -> None:
     """Convert an annotation variation file in parquet."""
     logger = logging.getLogger("annotations")
 
-    ctx.obj = {"input_path": input_path, "output_path": output_path}
+    ctx.obj = {"input_paths": input_paths, "output_path": output_path}
 
-    logger.debug(f"parameter: {input_path=} {output_path=}")
+    logger.debug(f"parameter: {input_paths=} {output_path=}")
 
 
 @annotations_main.command("vcf")
@@ -155,19 +157,40 @@ def annotations_main(ctx: click.Context, input_path: pathlib.Path, output_path: 
     "-i",
     "--info",
     multiple=True,
-    help="List of info fields that are kept if this list is empty all fields are kept",
+    help="List of info fields that are kept if this list is empty all fields are kept only the first vcf file header is read",
     type=str,
 )
-def annotations_vcf(ctx: click.Context, info: list[str]) -> None:
+@click.option(
+    "-r",
+    "--rename-id",
+    help="Set column name of variant id",
+    type=str,
+)
+def annotations_vcf(ctx: click.Context, info: set[str] | None = None, rename_id: str | None = None) -> None:
     """Convert an annotated vcf in parquet."""
     logger = logging.getLogger("annotations-vcf")
 
     ctx.ensure_object(dict)
 
-    input_path = ctx.obj["input_path"]
+    input_paths = ctx.obj["input_paths"]
     output_path = ctx.obj["output_path"]
 
-    logger.debug(f"parameter: {input_path=} {output_path=} {info=}")
+    logger.debug(f"parameter: {input_paths=} {output_path=} {info=}")
+
+    try:
+        info_parser = io.vcf.info2expr(input_paths[0], info)
+        lf = polars.concat(io.vcf.into_lazyframe(path) for path in input_paths)
+    except exception.NotAVCFError:
+        logger.exception("")
+        sys.exit(1)
+
+    lf = lf.with_columns(info_parser).drop(["chr", "pos", "ref", "alt", "filter", "qual", "info"])
+
+    if rename_id:
+        logger.info(f"Rename vcf variant id in {rename_id}")
+        lf = lf.rename({"vid": rename_id})
+
+    lf.collect().write_parquet(output_path)
 
 
 @annotations_main.command("csv")

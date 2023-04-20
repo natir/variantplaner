@@ -53,7 +53,8 @@ def info2expr(input_path: pathlib.Path, select_info: set[str] | None) -> list[po
         for line in fh:
             if line.startswith("#CHROM"):
                 return expressions
-            if (search := info_re.search(line)) is not None and (select_info is None or search["id"] in select_info):
+
+            if (search := info_re.search(line)) and (not select_info or search["id"] in select_info):
                 regex = rf"{search['id']}="
                 regex += type2regex[search["type"]]
                 regex += r";?"
