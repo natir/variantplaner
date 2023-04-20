@@ -71,15 +71,11 @@ def extract_genotypes(lf: polars.LazyFrame) -> polars.LazyFrame:
     }
 
     # Pivot value
-    genotypes = (
-        lf.drop("format")
-        .melt(id_vars=["id"])
-        .with_columns(
-            [
-                polars.col("id"),
-                polars.col("variable").alias("sample"),
-            ],
-        )
+    genotypes = lf.melt(id_vars=["id"]).with_columns(
+        [
+            polars.col("id"),
+            polars.col("variable").alias("sample"),
+        ],
     )
 
     # Split genotype column in sub value
