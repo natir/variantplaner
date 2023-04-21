@@ -29,8 +29,8 @@ Options:
 
 Commands:
   annotations  Convert an annotation variation file in parquet.
-  merge        Merge multiple variants parquet file in one.
   metadata     Convert an metadata file in parquet.
+  struct       Struct operation on parquet file.
   vcf2parquet  Convert a vcf in parquet.
 """
     )
@@ -61,30 +61,25 @@ Commands:
     )
 
 
-def test_show_help_merge() -> None:
-    """Call cli 'merge --help'."""
+def test_show_help_struct() -> None:
+    """Call cli 'struct --help'."""
     runner = CliRunner(mix_stderr=False)
-    result = runner.invoke(cli.main, ["merge", "--help"])
+    result = runner.invoke(cli.main, ["struct", "--help"])
 
     assert result.exit_code == 0
     assert (
         result.stdout
-        == """Usage: variantplanner merge [OPTIONS]
+        == """Usage: variantplanner struct [OPTIONS] COMMAND [ARGS]...
 
-  Merge multiple variants parquet file in one.
-
-  If you set TMPDIR, TEMP or TMP environment variable you can control where temp
-  file is create.
+  Struct operation on parquet file.
 
 Options:
-  -i, --inputs-path FILE          Paths of the variant files to be merged
-                                  [required]
-  -m, --merge-path PATH           Path where merged variants will be written
-                                  [required]
-  -b, --bytes-memory-limit INTEGER RANGE
-                                  Number of bytes used to build chunk of merge
-                                  file  [default: 10000000000; x>=0]
-  --help                          Show this message and exit.
+  -i, --input-paths FILE  Paths of the variant files to be merged  [required]
+  --help                  Show this message and exit.
+
+Commands:
+  genotypes  Convert set of genotype parquet in hive file.
+  variants   Merge multiple variants parquet file in one.
 """
     )
 

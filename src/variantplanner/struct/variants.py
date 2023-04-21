@@ -17,7 +17,7 @@ import polars
 # project import
 
 
-logger = logging.getLogger("structuration.merge_variant")
+logger = logging.getLogger("struct.variants")
 
 
 def __random_string(size: int = 30) -> str:
@@ -62,7 +62,7 @@ def __chunk_by_memory(
     yield ret
 
 
-def by_id(paths: list[pathlib.Path], output: pathlib.Path) -> None:
+def concat_uniq_by_id(paths: list[pathlib.Path], output: pathlib.Path) -> None:
     """Merge multiple parquet file.
 
     Only one copy of each variants is kept, based on id.
@@ -81,7 +81,7 @@ def by_id(paths: list[pathlib.Path], output: pathlib.Path) -> None:
     lf.sink_parquet(output)
 
 
-def parquet(paths: list[pathlib.Path], output: pathlib.Path, memory_limit: int = 10_000_000_000) -> None:
+def merge(paths: list[pathlib.Path], output: pathlib.Path, memory_limit: int = 10_000_000_000) -> None:
     """Perform merge of multiple parquet variants file in one file.
 
     Args:
@@ -107,7 +107,7 @@ def parquet(paths: list[pathlib.Path], output: pathlib.Path, memory_limit: int =
                 temp_output = temp_prefix / __random_string()
 
                 new_inputs.append(temp_output)
-                by_id(input_chunk, temp_output)
+                concat_uniq_by_id(input_chunk, temp_output)
 
             elif len(input_chunk) == 1:
                 # if chunk containt only one file it's last file of inputs

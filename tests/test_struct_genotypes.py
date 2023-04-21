@@ -11,7 +11,7 @@ import typing
 import polars
 
 # project import
-from variantplanner import structuration
+from variantplanner import struct
 
 DATA_DIR = pathlib.Path(__file__).parent / "data"
 
@@ -27,7 +27,7 @@ def __scantree(path: pathlib.Path) -> typing.Iterator[pathlib.Path]:
 
 def test_parquet(tmp_path: pathlib.Path) -> None:
     """Check partition genotype parquet."""
-    structuration.partition_genotype.parquet([DATA_DIR / "no_info.genotypes.parquet"], tmp_path)
+    struct.genotypes.hive([DATA_DIR / "no_info.genotypes.parquet"], tmp_path)
 
     partition_paths = set(__scantree(tmp_path))
 

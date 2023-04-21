@@ -24,7 +24,7 @@ import click
 import polars
 
 # project import
-from variantplanner import exception, io, manipulation, structuration
+from variantplanner import exception, io, manipulation, struct
 
 
 @click.group(name="variantplanner")
@@ -96,21 +96,33 @@ def vcf2parquet(input_path: pathlib.Path, variants: pathlib.Path, genotypes: pat
     logger.info(f"finish write {genotypes}")
 
 
-#########
-# Merge #
-#########
-@main.command()
+##########
+# Struct #
+##########
+@main.group("struct")
+@click.pass_context
 @click.option(
     "-i",
-    "--inputs-path",
+    "--input-paths",
     help="Paths of the variant files to be merged",
     multiple=True,
     type=click.Path(exists=True, dir_okay=False, readable=True, path_type=pathlib.Path),
     required=True,
 )
+def struct_main(ctx: click.Context, input_paths: list[pathlib.Path]) -> None:
+    """Struct operation on parquet file."""
+    logger = logging.getLogger("struct")
+
+    ctx.obj = {"input_paths": input_paths}
+
+    logger.debug(f"parameter: {input_paths=}")
+
+
+@struct_main.command()
+@click.pass_context
 @click.option(
-    "-m",
-    "--merge-path",
+    "-o",
+    "--output-path",
     help="Path where merged variants will be written",
     type=click.Path(writable=True, path_type=pathlib.Path),
     required=True,
@@ -123,16 +135,42 @@ def vcf2parquet(input_path: pathlib.Path, variants: pathlib.Path, genotypes: pat
     show_default=True,
     default=10_000_000_000,
 )
-def merge(inputs_path: list[pathlib.Path], merge_path: pathlib.Path, bytes_memory_limit: int = 10_000_000_000) -> None:
+def variants(ctx: click.Context, output_path: pathlib.Path, bytes_memory_limit: int = 10_000_000_000) -> None:
     """Merge multiple variants parquet file in one.
 
     If you set TMPDIR, TEMP or TMP environment variable you can control where temp file is create.
     """
-    logger = logging.getLogger("merge")
+    logger = logging.getLogger("struct.variants")
 
-    logger.debug(f"parameter: {inputs_path=} {merge_path=} {bytes_memory_limit}")
+    ctx.ensure_object(dict)
 
-    structuration.merge_variant.parquet(inputs_path, merge_path, bytes_memory_limit)
+    input_paths = ctx.obj["input_paths"]
+
+    logger.debug(f"parameter: {output_path=} {bytes_memory_limit}")
+
+    struct.variants.merge(input_paths, output_path, bytes_memory_limit)
+
+
+@struct_main.command()
+@click.pass_context
+@click.option(
+    "-p",
+    "--prefix-path",
+    help="Path prefix",
+    type=click.Path(file_okay=False, dir_okay=True, path_type=pathlib.Path),
+    required=True,
+)
+def genotypes(ctx: click.Context, prefix_path: pathlib.Path) -> None:
+    """Convert set of genotype parquet in hive file."""
+    logger = logging.getLogger("struct.genotypes")
+
+    ctx.ensure_object(dict)
+
+    input_paths = ctx.obj["input_paths"]
+
+    logger.debug(f"parameter: {prefix_path=}")
+
+    struct.genotypes.hive(input_paths, prefix_path)
 
 
 ###############

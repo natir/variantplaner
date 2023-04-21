@@ -14,7 +14,7 @@ import polars
 
 # project import
 
-logger = logging.getLogger("structuration.partition_genotype")
+logger = logging.getLogger("struct.genotypes")
 
 
 def manage_group(
@@ -50,7 +50,7 @@ def write_or_add(new_lf: polars.DataFrame, partition_path: pathlib.Path) -> None
         new_lf.write_parquet(partition_path)
 
 
-def parquet(paths: list[pathlib.Path], output_prefix: pathlib.Path) -> None:
+def hive(paths: list[pathlib.Path], output_prefix: pathlib.Path) -> None:
     """Reorganise genotypes struct in hive like struct.
 
     Args:

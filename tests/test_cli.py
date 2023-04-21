@@ -127,20 +127,21 @@ def test_vcf2parquet_no_genotype(tmp_path: pathlib.Path) -> None:
     assert result.exit_code == 2
 
 
-def test_merge(tmp_path: pathlib.Path) -> None:
-    """Basic merge run."""
+def test_struct_variants(tmp_path: pathlib.Path) -> None:
+    """Basic struct variant run."""
     merge_path = tmp_path / "merge.parquet"
 
     runner = CliRunner()
     result = runner.invoke(
         cli.main,
         [
-            "merge",
+            "struct",
             "-i",
             str(DATA_DIR / "no_genotypes.variants.parquet"),
             "-i",
             str(DATA_DIR / "no_info.variants.parquet"),
-            "-m",
+            "variants",
+            "-o",
             str(merge_path),
         ],
     )
@@ -150,6 +151,26 @@ def test_merge(tmp_path: pathlib.Path) -> None:
     lf = polars.scan_parquet(merge_path)
 
     assert lf.collect().get_column("id").to_list() == MERGE_IDS
+
+
+def test_struct_genotypes(tmp_path: pathlib.Path) -> None:
+    """Basic struct genotypes run."""
+    prefix_path = tmp_path / "hive"
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli.main,
+        [
+            "struct",
+            "-i",
+            str(DATA_DIR / "no_info.genotypes.parquet"),
+            "genotypes",
+            "-p",
+            str(prefix_path),
+        ],
+    )
+
+    assert result.exit_code == 0
 
 
 def test_annotations_vcf(tmp_path: pathlib.Path) -> None:

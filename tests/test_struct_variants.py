@@ -12,7 +12,7 @@ import polars
 import polars.testing
 
 # project import
-from variantplanner import structuration
+from variantplanner import struct
 
 DATA_DIR = pathlib.Path(__file__).parent / "data"
 
@@ -72,14 +72,14 @@ def test_random_string() -> None:
     """Check random string."""
     random.seed(42)
 
-    assert structuration.merge_variant.__random_string() == "OhbVrpoiVgRVIfLBcbfnoGMbJmTPSI"
+    assert struct.variants.__random_string() == "OhbVrpoiVgRVIfLBcbfnoGMbJmTPSI"
 
 
 def test_chunk_by_memory() -> None:
     """Check by memory."""
     paths = [pathlib.Path(entry.path) for entry in os.scandir(DATA_DIR) if entry.is_file()]
 
-    chunks = list(structuration.merge_variant.__chunk_by_memory(paths, 10000))
+    chunks = list(struct.variants.__chunk_by_memory(paths, 10000))
 
     truth = [
         [DATA_DIR / "no_genotypes.vcf", DATA_DIR / "no_info.genotypes.parquet"],
@@ -101,11 +101,11 @@ def test_chunk_by_memory() -> None:
     assert chunks == truth
 
 
-def test_merge_by_id(tmp_path: pathlib.Path) -> None:
-    """Check merge_by_id."""
+def test_concat_uniq_by_id(tmp_path: pathlib.Path) -> None:
+    """Check concat_uniq_by_id."""
     tmp_file = tmp_path / "merge_by_id.parquet"
 
-    structuration.merge_variant.by_id(
+    struct.variants.concat_uniq_by_id(
         [DATA_DIR / "no_genotypes.variants.parquet", DATA_DIR / "no_info.variants.parquet"],
         tmp_file,
     )
@@ -115,11 +115,11 @@ def test_merge_by_id(tmp_path: pathlib.Path) -> None:
     assert lf.collect().get_column("id").to_list() == MERGE_IDS
 
 
-def test_merge_parquet(tmp_path: pathlib.Path) -> None:
-    """Check merge_by_id."""
+def test_merge(tmp_path: pathlib.Path) -> None:
+    """Check merge."""
     tmp_file = tmp_path / "merge_parquet.parquet"
 
-    structuration.merge_variant.parquet(
+    struct.variants.merge(
         [DATA_DIR / "no_genotypes.variants.parquet", DATA_DIR / "no_info.variants.parquet"],
         tmp_file,
     )
