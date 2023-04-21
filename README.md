@@ -21,6 +21,61 @@ python3.8 -m pip install --user pipx
 pipx install variantplanner
 ```
 
+## Usage
+
+### Convert vcf in parquet
+
+```
+variantplanner vcf2parquet -i input.vcf -v variants.parquet -g genotypes.parquet
+```
+
+Convert multiple vcf in parquet
+
+```
+mkdir -p variants genotypes
+for path in $(ls vcf/*.vcf | base)
+do
+vcf_basename=$(basename ${path} .vcf)
+variantplanner vcf2parquet -i vcf/${vcf_basename}.vcf -v variants/${vcf_basename}.parquet -g genotypes/${vcf_basename}.parquet
+done
+```
+
+or use gnu parallel
+
+```
+find tests/data/ -type f -name *.vcf -exec basename {} .vcf \; | parallel variantplanner vcf2parquet -i vcf/{}.vcf -v variants/{}.parquet -g genotypes/{}.parquet
+```
+
+### Merge variants
+
+**Warning**: this command could have huge memory and disk usage
+
+```
+variantplanner merge -i variants/1.parquet -i variants/2.parquet -i variants/3.parquet … -i variants/n.parquet -m variants.parquet
+```
+
+By default temporary file are write in /tmp you can use TMPDIR, TEMP or TMP to change this behavior.
+
+This command use divide and conquer algorithm to perform merge of variants option `-b|--bytes-memory-limit` control bytes size of chunk of files.
+
+### Annotations
+
+#### Vcf format
+
+```
+variantplanner annotations -i annotations.vcf -o annotations.parquet vcf --info CLNDN --info AF_ESP
+```
+
+`clinvar.parquet` containts `id` of variant and info field select if you didn't set `info` option all info column are include.
+
+#### Csv format
+
+```
+variantplanner annotations -i annotations.tsv -o annotations.parquet csv -c chr -p pos -r ref -a alt -s$'\t' --info CLNDN --info AF_ESP
+```
+
+It's work same as vcf sub command but you must specify chromosome (`-c`), position (`-p`), reference (`-r`) and alternative (`-a`), you can change separate with option `-s`
+
 ## Developement setup
 
 Initialisation step:
