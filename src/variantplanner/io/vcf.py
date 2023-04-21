@@ -96,15 +96,17 @@ def sample_index(input_path: pathlib.Path) -> dict[str, int] | None:
     """
     with open(input_path) as fh:
         for line in fh:
-            if line.startswith("#CHR"):
-                split_line = line.split("\t")
-                if len(split_line) > MINIMAL_COL_NUMBER:
-                    return None
-
-                return {sample: i for (i, sample) in enumerate(split_line[SAMPLE_COL_BEGIN:])}
             if not line.startswith("#"):
                 raise NotAVCFError(input_path)
 
+            if line.startswith("#CHR"):
+                split_line = line.strip().split("\t")
+                if len(split_line) <= MINIMAL_COL_NUMBER:
+                    return None
+
+                return {sample: i for (i, sample) in enumerate(split_line[SAMPLE_COL_BEGIN:])}
+
+    print("Reach and of file only comment")
     raise NotAVCFError(input_path)
 
 
@@ -147,6 +149,8 @@ def into_lazyframe(input_path: pathlib.Path) -> polars.LazyFrame:
     Returns:
         A lazyframe that containt vcf information ('chr', 'pos', 'vid', 'ref', 'alt', 'qual', 'filter', 'info', ['format'], ['genotypes',…], 'id').
     """
+    col_name = {f"column_{i}": name for (i, name) in enumerate(__column_name(input_path), start=1)}
+
     lf = polars.scan_csv(
         input_path,
         separator="\t",
@@ -156,7 +160,7 @@ def into_lazyframe(input_path: pathlib.Path) -> polars.LazyFrame:
         ignore_errors=True,
     )
 
-    lf = lf.rename({f"column_{i}": name for (i, name) in enumerate(__column_name(input_path), start=1)})
+    lf = lf.rename(col_name)
 
     lf = normalization.chromosome2integer(lf)
 
