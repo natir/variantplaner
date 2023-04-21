@@ -1,4 +1,4 @@
-"""Tests for the `manipulation` module."""
+"""Tests for the `extract` module."""
 
 # std import
 from __future__ import annotations
@@ -11,7 +11,7 @@ import polars.testing
 import pytest
 
 # project import
-from variantplanner import exception, io, manipulation
+from variantplanner import exception, extract, io
 
 DATA_DIR = pathlib.Path(__file__).parent / "data"
 
@@ -22,7 +22,7 @@ def test_extract_variants() -> None:
 
     df = io.vcf.into_lazyframe(DATA_DIR / "no_info.vcf")
 
-    lf = manipulation.extract_variants(df.lazy())
+    lf = extract.variants(df.lazy())
 
     polars.testing.assert_frame_equal(truth, lf)
 
@@ -33,7 +33,7 @@ def test_extract_genotypes() -> None:
 
     df = io.vcf.into_lazyframe(DATA_DIR / "no_info.vcf")
 
-    lf = manipulation.extract_genotypes(df.lazy())
+    lf = extract.genotypes(df.lazy())
 
     polars.testing.assert_frame_equal(truth, lf)
 
@@ -43,4 +43,4 @@ def test_extract_genotypes_without_genotypes() -> None:
     df = io.vcf.into_lazyframe(DATA_DIR / "no_genotypes.vcf")
 
     with pytest.raises(exception.NoGenotypeError):
-        manipulation.extract_genotypes(df.lazy())
+        extract.genotypes(df.lazy())

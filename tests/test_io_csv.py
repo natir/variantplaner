@@ -10,14 +10,14 @@ import polars
 import polars.testing
 
 # project import
-from variantplanner import io, manipulation
+from variantplanner import extract, io
 
 DATA_DIR = pathlib.Path(__file__).parent / "data"
 
 
 def test_into_lazyframe() -> None:
     """Check io.csv.into_lazyframe."""
-    vcf = manipulation.extract_variants(io.vcf.into_lazyframe(DATA_DIR / "no_info.vcf"))
+    vcf = extract.variants(io.vcf.into_lazyframe(DATA_DIR / "no_info.vcf"))
 
     csv = io.csv.into_lazyframe(
         DATA_DIR / "no_info.csv",

@@ -19,7 +19,7 @@ LF_COL_NB_NO_GENOTYPE = MINIMAL_COL_NUMBER + 1
 logger = logging.getLogger("manipulation")
 
 
-def extract_variants(lf: polars.LazyFrame) -> polars.LazyFrame:
+def variants(lf: polars.LazyFrame) -> polars.LazyFrame:
     """Extract variants only information of lazyframe.
 
     Args:
@@ -39,8 +39,8 @@ def extract_variants(lf: polars.LazyFrame) -> polars.LazyFrame:
     )
 
 
-def extract_genotypes(lf: polars.LazyFrame) -> polars.LazyFrame:
-    """Extarct genotypes information in lazyframe.
+def genotypes(lf: polars.LazyFrame) -> polars.LazyFrame:
+    """Extract genotypes information in lazyframe.
 
     Only variant with format column like 'GT:AD:DP:GQ' are support.
 

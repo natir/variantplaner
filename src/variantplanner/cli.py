@@ -24,7 +24,7 @@ import click
 import polars
 
 # project import
-from variantplanner import exception, io, manipulation, struct
+from variantplanner import exception, extract, io, struct
 
 
 @click.group(name="variantplanner")
@@ -83,12 +83,12 @@ def vcf2parquet(input_path: pathlib.Path, variants: pathlib.Path, genotypes: pat
         logger.exception("")
         sys.exit(1)
 
-    manipulation.extract_variants(lf).sink_parquet(variants)
+    extract.variants(lf).sink_parquet(variants)
     logger.info(f"finish write {variants}")
 
     if genotypes:
         try:
-            manipulation.extract_genotypes(lf).sink_parquet(genotypes)
+            extract.genotypes(lf).sink_parquet(genotypes)
         except exception.NoGenotypeError:
             logger.exception("")
             sys.exit(2)

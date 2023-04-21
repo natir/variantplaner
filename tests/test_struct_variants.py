@@ -1,4 +1,4 @@
-"""Tests for the `manipulation` module."""
+"""Tests for the `struct.variants` module."""
 
 # std import
 from __future__ import annotations
