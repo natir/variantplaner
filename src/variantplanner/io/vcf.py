@@ -106,7 +106,6 @@ def sample_index(input_path: pathlib.Path) -> dict[str, int] | None:
 
                 return {sample: i for (i, sample) in enumerate(split_line[SAMPLE_COL_BEGIN:])}
 
-    print("Reach and of file only comment")
     raise NotAVCFError(input_path)
 
 

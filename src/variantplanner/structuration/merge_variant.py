@@ -62,7 +62,7 @@ def __chunk_by_memory(
     yield ret
 
 
-def merge_by_id(paths: list[pathlib.Path], output: pathlib.Path) -> None:
+def by_id(paths: list[pathlib.Path], output: pathlib.Path) -> None:
     """Merge multiple parquet file.
 
     Only one copy of each variants is kept, based on id.
@@ -81,7 +81,7 @@ def merge_by_id(paths: list[pathlib.Path], output: pathlib.Path) -> None:
     lf.sink_parquet(output)
 
 
-def parquet(paths: list[pathlib.Path], output: pathlib.Path, memory_limit: int) -> None:
+def parquet(paths: list[pathlib.Path], output: pathlib.Path, memory_limit: int = 10_000_000_000) -> None:
     """Perform merge of multiple parquet variants file in one file.
 
     Args:
@@ -107,7 +107,7 @@ def parquet(paths: list[pathlib.Path], output: pathlib.Path, memory_limit: int) 
                 temp_output = temp_prefix / __random_string()
 
                 new_inputs.append(temp_output)
-                merge_by_id(input_chunk, temp_output)
+                by_id(input_chunk, temp_output)
 
             elif len(input_chunk) == 1:
                 # if chunk containt only one file it's last file of inputs
@@ -117,7 +117,7 @@ def parquet(paths: list[pathlib.Path], output: pathlib.Path, memory_limit: int) 
             logger.debug(f"{new_inputs=}")
             inputs = new_inputs
 
-    # When loop finish we have on file in inputs with all merge
+    # When loop finish we have one file in inputs with all merge
     # We just have to rename it
     shutil.move(inputs[0], output)
 

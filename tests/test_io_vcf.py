@@ -7,6 +7,7 @@ import filecmp
 
 # 3rd party import
 import pathlib
+
 import polars
 import pytest
 
@@ -36,6 +37,7 @@ def test_sample_index() -> None:
 
     sample2idx = io.vcf.sample_index(DATA_DIR / "no_info.vcf")
 
+    assert sample2idx
     assert len(truth) == len(sample2idx)
     assert all(v == sample2idx[k] for k, v in truth.items())
 
@@ -48,15 +50,14 @@ def test_sample_index_no_genotypes() -> None:
 def test_sample_index_exception() -> None:
     """Check sample index exception."""
     with pytest.raises(exception.NotAVCFError):
-        io.vcf.sample_index(DATA_DIR / "no_info.tsv") is None
+        io.vcf.sample_index(DATA_DIR / "no_info.tsv")
 
     with pytest.raises(exception.NotAVCFError):
-        io.vcf.sample_index(DATA_DIR / "only_header.vcf") is None
+        io.vcf.sample_index(DATA_DIR / "only_header.vcf")
 
 
 def test_into_lazyframe() -> None:
-    """Check into lazyframe"""
-
+    """Check into lazyframe."""
     truth = polars.scan_parquet(DATA_DIR / "no_info.parquet")
 
     lf = io.vcf.into_lazyframe(DATA_DIR / "no_info.vcf")
@@ -72,17 +73,15 @@ def test_into_lazyframe() -> None:
 
 def test_into_lazyframe_exception() -> None:
     """Check into_lazyframe exception."""
+    with pytest.raises(exception.NotAVCFError):
+        io.vcf.into_lazyframe(DATA_DIR / "no_info.tsv")
 
     with pytest.raises(exception.NotAVCFError):
-        io.vcf.into_lazyframe(DATA_DIR / "no_info.tsv") is None
-
-    with pytest.raises(exception.NotAVCFError):
-        io.vcf.into_lazyframe(DATA_DIR / "only_header.vcf") is None
+        io.vcf.into_lazyframe(DATA_DIR / "only_header.vcf")
 
 
-def test_from_lazyframe(tmp_path) -> None:
+def test_from_lazyframe(tmp_path: pathlib.Path) -> None:
     """Check from_lazyframe."""
-
     tmp_file = tmp_path / "output.vcf"
 
     lf = polars.scan_parquet(DATA_DIR / "no_info.parquet")
