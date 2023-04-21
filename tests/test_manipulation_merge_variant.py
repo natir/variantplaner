@@ -82,7 +82,7 @@ def test_chunk_by_memory() -> None:
     chunks = list(structuration.merge_variant.__chunk_by_memory(paths, 10000))
 
     truth = [
-        [pathlib.Path(DATA_DIR / "no_genotypes.vcf"), pathlib.Path(DATA_DIR / "no_info.genotypes.parquet")],
+        [DATA_DIR / "no_genotypes.vcf", DATA_DIR / "no_info.genotypes.parquet"],
         [
             DATA_DIR / "no_info.variants.parquet",
             DATA_DIR / "no_info.vcf",
@@ -93,9 +93,9 @@ def test_chunk_by_memory() -> None:
             DATA_DIR / "only_header.vcf",
             DATA_DIR / "no_genotypes.parquet",
             DATA_DIR / "no_info.parquet",
-            DATA_DIR / "no_info.parquet2vcf.vcf",
+            DATA_DIR / "no_genotypes.variants.parquet",
         ],
-        [DATA_DIR / "no_genotypes.variants.parquet", DATA_DIR / "annotations.csv"],
+        [DATA_DIR / "annotations.csv", DATA_DIR / "no_info.parquet2vcf.vcf"],
     ]
 
     assert chunks == truth

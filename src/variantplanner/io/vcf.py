@@ -168,7 +168,38 @@ def into_lazyframe(input_path: pathlib.Path) -> polars.LazyFrame:
     return lf
 
 
-def from_lazyframe(lf: polars.LazyFrame, output_path: pathlib.Path) -> None:
+if typing.TYPE_CHECKING:  # pragma: no cover
+    RenameCol = typing.TypedDict(
+        "RenameCol",
+        {
+            "#CHROM": str,
+            "POS": str,
+            "ID": str,
+            "REF": str,
+            "ALT": str,
+            "QUAL": str,
+            "FILTER": str,
+            "INFO": dict[str, str],
+        },
+    )
+
+DEFAULT_RENAME: RenameCol = {
+    "#CHROM": "chr",
+    "POS": "pos",
+    "ID": "id",
+    "REF": "ref",
+    "ALT": "alt",
+    "QUAL": ".",
+    "FILTER": ".",
+    "INFO": {},
+}
+
+
+def from_lazyframe(
+    lf: polars.LazyFrame,
+    output_path: pathlib.Path,
+    renaming: RenameCol = DEFAULT_RENAME,
+) -> None:
     """Write lazyframe in vcf format.
 
     Only variants information is write no info or genotype.
@@ -178,7 +209,7 @@ def from_lazyframe(lf: polars.LazyFrame, output_path: pathlib.Path) -> None:
         - 24: Y
         - 25: MT
 
-    All other numbre isn't change.
+    All other number isn't change.
 
     Warning: This function perform LazyFrame.collect() before write csv, this can have a significant impact on memory usage
 
@@ -189,29 +220,43 @@ def from_lazyframe(lf: polars.LazyFrame, output_path: pathlib.Path) -> None:
     Returns:
         None
     """
-    lf = lf.select(
+    lf = lf.with_columns(
         [
-            polars.col("chr")
+            polars.col(renaming["#CHROM"])
             .cast(polars.Utf8)
             .str.replace("23", "X")
             .str.replace("24", "Y")
             .str.replace("25", "MT")
             .alias("#CHROM"),
-            polars.col("pos").alias("POS"),
-            polars.col("id").alias("ID"),
-            polars.col("ref").alias("REF"),
-            polars.col("alt").alias("ALT"),
-            polars.lit(".").alias("QUAL"),
-            polars.lit(".").alias("FILTER"),
+            polars.col(renaming["POS"]).alias("POS"),
+            polars.col(renaming["ID"]).alias("ID"),
+            polars.col(renaming["REF"]).alias("REF"),
+            polars.col(renaming["ALT"]).alias("ALT"),
+        ],
+    )
+
+    if renaming["QUAL"] != ".":
+        lf = lf.with_columns([polars.col(renaming["QUAL"]).alias("QUAL")])
+    else:
+        lf = lf.with_columns([polars.lit(".").alias("QUAL")])
+
+    if renaming["FILTER"] != ".":
+        lf = lf.with_columns([polars.col(renaming["FILTER"]).alias("FILTER")])
+    else:
+        lf = lf.with_columns([polars.lit(".").alias("FILTER")])
+
+    lf = lf.with_columns(
+        [
             polars.lit(".").alias("INFO"),
         ],
     )
 
+    lf = lf.select([polars.col(colname) for colname in renaming])
+
     header = """##fileformat=VCFv4.3
-    ##source=VariantPlanner
-    """
+##source=VariantPlanner
+"""
 
     with open(output_path, "wb") as fh:
         fh.write(header.encode())
-
-    lf.collect().write_csv(output_path, separator="\t")
+        fh.write(lf.collect().write_csv(separator="\t").encode())
