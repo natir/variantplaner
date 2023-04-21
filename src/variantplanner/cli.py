@@ -248,6 +248,8 @@ def annotations_vcf(ctx: click.Context, info: set[str] | None = None, rename_id:
     "--separator",
     help="Single byte character to use as delimiter in the file",
     type=str,
+    default=",",
+    show_default=True,
 )
 def annotations_csv(
     ctx: click.Context,
@@ -263,26 +265,29 @@ def annotations_csv(
 
     ctx.ensure_object(dict)
 
-    input_path = ctx.obj["input_path"]
+    input_paths = ctx.obj["input_paths"]
     output_path = ctx.obj["output_path"]
 
     logger.debug(
-        f"parameter: {input_path=} {output_path=} {chromosome=} {position=} {reference=} {alternative=} {info=}",
+        f"parameter: {input_paths=} {output_path=} {chromosome=} {position=} {reference=} {alternative=} {info=}",
     )
 
-    lf = io.csv.into_lazyframe(
-        input_path,
-        chromosome,
-        position,
-        reference,
-        alternative,
-        info,
-        separator=separator,
+    lf = polars.concat(
+        io.csv.into_lazyframe(
+            path,
+            chromosome,
+            position,
+            reference,
+            alternative,
+            info,
+            separator=separator,
+        )
+        for path in input_paths
     )
 
-    lf.sink_parquet(output_path)
+    lf = lf.drop([chromosome, position, reference, alternative])
 
-    logging.info("end of annontations csv")
+    lf.collect().write_parquet(output_path)
 
 
 ############

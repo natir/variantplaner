@@ -87,7 +87,8 @@ def into_lazyframe(
         },
     )
 
-    lf = lf.select(["chr", "pos", "ref", "alt", *info_cols])
+    if info_cols:
+        lf = lf.select(["chr", "pos", "ref", "alt", *info_cols])
 
     lf = normalization.chromosome2integer(lf)
 

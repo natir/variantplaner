@@ -84,18 +84,18 @@ def test_chunk_by_memory() -> None:
     truth = [
         [pathlib.Path(DATA_DIR / "no_genotypes.vcf"), pathlib.Path(DATA_DIR / "no_info.genotypes.parquet")],
         [
-            pathlib.Path(DATA_DIR / "no_info.variants.parquet"),
-            pathlib.Path(DATA_DIR / "no_info.vcf"),
-            pathlib.Path(DATA_DIR / "no_info.csv"),
-            pathlib.Path(DATA_DIR / "no_info.tsv"),
+            DATA_DIR / "no_info.variants.parquet",
+            DATA_DIR / "no_info.vcf",
+            DATA_DIR / "no_info.csv",
+            DATA_DIR / "no_info.tsv",
         ],
         [
-            pathlib.Path(DATA_DIR / "only_header.vcf"),
-            pathlib.Path(DATA_DIR / "no_genotypes.parquet"),
-            pathlib.Path(DATA_DIR / "no_info.parquet"),
-            pathlib.Path(DATA_DIR / "no_info.parquet2vcf.vcf"),
+            DATA_DIR / "only_header.vcf",
+            DATA_DIR / "no_genotypes.parquet",
+            DATA_DIR / "no_info.parquet",
+            DATA_DIR / "no_info.parquet2vcf.vcf",
         ],
-        [pathlib.Path(DATA_DIR / "no_genotypes.variants.parquet")],
+        [DATA_DIR / "no_genotypes.variants.parquet", DATA_DIR / "annotations.csv"],
     ]
 
     assert chunks == truth

@@ -63,10 +63,12 @@ This command use divide and conquer algorithm to perform merge of variants optio
 #### Vcf format
 
 ```
-variantplanner annotations -i annotations.vcf -o annotations.parquet vcf --info CLNDN --info AF_ESP
+variantplanner annotations -i annotations.vcf -o annotations.parquet vcf -r annot_id --info CLNDN --info AF_ESP
 ```
 
 `clinvar.parquet` containts `id` of variant and info field select if you didn't set `info` option all info column are include.
+
+Option `-r|--rename-id` could be use to rename vcf id column name (default name is `vid`).
 
 #### Csv format
 

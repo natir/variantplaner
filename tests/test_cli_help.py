@@ -1,4 +1,4 @@
-"""Tests for the `cli` module."""
+"""Tests for help message of cli."""
 
 # std import
 from __future__ import annotations
