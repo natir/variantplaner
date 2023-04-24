@@ -96,6 +96,100 @@ def vcf2parquet(input_path: pathlib.Path, variants: pathlib.Path, genotypes: pat
     logger.info(f"finish write {genotypes}")
 
 
+###############
+# parquet2vcf #
+###############
+@main.command()
+@click.option(
+    "-i",
+    "--input-path",
+    help="Path to variants in parquet format",
+    type=click.Path(exists=True, dir_okay=False, readable=True, allow_dash=True, path_type=pathlib.Path),
+    required=True,
+)
+@click.option(
+    "-o",
+    "--output",
+    help="Path where the vcf is write",
+    type=click.Path(dir_okay=False, writable=True, path_type=pathlib.Path),
+    required=True,
+)
+@click.option(
+    "-c",
+    "--chromosome",
+    help="Name of chromosome column",
+    type=str,
+    default="chr",
+    show_default=True,
+)
+@click.option(
+    "-p",
+    "--position",
+    help="Name of position column",
+    type=str,
+    default="pos",
+    show_default=True,
+)
+@click.option(
+    "-I",
+    "--identifier",
+    help="Name of identity column",
+    type=str,
+    default="id",
+    show_default=True,
+)
+@click.option(
+    "-r",
+    "--reference",
+    help="Name of reference column",
+    default="ref",
+    show_default=True,
+)
+@click.option(
+    "-a",
+    "--alternative",
+    help="Name of alternative column",
+    default="alt",
+    show_default=True,
+)
+@click.option(
+    "-q",
+    "--quality",
+    help="Name of quality column",
+    type=str,
+)
+@click.option(
+    "-f",
+    "--filter",
+    "filter_col",
+    help="Name of filter column",
+    type=str,
+)
+def parquet2vcf(
+    input_path: pathlib.Path,
+    output: pathlib.Path,
+    chromosome: str = "chr",
+    position: str = "pos",
+    identifier: str = "id",
+    reference: str = "ref",
+    alternative: str = "alt",
+    quality: str | None = None,
+    filter_col: str | None = None,
+) -> None:
+    """Convert parquet in vcf."""
+    logger = logging.getLogger("parquet2vcf")
+
+    logger.debug(f"parameter: {input_path=} {output=}")
+
+    lf = polars.scan_parquet(input_path)
+
+    io.vcf.from_lazyframe(
+        lf,
+        output,
+        io.vcf.build_rename_column(chromosome, position, identifier, reference, alternative, quality, filter_col),
+    )
+
+
 ##########
 # Struct #
 ##########

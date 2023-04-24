@@ -30,6 +30,7 @@ Options:
 Commands:
   annotations  Convert an annotation variation file in parquet.
   metadata     Convert an metadata file in parquet.
+  parquet2vcf  Convert parquet in vcf.
   struct       Struct operation on parquet file.
   vcf2parquet  Convert a vcf in parquet.
 """
@@ -127,5 +128,32 @@ Options:
                          [required]
   -g, --genotypes FILE   Path where the genotypes will be written in parquet
   --help                 Show this message and exit.
+"""
+    )
+
+
+def test_show_help_parquet2vcf() -> None:
+    """Call cli 'parquet2vcf --help'."""
+    runner = CliRunner()
+    result = runner.invoke(cli.main, ["parquet2vcf", "--help"])
+
+    assert result.exit_code == 0
+    assert (
+        result.stdout
+        == """Usage: variantplanner parquet2vcf [OPTIONS]
+
+  Convert parquet in vcf.
+
+Options:
+  -i, --input-path FILE   Path to variants in parquet format  [required]
+  -o, --output FILE       Path where the vcf is write  [required]
+  -c, --chromosome TEXT   Name of chromosome column  [default: chr]
+  -p, --position TEXT     Name of position column  [default: pos]
+  -I, --identifier TEXT   Name of identity column  [default: id]
+  -r, --reference TEXT    Name of reference column  [default: ref]
+  -a, --alternative TEXT  Name of alternative column  [default: alt]
+  -q, --quality TEXT      Name of quality column
+  -f, --filter TEXT       Name of filter column
+  --help                  Show this message and exit.
 """
     )

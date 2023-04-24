@@ -195,6 +195,33 @@ DEFAULT_RENAME: RenameCol = {
 }
 
 
+def build_rename_column(
+    chromosome: str,
+    pos: str,
+    identifier: str,
+    ref: str,
+    alt: str,
+    qual: str | None = ".",
+    filter_col: str | None = ".",
+    info: dict[str, str] | None = None,
+) -> RenameCol:
+    """Helper to generate rename column for from_lazyframe.
+
+    Returns:
+        A rename column dictionary.
+    """
+    return {
+        "#CHROM": chromosome,
+        "POS": pos,
+        "ID": identifier,
+        "REF": ref,
+        "ALT": alt,
+        "QUAL": "." if qual is None else qual,
+        "FILTER": "." if filter_col is None else filter_col,
+        "INFO": info if info is not None else {},
+    }
+
+
 def from_lazyframe(
     lf: polars.LazyFrame,
     output_path: pathlib.Path,

@@ -80,6 +80,31 @@ def test_into_lazyframe_exception() -> None:
         io.vcf.into_lazyframe(DATA_DIR / "only_header.vcf")
 
 
+def test_build_rename_column() -> None:
+    """Check build_rename_column."""
+    assert io.vcf.build_rename_column("chr", "pos", "id", "ref", "alt") == {
+        "#CHROM": "chr",
+        "POS": "pos",
+        "ID": "id",
+        "REF": "ref",
+        "ALT": "alt",
+        "QUAL": ".",
+        "FILTER": ".",
+        "INFO": {},
+    }
+
+    assert io.vcf.build_rename_column("chr", "pos", "id", "ref", "alt", "quality", "FILTER", {"GENE": "gene_name"}) == {
+        "#CHROM": "chr",
+        "POS": "pos",
+        "ID": "id",
+        "REF": "ref",
+        "ALT": "alt",
+        "QUAL": "quality",
+        "FILTER": "FILTER",
+        "INFO": {"GENE": "gene_name"},
+    }
+
+
 def test_from_lazyframe(tmp_path: pathlib.Path) -> None:
     """Check from_lazyframe."""
     tmp_file = tmp_path / "output.vcf"
@@ -87,5 +112,9 @@ def test_from_lazyframe(tmp_path: pathlib.Path) -> None:
     lf = polars.scan_parquet(DATA_DIR / "no_info.parquet")
 
     io.vcf.from_lazyframe(lf, tmp_file)
+
+    assert filecmp.cmp(tmp_file, DATA_DIR / "no_info.parquet2vcf.vcf")
+
+    io.vcf.from_lazyframe(lf, tmp_file, io.vcf.build_rename_column("chr", "pos", "id", "ref", "alt", "vid", "vid"))
 
     assert filecmp.cmp(tmp_file, DATA_DIR / "no_info.parquet2vcf.vcf")

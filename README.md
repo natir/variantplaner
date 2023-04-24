@@ -92,6 +92,8 @@ make setup
 Working step:
 
 ```
+git switch -c <your_branch_name>
+
 <write code>
 make format  # to auto-format the code
 
