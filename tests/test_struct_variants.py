@@ -77,25 +77,30 @@ def test_random_string() -> None:
 
 def test_chunk_by_memory() -> None:
     """Check by memory."""
-    paths = [pathlib.Path(entry.path) for entry in os.scandir(DATA_DIR) if entry.is_file()]
+    paths = sorted(pathlib.Path(entry.path) for entry in os.scandir(DATA_DIR) if entry.is_file())
 
     chunks = list(struct.variants.__chunk_by_memory(paths, 10000))
 
     truth = [
-        [DATA_DIR / "no_genotypes.vcf", DATA_DIR / "no_info.genotypes.parquet"],
         [
+            DATA_DIR / "annotations.csv",
+            DATA_DIR / "no_genotypes.parquet",
+            DATA_DIR / "no_genotypes.variants.parquet",
+            DATA_DIR / "no_genotypes.vcf",
+        ],
+        [
+            DATA_DIR / "no_info.csv",
+            DATA_DIR / "no_info.genotypes.parquet",
+            DATA_DIR / "no_info.parquet",
+            DATA_DIR / "no_info.parquet2vcf.vcf",
+        ],
+        [
+            DATA_DIR / "no_info.tsv",
             DATA_DIR / "no_info.variants.parquet",
             DATA_DIR / "no_info.vcf",
-            DATA_DIR / "no_info.csv",
-            DATA_DIR / "no_info.tsv",
-        ],
-        [
             DATA_DIR / "only_header.vcf",
-            DATA_DIR / "no_genotypes.parquet",
-            DATA_DIR / "no_info.parquet",
-            DATA_DIR / "no_genotypes.variants.parquet",
         ],
-        [DATA_DIR / "annotations.csv", DATA_DIR / "no_info.parquet2vcf.vcf"],
+        [],
     ]
 
     assert chunks == truth
