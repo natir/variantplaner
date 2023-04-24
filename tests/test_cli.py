@@ -127,6 +127,18 @@ def test_vcf2parquet_no_genotype(tmp_path: pathlib.Path) -> None:
     assert result.exit_code == 2
 
 
+def test_parquet2vcf(tmp_path: pathlib.Path) -> None:
+    """parquet2vcf run."""
+    variants_path = tmp_path / "variants.parquet"
+
+    runner = CliRunner()
+    result = runner.invoke(cli.main, ["parquet2vcf", "-i", str(DATA_DIR / "no_info.parquet"), "-o", str(variants_path)])
+
+    assert result.exit_code == 0
+
+    assert filecmp.cmp(variants_path, DATA_DIR / "no_info.parquet2vcf.vcf")
+
+
 def test_struct_variants(tmp_path: pathlib.Path) -> None:
     """Basic struct variant run."""
     merge_path = tmp_path / "merge.parquet"
@@ -365,3 +377,114 @@ def test_annotations_csv_select(tmp_path: pathlib.Path) -> None:
         "ENUM",
         "id",
     ]
+
+
+def test_metadata_json(tmp_path: pathlib.Path) -> None:
+    """Run metadata json."""
+    metadata_path = tmp_path / "metadata.parquet"
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli.main,
+        [
+            "metadata",
+            "-i",
+            str(DATA_DIR / "metadata.json"),
+            "-o",
+            str(metadata_path),
+            "json",
+        ],
+    )
+
+    assert result.exit_code == 0
+
+    assert filecmp.cmp(metadata_path, DATA_DIR / "metadata.parquet")
+
+
+def test_metadata_json_select(tmp_path: pathlib.Path) -> None:
+    """Run metadata json."""
+    metadata_path = tmp_path / "metadata.parquet"
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli.main,
+        [
+            "metadata",
+            "-i",
+            str(DATA_DIR / "metadata.json"),
+            "-o",
+            str(metadata_path),
+            "json",
+            "-f",
+            "sample",
+            "-f",
+            "link",
+            "-f",
+            "gender",
+            "-f",
+            "kindex",
+        ],
+    )
+
+    assert result.exit_code == 0
+
+    truth = polars.scan_parquet(DATA_DIR / "metadata.parquet").select(["sample", "link", "gender", "kindex"])
+    value = polars.scan_parquet(metadata_path)
+
+    polars.testing.assert_frame_equal(truth, value)
+
+
+def test_metadata_csv(tmp_path: pathlib.Path) -> None:
+    """Run metadata csv."""
+    metadata_path = tmp_path / "metadata.parquet"
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli.main,
+        [
+            "metadata",
+            "-i",
+            str(DATA_DIR / "metadata.csv"),
+            "-o",
+            str(metadata_path),
+            "csv",
+        ],
+    )
+
+
+    assert result.exit_code == 0
+
+    assert filecmp.cmp(metadata_path, DATA_DIR / "metadata.parquet")
+
+
+def test_metadata_csv_select(tmp_path: pathlib.Path) -> None:
+    """Run metadata csv."""
+    metadata_path = tmp_path / "metadata.parquet"
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli.main,
+        [
+            "metadata",
+            "-i",
+            str(DATA_DIR / "metadata.csv"),
+            "-o",
+            str(metadata_path),
+            "csv",
+            "-c",
+            "sample",
+            "-c",
+            "link",
+            "-c",
+            "gender",
+            "-c",
+            "kindex",
+        ],
+    )
+
+    assert result.exit_code == 0
+
+    truth = polars.scan_parquet(DATA_DIR / "metadata.parquet").select(["sample", "link", "gender", "kindex"])
+    value = polars.scan_parquet(metadata_path)
+
+    polars.testing.assert_frame_equal(truth, value)

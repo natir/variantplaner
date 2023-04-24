@@ -470,7 +470,7 @@ def metadata_json(ctx: click.Context, fields: list[str]) -> None:
 
     logger.debug(f"parameter: {input_path=} {output_path=} {fields=}")
 
-    lf = polars.read_ndjson(input_path)
+    lf = polars.read_json(input_path)
 
     if fields:
         lf = lf.select(fields)
@@ -510,5 +510,8 @@ def metadata_csv(ctx: click.Context, columns: list[str], separator: str = ",") -
 
     if columns:
         lf = lf.select(columns)
+
+    print(lf.columns)
+    print(lf.dtypes)
 
     lf.sink_parquet(output_path)

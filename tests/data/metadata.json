@@ -1,0 +1,7 @@
+[
+{"sample": "sample_1", "kindex": true, "gender": "F", "link": "Patient", "affected": true, "type_analyse": "WGS-C", "pid": 103, "pid_crc": "AAAA", "date": 1608704361485, "preindication": "p1", "subpreindication": "p1-sp8", "hpos": "h0001644", "ets_prescripteur": "Ets 1"},
+{"sample": "sample_2", "kindex": false, "gender": "H", "link": "Père", "affected": true, "type_analyse": "WGS-C", "pid": 103, "pid_crc": "AAAA", "date": 1608704361485, "preindication": "p1", "subpreindication": "p1-sp8", "hpos": "h0001644", "ets_prescripteur": "Ets 1"},
+{"sample": "sample_3", "kindex": false, "gender": "F", "link": "Mère", "affected": false, "type_analyse": "WGS-C", "pid": 103, "pid_crc": "AAAA", "date": 1608704361485, "preindication": "p1", "subpreindication": "p1-sp8", "hpos": "h0001644", "ets_prescripteur": "Ets 1"},
+{"sample": "sample_4", "kindex": true, "gender": "F", "link": "Patient", "affected": true, "type_analyse": "WGS-C", "pid": 1, "pid_crc": "111", "date": 16088018815879, "preindication": "p2", "subpreindication": "p2-sp7", "hpos": null, "ets_prescripteur": "Ets 2"},
+{"sample": "sample_5", "kindex": false, "gender": "H", "link": "Père", "affected": true, "type_analyse": "WGS-C", "pid": 1, "pid_crc": "111", "date": 16088018815879, "preindication": "p2", "subpreindication": "p2-sp7", "hpos": null, "ets_prescripteur": "Ets 2"}
+]

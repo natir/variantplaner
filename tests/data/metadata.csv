@@ -1,0 +1,6 @@
+sample,kindex,gender,link,affected,type_analyse,pid,pid_crc,date,preindication,subpreindication,hpos,ets_prescripteur
+sample_1,true,F,Patient,true,WGS-C,103,AAAA,1608704361485,p1,p1-sp8,"h0001644","Ets 1"
+sample_2,false,H,Père,true,WGS-C,103,AAAA,1608704361485,p1,p1-sp8,"h0001644","Ets 1"
+sample_3,false,F,Mère,false,WGS-C,103,AAAA,1608704361485,p1,p1-sp8,"h0001644","Ets 1"
+sample_4,true,F,Patient,true,WGS-C,1,111,16088018815879,p2,p2-sp7,,"Ets 2"
+sample_5,false,H,Père,true,WGS-C,1,111,16088018815879,p2,p2-sp7,,"Ets 2"

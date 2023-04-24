@@ -84,23 +84,20 @@ def test_chunk_by_memory() -> None:
     truth = [
         [
             DATA_DIR / "annotations.csv",
+            DATA_DIR / "metadata.csv",
+            DATA_DIR / "metadata.json",
+            DATA_DIR / "metadata.parquet",
             DATA_DIR / "no_genotypes.parquet",
             DATA_DIR / "no_genotypes.variants.parquet",
-            DATA_DIR / "no_genotypes.vcf",
         ],
+        [DATA_DIR / "no_genotypes.vcf", DATA_DIR / "no_info.csv"],
         [
-            DATA_DIR / "no_info.csv",
             DATA_DIR / "no_info.genotypes.parquet",
             DATA_DIR / "no_info.parquet",
             DATA_DIR / "no_info.parquet2vcf.vcf",
-        ],
-        [
             DATA_DIR / "no_info.tsv",
-            DATA_DIR / "no_info.variants.parquet",
-            DATA_DIR / "no_info.vcf",
-            DATA_DIR / "only_header.vcf",
         ],
-        [],
+        [DATA_DIR / "no_info.variants.parquet", DATA_DIR / "no_info.vcf", DATA_DIR / "only_header.vcf"],
     ]
 
     assert chunks == truth
