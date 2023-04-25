@@ -419,7 +419,7 @@ def annotations_csv(
 
     lf = lf.drop([chromosome, position, reference, alternative])
 
-    lf.sink_parquet(output_path)
+    lf.collect(streaming=True).write_parquet(output_path)
 
 
 ############
