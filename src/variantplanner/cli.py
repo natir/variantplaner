@@ -324,7 +324,7 @@ def annotations_vcf(ctx: click.Context, info: set[str] | None = None, rename_id:
 
     try:
         info_parser = io.vcf.info2expr(input_paths[0], info)
-        lf = polars.concat(io.vcf.into_lazyframe(path) for path in input_paths)
+        lf = io.vcf.into_lazyframe(input_paths[0])
     except exception.NotAVCFError:
         logger.exception("")
         sys.exit(1)
@@ -335,7 +335,7 @@ def annotations_vcf(ctx: click.Context, info: set[str] | None = None, rename_id:
         logger.info(f"Rename vcf variant id in {rename_id}")
         lf = lf.rename({"vid": rename_id})
 
-    lf.collect().write_parquet(output_path)
+    lf.sink_parquet(output_path, compression="snappy")
 
 
 @annotations_main.command("csv")
@@ -419,7 +419,7 @@ def annotations_csv(
 
     lf = lf.drop([chromosome, position, reference, alternative])
 
-    lf.collect().write_parquet(output_path)
+    lf.sink_parquet(output_path)
 
 
 ############
