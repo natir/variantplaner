@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import logging
+import multiprocessing
 import typing
 
 if typing.TYPE_CHECKING:  # pragma: no cover
@@ -20,8 +21,18 @@ logger = logging.getLogger("struct.genotypes")
 def manage_group(
     prefix: pathlib.Path,
     group_columns: list[str],
+    basename: str,
 ) -> typing.Callable[[polars.DataFrame], polars.DataFrame]:
-    """Function to generate function apply to group."""
+    """Function to generate function apply to group.
+
+    Args:
+        prefix: Prefix of hive
+        group_columns: List of columns use to group
+        basename: Basename of final parquet
+
+    Returns:
+        Function that perform operation on polars group by
+    """
 
     def get_value(column: str, columns: list[str], row: tuple[typing.Any, ...]) -> typing.Any:
         return row[columns.index(column)]
@@ -30,7 +41,8 @@ def manage_group(
         row = group.row(0)
         columns = group.columns
         path = (
-            prefix.joinpath(*[f"{column}={get_value(column, columns, row)}" for column in group_columns]) / "0.parquet"
+            prefix.joinpath(*[f"{column}={get_value(column, columns, row)}" for column in group_columns])
+            / f"{basename}.parquet"
         )
 
         write_or_add(group, path)
@@ -41,7 +53,15 @@ def manage_group(
 
 
 def write_or_add(new_lf: polars.DataFrame, partition_path: pathlib.Path) -> None:
-    """Create or add new data in parquet partition."""
+    """Create or add new data in parquet partition.
+
+    Args:
+        new_lf: Dataframe to add or write
+        partition_path: Path where dataframe is write
+
+    Returns:
+        None
+    """
     if partition_path.exists():
         old_lf = polars.read_parquet(partition_path)
         polars.concat([old_lf, new_lf]).write_parquet(partition_path)
@@ -50,7 +70,41 @@ def write_or_add(new_lf: polars.DataFrame, partition_path: pathlib.Path) -> None
         new_lf.write_parquet(partition_path)
 
 
-def hive(paths: list[pathlib.Path], output_prefix: pathlib.Path) -> None:
+def __hive_worker(path: pathlib.Path, output_prefix: pathlib.Path, basename: int) -> pathlib.Path:
+    """Subprocess of hive function run in parallel.
+
+    Args:
+        path: List of file you want reorganise
+        output_prefix: prefix of hive
+        basename: name of parquet file
+
+    Returns:
+        None
+    """
+    polars.scan_parquet(path).with_columns(
+        [
+            polars.col("id").mod(50).alias("id_mod"),
+            polars.col("sample").hash().mod(50).alias("sample_mod"),
+        ],
+    ).groupby(
+        "id_mod",
+        "sample_mod",
+    ).apply(
+        manage_group(
+            output_prefix,
+            [
+                "id_mod",
+                "sample_mod",
+            ],
+            str(basename),
+        ),
+        schema=None,
+    ).collect()
+
+    return path
+
+
+def hive(paths: list[pathlib.Path], output_prefix: pathlib.Path, threads: int = 1) -> None:
     """Reorganise genotypes struct in hive like struct.
 
     Args:
@@ -60,20 +114,7 @@ def hive(paths: list[pathlib.Path], output_prefix: pathlib.Path) -> None:
     Returns:
         None
     """
-    # Iterate over each genotypes
-    for path in paths:
-        polars.scan_parquet(path).with_columns([polars.col("id").mod(50).alias("id_mod")]).groupby(
-            "gt",
-            "sample",
-            "id_mod",
-        ).apply(
-            manage_group(
-                output_prefix,
-                [
-                    "gt",
-                    "sample",
-                    "id_mod",
-                ],
-            ),
-            schema=None,
-        ).collect()
+    threads = min(threads, len(paths))
+
+    with multiprocessing.get_context("spawn").Pool() as pool:
+        pool.starmap(__hive_worker, [(path, output_prefix, i) for i, path in enumerate(paths)])

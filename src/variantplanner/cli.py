@@ -262,9 +262,13 @@ def genotypes(ctx: click.Context, prefix_path: pathlib.Path) -> None:
 
     input_paths = ctx.obj["input_paths"]
 
-    logger.debug(f"parameter: {prefix_path=}")
+    threads = int(os.environ["POLARS_MAX_THREADS"])
+    os.environ["POLARS_MAX_THREADS"] = "1"
 
-    struct.genotypes.hive(input_paths, prefix_path)
+    logger.debug(f"parameter: {prefix_path=}")
+    print(f"{threads=}, {os.environ['POLARS_MAX_THREADS']=}")
+
+    struct.genotypes.hive(input_paths, prefix_path, threads)
 
 
 ###############
@@ -510,8 +514,5 @@ def metadata_csv(ctx: click.Context, columns: list[str], separator: str = ",") -
 
     if columns:
         lf = lf.select(columns)
-
-    print(lf.columns)
-    print(lf.dtypes)
 
     lf.sink_parquet(output_path)

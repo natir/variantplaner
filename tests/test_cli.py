@@ -10,6 +10,14 @@ import pathlib
 import polars
 from click.testing import CliRunner
 
+try:
+    from pytest_cov.embed import cleanup_on_sigterm
+except ImportError:  # pragma: no cover
+    pass
+else:
+    cleanup_on_sigterm()
+
+
 # project import
 from variantplanner import cli
 
@@ -173,6 +181,7 @@ def test_struct_genotypes(tmp_path: pathlib.Path) -> None:
     result = runner.invoke(
         cli.main,
         [
+            "-vvvv",
             "struct",
             "-i",
             str(DATA_DIR / "no_info.genotypes.parquet"),
@@ -450,7 +459,6 @@ def test_metadata_csv(tmp_path: pathlib.Path) -> None:
             "csv",
         ],
     )
-
 
     assert result.exit_code == 0
 
