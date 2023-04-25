@@ -33,7 +33,7 @@ Convert multiple vcf in parquet
 
 ```
 mkdir -p variants genotypes
-for path in $(ls vcf/*.vcf | base)
+for path in $(ls vcf/*.vcf)
 do
 vcf_basename=$(basename ${path} .vcf)
 variantplanner vcf2parquet -i vcf/${vcf_basename}.vcf -v variants/${vcf_basename}.parquet -g genotypes/${vcf_basename}.parquet
@@ -46,17 +46,27 @@ or use gnu parallel
 find tests/data/ -type f -name *.vcf -exec basename {} .vcf \; | parallel variantplanner vcf2parquet -i vcf/{}.vcf -v variants/{}.parquet -g genotypes/{}.parquet
 ```
 
-### Merge variants
+### Structuration of data
+
+#### Merge variants
 
 **Warning**: this command could have huge memory and disk usage
 
 ```
-variantplanner merge -i variants/1.parquet -i variants/2.parquet -i variants/3.parquet … -i variants/n.parquet -m variants.parquet
+variantplanner struct -i variants/1.parquet -i variants/2.parquet -i variants/3.parquet … -i variants/n.parquet variants -o variants.parquet
 ```
 
 By default temporary file are write in /tmp you can use TMPDIR, TEMP or TMP to change this behavior.
 
 This command use divide and conquer algorithm to perform merge of variants option `-b|--bytes-memory-limit` control bytes size of chunk of files.
+
+#### Hive genotypes
+
+**Warning**: this command could have huge disk usage
+
+```
+variantplanner struct -i genotypes/1.parquet -i genotypes/2.parquet -i genotypes/3.parquet … -i genotypes/n.parquet genotypes -p hive_prefix/
+```
 
 ### Annotations
 
@@ -77,6 +87,20 @@ variantplanner annotations -i annotations.tsv -o annotations.parquet csv -c chr 
 ```
 
 It's work same as vcf sub command but you must specify chromosome (`-c`), position (`-p`), reference (`-r`) and alternative (`-a`), you can change separate with option `-s`
+
+### Metadata
+
+#### Json format
+
+```
+variantplanner metadata -i metadata.json -o metadata.parquet json -f sample -f link -f kindex
+```
+
+#### Csv format
+
+```
+variantplanner metadata -i metadata.csv -o metadata.parquet csv -c sample -c link -c kindex
+```
 
 ## Developement setup
 
