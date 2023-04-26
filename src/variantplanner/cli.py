@@ -327,7 +327,8 @@ def annotations_vcf(ctx: click.Context, info: set[str] | None = None, rename_id:
     logger.debug(f"parameter: {input_paths=} {output_path=} {info=}")
 
     try:
-        info_parser = io.vcf.info2expr(input_paths[0], info)
+        vcf_header = io.vcf.extract_header(input_paths[0])
+        info_parser = io.vcf.info2expr(vcf_header, input_paths[0], info)
         lf = io.vcf.into_lazyframe(input_paths[0])
     except exception.NotAVCFError:
         logger.exception("")

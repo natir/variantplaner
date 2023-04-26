@@ -56,7 +56,7 @@ def genotypes(lf: polars.LazyFrame) -> polars.LazyFrame:
     if len(lf.columns) <= LF_COL_NB_NO_GENOTYPE:
         raise NoGenotypeError
 
-    # Select genotype columns (side effect last columns are format, [genotypes,…] and id)
+    # Select genotype columns (side effect last columns are: format, [genotypes,…] and id)
     lf = lf.select([*lf.columns[MINIMAL_COL_NUMBER:]])
 
     # Clean bad variant

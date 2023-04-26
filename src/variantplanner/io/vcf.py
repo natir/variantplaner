@@ -23,10 +23,39 @@ SAMPLE_COL_BEGIN: int = 9
 logger = logging.getLogger("io.vcf")
 
 
-def info2expr(input_path: pathlib.Path, select_info: set[str] | None = None) -> list[polars.Expr]:
+def extract_header(input_path: pathlib.Path) -> list[str]:
+    """Extract all header information of vcf file.
+
+    Args:
+        input_path: Path to vcf file.
+
+    Returns:
+        List of header string.
+
+    Raises:
+        NotAVCFError: If a line not starts with '#'
+        NotAVCFError: If all line not start by '#CHR'
+    """
+    headers = []
+    with open(input_path) as fh:
+        for line in (full_line.strip() for full_line in fh):
+            if not line.startswith("#"):
+                raise NotAVCFError(input_path)
+
+            if line.startswith("#CHR"):
+                headers.append(line)
+                return headers
+
+            headers.append(line)
+
+    raise NotAVCFError(input_path)
+
+
+def info2expr(header: list[str], input_path: pathlib.Path, select_info: set[str] | None = None) -> list[polars.Expr]:
     """Read vcf header to generate a list of polars.Expr to extract info.
 
     Args:
+        header: Line of vcf header
         input_path: Path to vcf file.
         select_info: List of info field
 
@@ -34,7 +63,6 @@ def info2expr(input_path: pathlib.Path, select_info: set[str] | None = None) -> 
         List of polars expr to parse info columns.
 
     Raises:
-        NotAVCFError: If a line not starts with '#'
         NotAVCFError: If all line not start by '#CHR'
     """
     info_re = re.compile(
@@ -43,90 +71,80 @@ def info2expr(input_path: pathlib.Path, select_info: set[str] | None = None) -> 
 
     expressions: list[polars.Expr] = []
 
-    with open(input_path) as fh:
-        for line in fh:
-            if line.startswith("#CHROM"):
-                return expressions
+    for line in header:
+        if line.startswith("#CHROM"):
+            return expressions
 
-            if not line.startswith("##INFO"):
-                continue
+        if not line.startswith("##INFO"):
+            continue
 
-            if (search := info_re.search(line)) and (not select_info or search["id"] in select_info):
-                regex = rf"{search['id']}=([^;]+);?"
+        if (search := info_re.search(line)) and (not select_info or search["id"] in select_info):
+            regex = rf"{search['id']}=([^;]+);?"
 
-                local_expr = polars.col("info").str.extract(regex, 1)
+            local_expr = polars.col("info").str.extract(regex, 1)
 
-                if search["number"] == "1":
-                    if search["type"] == "Integer":
-                        local_expr = local_expr.cast(polars.Int64)
-                    elif search["type"] == "Float":
-                        local_expr = local_expr.cast(polars.Float64)
-                else:
-                    local_expr = local_expr.str.split(",")
-                    if search["type"] == "Integer":
-                        local_expr = local_expr.cast(polars.List(polars.Int64))
-                    elif search["type"] == "Float":
-                        local_expr = local_expr.cast(polars.List(polars.Float64))
+            if search["number"] == "1":
+                if search["type"] == "Integer":
+                    local_expr = local_expr.cast(polars.Int64)
+                elif search["type"] == "Float":
+                    local_expr = local_expr.cast(polars.Float64)
+            else:
+                local_expr = local_expr.str.split(",")
+                if search["type"] == "Integer":
+                    local_expr = local_expr.cast(polars.List(polars.Int64))
+                elif search["type"] == "Float":
+                    local_expr = local_expr.cast(polars.List(polars.Float64))
 
-                expressions.append(local_expr.alias(search["id"]))
+            expressions.append(local_expr.alias(search["id"]))
 
     raise NotAVCFError(input_path)
 
 
-def sample_index(input_path: pathlib.Path) -> dict[str, int] | None:
+def sample_index(header: list[str], input_path: pathlib.Path) -> dict[str, int] | None:
     """Read vcf header to generate an association map between sample name and index.
 
     Args:
-        input_path: Path to vcf file.
+        header: Header string.
 
     Returns:
         Map that associate a sample name to is sample index.
 
     Raises:
-        NotAVCFError: If a line not starts with '#'
         NotAVCFError: If all line not start by '#CHR'
     """
-    with open(input_path) as fh:
-        for line in fh:
-            if not line.startswith("#"):
-                raise NotAVCFError(input_path)
+    for line in reversed(header):
+        if line.startswith("#CHR"):
+            split_line = line.strip().split("\t")
+            if len(split_line) <= MINIMAL_COL_NUMBER:
+                return None
 
-            if line.startswith("#CHR"):
-                split_line = line.strip().split("\t")
-                if len(split_line) <= MINIMAL_COL_NUMBER:
-                    return None
-
-                return {sample: i for (i, sample) in enumerate(split_line[SAMPLE_COL_BEGIN:])}
+            return {sample: i for (i, sample) in enumerate(split_line[SAMPLE_COL_BEGIN:])}
 
     raise NotAVCFError(input_path)
 
 
-def __column_name(input_path: pathlib.Path) -> list[str]:
+def __column_name(header: list[str], input_path: pathlib.Path) -> list[str]:
     """Read vcf header to generate list of column name.
 
     Args:
-        input_path: Path to vcf file.
+        header: Header string.
 
     Returns:
         List of lazyframe columns name.
 
     Raises:
-        NotAVCFError: If a line not starts with '#'
         NotAVCFError: If all line not start by '#CHR'
     """
-    with open(input_path) as fh:
-        for line in fh:
-            if line.startswith("#CHR"):
-                split_line = line.strip().split("\t")
-                cols_name = ["chr", "pos", "vid", "ref", "alt", "qual", "filter", "info"]
-                if len(split_line) > MINIMAL_COL_NUMBER:
-                    cols_name.append("format")
-                    for sample in split_line[SAMPLE_COL_BEGIN:]:
-                        cols_name.append(sample)
+    for line in reversed(header):
+        if line.startswith("#CHR"):
+            split_line = line.strip().split("\t")
+            cols_name = ["chr", "pos", "vid", "ref", "alt", "qual", "filter", "info"]
+            if len(split_line) > MINIMAL_COL_NUMBER:
+                cols_name.append("format")
+                for sample in split_line[SAMPLE_COL_BEGIN:]:
+                    cols_name.append(sample)
 
-                return cols_name
-            if not line.startswith("#"):
-                raise NotAVCFError(input_path)
+            return cols_name
 
     raise NotAVCFError(input_path)
 
@@ -140,7 +158,9 @@ def into_lazyframe(input_path: pathlib.Path) -> polars.LazyFrame:
     Returns:
         A lazyframe that containt vcf information ('chr', 'pos', 'vid', 'ref', 'alt', 'qual', 'filter', 'info', ['format'], ['genotypes',…], 'id').
     """
-    col_name = {f"column_{i}": name for (i, name) in enumerate(__column_name(input_path), start=1)}
+    header = extract_header(input_path)
+
+    col_name = {f"column_{i}": name for (i, name) in enumerate(__column_name(header, input_path), start=1)}
 
     lf = polars.scan_csv(
         input_path,

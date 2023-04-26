@@ -17,25 +17,83 @@ from variantplanner import exception, io
 DATA_DIR = pathlib.Path(__file__).parent / "data"
 
 
+def test_extract_header() -> None:
+    """Check extract_header."""
+    header = io.vcf.extract_header(DATA_DIR / "no_info.vcf")
+
+    assert header == [
+        "##fileformat=VCFv4.2",
+        '##FILTER=<ID=PASS,Description="All filters passed">',
+        '##FILTER=<ID=LowQual,Description="Low quality">',
+        '##FORMAT=<ID=AD,Number=R,Type=Integer,Description="Allelic depths for the ref and alt alleles in the order listed">',
+        '##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Approximate read depth (reads with MQ=255 or with bad mates are filtered)">',
+        '##FORMAT=<ID=GQ,Number=1,Type=Integer,Description="Genotype Quality">',
+        '##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">',
+        '##FILTER=<ID=base_qual,Description="alt median base quality">',
+        '##FILTER=<ID=clustered_events,Description="Clustered events observed in the tumor">',
+        '##FILTER=<ID=contamination,Description="contamination">',
+        '##FILTER=<ID=duplicate,Description="evidence for alt allele is overrepresented by apparent duplicates">',
+        '##FILTER=<ID=fragment,Description="abs(ref - alt) median fragment length">',
+        '##FILTER=<ID=germline,Description="Evidence indicates this site is germline, not somatic">',
+        '##FILTER=<ID=haplotype,Description="Variant near filtered variant on same haplotype.">',
+        '##FILTER=<ID=low_allele_frac,Description="Allele fraction is below specified threshold">',
+        '##FILTER=<ID=map_qual,Description="ref - alt median mapping quality">',
+        '##FILTER=<ID=multiallelic,Description="Site filtered because too many alt alleles pass tumor LOD">',
+        '##FILTER=<ID=n_ratio,Description="Ratio of N to alt exceeds specified ratio">',
+        '##FILTER=<ID=normal_artifact,Description="artifact_in_normal">',
+        '##FILTER=<ID=numt_chimera,Description="NuMT variant with too many ALT reads originally from autosome">',
+        '##FILTER=<ID=numt_novel,Description="Alt depth is below expected coverage of NuMT in autosome">',
+        '##FILTER=<ID=orientation,Description="orientation bias detected by the orientation bias mixture model">',
+        '##FILTER=<ID=panel_of_normals,Description="Blacklisted site in panel of normals">',
+        '##FILTER=<ID=position,Description="median distance of alt variants from end of reads">',
+        '##FILTER=<ID=slippage,Description="Site filtered due to contraction of short tandem repeat region">',
+        '##FILTER=<ID=strand_bias,Description="Evidence for alt allele comes from one read direction only">',
+        '##FILTER=<ID=strict_strand,Description="Evidence for alt allele is not represented in both directions">',
+        '##FILTER=<ID=weak_evidence,Description="Mutation does not meet likelihood threshold">',
+        "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tsample_1\tsample_2\tsample_3",
+    ]
+
+
+def test_extract_header_exception() -> None:
+    """Check extract_header."""
+    with pytest.raises(exception.NotAVCFError):
+        io.vcf.extract_header(DATA_DIR / "no_info.tsv")
+
+    with pytest.raises(exception.NotAVCFError):
+        io.vcf.extract_header(DATA_DIR / "only_header.vcf")
+
+
 def test_info2expr_no_info_vcf() -> None:
     """Check info2expr."""
-    expressions = io.vcf.info2expr(DATA_DIR / "no_info.vcf")
+    header = io.vcf.extract_header(DATA_DIR / "no_info.vcf")
+    expressions = io.vcf.info2expr(header, DATA_DIR / "no_info.vcf")
 
     assert expressions == []
 
 
 def test_info2expr() -> None:
     """Check info2expr."""
-    expressions = io.vcf.info2expr(DATA_DIR / "no_genotypes.vcf")
+    header = io.vcf.extract_header(DATA_DIR / "no_genotypes.vcf")
+    expressions = io.vcf.info2expr(header, DATA_DIR / "no_genotypes.vcf")
 
     assert len(expressions) == 21
+
+
+def test_info2expr_exception() -> None:
+    """Check info2expr."""
+    header = io.vcf.extract_header(DATA_DIR / "no_genotypes.vcf")
+
+    with pytest.raises(exception.NotAVCFError):
+        io.vcf.info2expr(header[:-1], DATA_DIR / "no_genotypes.vcf")
 
 
 def test_sample_index() -> None:
     """Check sample index."""
     truth = {"sample_1": 0, "sample_2": 1, "sample_3": 2}
 
-    sample2idx = io.vcf.sample_index(DATA_DIR / "no_info.vcf")
+    header = io.vcf.extract_header(DATA_DIR / "no_info.vcf")
+    header.reverse()
+    sample2idx = io.vcf.sample_index(header, DATA_DIR / "no_info.vcf")
 
     assert sample2idx
     assert len(truth) == len(sample2idx)
@@ -44,16 +102,43 @@ def test_sample_index() -> None:
 
 def test_sample_index_no_genotypes() -> None:
     """Check sample index."""
-    assert io.vcf.sample_index(DATA_DIR / "no_genotypes.vcf") is None
+    header = io.vcf.extract_header(DATA_DIR / "no_genotypes.vcf")
+    assert io.vcf.sample_index(header, DATA_DIR / "no_genotypes.vcf") is None
 
 
 def test_sample_index_exception() -> None:
     """Check sample index exception."""
     with pytest.raises(exception.NotAVCFError):
-        io.vcf.sample_index(DATA_DIR / "no_info.tsv")
+        io.vcf.extract_header(DATA_DIR / "no_info.tsv")
 
     with pytest.raises(exception.NotAVCFError):
-        io.vcf.sample_index(DATA_DIR / "only_header.vcf")
+        io.vcf.sample_index([], DATA_DIR / "no_info.tsv")
+
+    with pytest.raises(exception.NotAVCFError):
+        io.vcf.extract_header(DATA_DIR / "only_header.vcf")
+
+
+def test__column_name() -> None:
+    """Check __column_name."""
+    header = io.vcf.extract_header(DATA_DIR / "no_info.vcf")
+    assert io.vcf.__column_name(header, DATA_DIR / "no_info.vcf") == [
+        "chr",
+        "pos",
+        "vid",
+        "ref",
+        "alt",
+        "qual",
+        "filter",
+        "info",
+        "format",
+        "sample_1",
+        "sample_2",
+        "sample_3",
+    ]
+
+    print(header[:-1])
+    with pytest.raises(exception.NotAVCFError):
+        io.vcf.__column_name(header[:-1], DATA_DIR / "no_info.vcf")
 
 
 def test_into_lazyframe() -> None:
@@ -125,7 +210,8 @@ def test_from_lazyframe_qual_filter_info(tmp_path: pathlib.Path) -> None:
     output_path = tmp_path / "output.vcf"
     input_path = DATA_DIR / "no_genotypes.vcf"
 
-    info_parser = io.vcf.info2expr(input_path)
+    vcf_header = io.vcf.extract_header(input_path)
+    info_parser = io.vcf.info2expr(vcf_header, input_path)
     lf = io.vcf.into_lazyframe(DATA_DIR / "no_genotypes.vcf").with_columns(info_parser)
 
     io.vcf.from_lazyframe(
@@ -148,7 +234,8 @@ def test_from_lazyframe_qual_filter_info(tmp_path: pathlib.Path) -> None:
 
 def test_add_info_column() -> None:
     """Check add_info_column."""
-    info_parser = io.vcf.info2expr(DATA_DIR / "no_genotypes.vcf")
+    vcf_header = io.vcf.extract_header(DATA_DIR / "no_genotypes.vcf")
+    info_parser = io.vcf.info2expr(vcf_header, DATA_DIR / "no_genotypes.vcf")
     lf = io.vcf.into_lazyframe(DATA_DIR / "no_genotypes.vcf").with_columns(info_parser)
 
     info = io.vcf.add_info_column(lf, {col_name: col_name for col_name in lf.columns if col_name.isupper()})
@@ -184,7 +271,8 @@ def test_add_info_column() -> None:
 
 def test_generate_header() -> None:
     """Check generate header."""
-    info_parser = io.vcf.info2expr(DATA_DIR / "no_genotypes.vcf")
+    vcf_header = io.vcf.extract_header(DATA_DIR / "no_genotypes.vcf")
+    info_parser = io.vcf.info2expr(vcf_header, DATA_DIR / "no_genotypes.vcf")
     lf = io.vcf.into_lazyframe(DATA_DIR / "no_genotypes.vcf").with_columns(info_parser)
 
     assert (
