@@ -41,12 +41,6 @@ def info2expr(input_path: pathlib.Path, select_info: set[str] | None = None) -> 
         r"ID=(?P<id>([A-Za-z_][0-9A-Za-z_.]*|1000G)),Number=(?P<number>[ARG0-9\.]+),Type=(?P<type>Integer|Float|String)",
     )
 
-    type2regex = {
-        "Integer": r"((\d+),?)+",
-        "Float": r"((\d+.\d+),?)+",
-        "String": r"(([^,;]+),?)+",
-    }
-
     expressions: list[polars.Expr] = []
 
     with open(input_path) as fh:
@@ -58,9 +52,7 @@ def info2expr(input_path: pathlib.Path, select_info: set[str] | None = None) -> 
                 continue
 
             if (search := info_re.search(line)) and (not select_info or search["id"] in select_info):
-                regex = rf"{search['id']}="
-                regex += type2regex[search["type"]]
-                regex += r";?"
+                regex = rf"{search['id']}=([^;]+);?"
 
                 local_expr = polars.col("info").str.extract(regex, 1)
 
@@ -262,6 +254,8 @@ def from_lazyframe(
         ],
     )
 
+    header = generate_header(lf, renaming["INFO"])
+
     if renaming["QUAL"] != ".":
         lf = lf.with_columns([polars.col(renaming["QUAL"]).alias("QUAL")])
     else:
@@ -272,18 +266,93 @@ def from_lazyframe(
     else:
         lf = lf.with_columns([polars.lit(".").alias("FILTER")])
 
-    lf = lf.with_columns(
-        [
+    if "INFO" in renaming and renaming["INFO"]:
+        lf = add_info_column(lf, renaming["INFO"])
+    else:
+        lf = lf.with_columns(
             polars.lit(".").alias("INFO"),
-        ],
-    )
+        )
 
     lf = lf.select([polars.col(colname) for colname in renaming])
-
-    header = """##fileformat=VCFv4.3
-##source=VariantPlanner
-"""
 
     with open(output_path, "wb") as fh:
         fh.write(header.encode())
         fh.write(lf.collect().write_csv(separator="\t").encode())
+
+
+def add_info_column(lf: polars.LazyFrame, vcfinfo2parquet_name: dict[str, str]) -> polars.LazyFrame:
+    """Add INFO column in polars lazyframe.
+
+    Args:
+        lf: The dataframe
+        vcfinfo2parquet_name: vcf column name link to column name
+
+    Returns:
+        LazyFrame with INFO column and remove select column
+    """
+    polars.Config().set_tbl_cols(100)
+
+    lf = lf.with_columns(
+        [
+            polars.col(name).arr.join(",").fill_null(".").alias(name)
+            for name, dtype in zip(lf.columns, lf.dtypes)
+            if isinstance(dtype, polars.List)
+        ],
+    )
+
+    lf = lf.with_columns(
+        [
+            polars.col(name).cast(str).fill_null(".").alias(name)
+            for name, dtype in zip(lf.columns, lf.dtypes)
+            if not isinstance(dtype, polars.List)
+        ],
+    )
+
+    lf = lf.with_columns(
+        [
+            polars.concat_str(
+                [
+                    polars.concat_str(
+                        [
+                            polars.lit(vcf_name),
+                            polars.lit("="),
+                            polars.col(parquet_name),
+                        ],
+                    )
+                    for vcf_name, parquet_name in vcfinfo2parquet_name.items()
+                ],
+                separator=";",
+            ).alias("INFO"),
+        ],
+    )
+
+    lf = lf.drop(list(vcfinfo2parquet_name.values()))
+
+    return lf
+
+
+def generate_header(lf: polars.LazyFrame, vcfinfo2parquet_name: dict[str, str] | None = None) -> str:
+    """Generate header of vcf file.
+
+    Args:
+        lf: Dataframe
+        vcfinfo2parquet_name: vcf column name link to column name
+
+    Returns:
+        The header of vcf file
+    """
+    header = """##fileformat=VCFv4.3
+##source=VariantPlanner
+"""
+
+    if vcfinfo2parquet_name:
+        col2type = dict(zip(lf.columns, lf.dtypes))
+        for vcf_name, col_name in vcfinfo2parquet_name.items():
+            number = "." if isinstance(col2type[col_name], polars.List) else "1"
+            type_ = "String"
+            type_ = "Float" if isinstance(col2type[col_name], polars.Float64) else type_
+            type_ = "Integer" if isinstance(col2type[col_name], polars.Int64) else type_
+
+            header += f'##INFO=<ID={vcf_name},Number={number},Type={type_},Description="Unknow">\n'
+
+    return header
