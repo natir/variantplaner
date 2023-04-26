@@ -26,7 +26,16 @@ jobs:
         run: pdm lock -v
 
       - name: Install dependencies
-        run: pdm install -G duty -G docs -G quality -G typing -G security
+        run: pdm install -G duty -G docs -G tests
 
-      - name: Deploying documentation
+      - name: Run test
+        run: pdm run duty test
+
+      - name: Run coverage
+        run: pdm run duty coverage
+
+      - name: Build documentation
+        run: pdm run duty check-docs
+
+      - name: Deploy documentation
         run: pdm run duty docs-deploy

@@ -182,7 +182,7 @@ def docs_deploy(ctx: Context) -> None:
     Parameters:
         ctx: The context instance (passed automatically).
     """
-    ctx.run(mkdocs.gh_deploy, title="Deploying documentation")
+    ctx.run(mkdocs.gh_deploy(force=True), title="Deploying documentation")
 
 
 @duty
