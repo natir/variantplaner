@@ -137,7 +137,7 @@ def test_vcf2parquet_no_genotype(tmp_path: pathlib.Path) -> None:
 
 def test_parquet2vcf(tmp_path: pathlib.Path) -> None:
     """parquet2vcf run."""
-    variants_path = tmp_path / "variants.parquet"
+    variants_path = tmp_path / "variants.vcf"
 
     runner = CliRunner()
     result = runner.invoke(cli.main, ["parquet2vcf", "-i", str(DATA_DIR / "no_info.parquet"), "-o", str(variants_path)])

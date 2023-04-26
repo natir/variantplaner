@@ -136,7 +136,6 @@ def test__column_name() -> None:
         "sample_3",
     ]
 
-    print(header[:-1])
     with pytest.raises(exception.NotAVCFError):
         io.vcf.__column_name(header[:-1], DATA_DIR / "no_info.vcf")
 
