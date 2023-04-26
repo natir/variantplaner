@@ -10,7 +10,7 @@ import polars
 import polars.testing
 
 # project import
-from variantplanner import extract, io
+from variantplaner import extract, io
 
 DATA_DIR = pathlib.Path(__file__).parent / "data"
 

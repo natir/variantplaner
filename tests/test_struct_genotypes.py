@@ -19,7 +19,7 @@ else:
 
 
 # project import
-from variantplanner import struct
+from variantplaner import struct
 
 DATA_DIR = pathlib.Path(__file__).parent / "data"
 

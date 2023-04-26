@@ -46,7 +46,7 @@ if typing.TYPE_CHECKING:  # pragma: no cover
 
 
 # project import
-from variantplanner import normalization
+from variantplaner import normalization
 
 
 def into_lazyframe(

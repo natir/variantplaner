@@ -5,11 +5,11 @@
 # You might be tempted to import things from `__main__` later,
 # but that will cause problems: the code will get executed twice:
 #
-# - When you run `python -m variantplanner` python will execute
+# - When you run `python -m variantplaner` python will execute
 #   `__main__.py` as a script. That means there won't be any
-#   `variantplanner.__main__` in `sys.modules`.
+#   `variantplaner.__main__` in `sys.modules`.
 # - When you import `__main__` it will get executed again (as a module) because
-#   there's no `variantplanner.__main__` in `sys.modules`.
+#   there's no `variantplaner.__main__` in `sys.modules`.
 
 # std import
 from __future__ import annotations
@@ -24,10 +24,10 @@ import click
 import polars
 
 # project import
-from variantplanner import exception, extract, io, struct
+from variantplaner import exception, extract, io, struct
 
 
-@click.group(name="variantplanner")
+@click.group(name="variantplaner")
 @click.option("-t", "--threads", help="Number of threads usable", default=1, type=click.IntRange(0), show_default=True)
 @click.option("-v", "--verbose", help="Verbosity level", count=True, type=click.IntRange(0, 4))
 def main(threads: int = 1, verbose: int = 0) -> None:

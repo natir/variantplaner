@@ -12,7 +12,7 @@ import polars
 import pytest
 
 # project import
-from variantplanner import exception, io
+from variantplaner import exception, io
 
 DATA_DIR = pathlib.Path(__file__).parent / "data"
 

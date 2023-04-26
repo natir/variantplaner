@@ -7,7 +7,7 @@ from __future__ import annotations
 from click.testing import CliRunner
 
 # project import
-from variantplanner import cli
+from variantplaner import cli
 
 
 def test_show_help() -> None:
@@ -18,7 +18,7 @@ def test_show_help() -> None:
     assert result.exit_code == 0
     assert (
         result.stdout
-        == """Usage: variantplanner [OPTIONS] COMMAND [ARGS]...
+        == """Usage: variantplaner [OPTIONS] COMMAND [ARGS]...
 
   Run VariantPlanner.
 
@@ -45,7 +45,7 @@ def test_show_help_annotations() -> None:
     assert result.exit_code == 0
     assert (
         result.stdout
-        == """Usage: variantplanner annotations [OPTIONS] COMMAND [ARGS]...
+        == """Usage: variantplaner annotations [OPTIONS] COMMAND [ARGS]...
 
   Convert an annotation variation file in parquet.
 
@@ -70,7 +70,7 @@ def test_show_help_struct() -> None:
     assert result.exit_code == 0
     assert (
         result.stdout
-        == """Usage: variantplanner struct [OPTIONS] COMMAND [ARGS]...
+        == """Usage: variantplaner struct [OPTIONS] COMMAND [ARGS]...
 
   Struct operation on parquet file.
 
@@ -93,7 +93,7 @@ def test_show_help_metadata() -> None:
     assert result.exit_code == 0
     assert (
         result.stdout
-        == """Usage: variantplanner metadata [OPTIONS] COMMAND [ARGS]...
+        == """Usage: variantplaner metadata [OPTIONS] COMMAND [ARGS]...
 
   Convert an metadata file in parquet.
 
@@ -118,7 +118,7 @@ def test_show_help_vcf2parquet() -> None:
     assert result.exit_code == 0
     assert (
         result.stdout
-        == """Usage: variantplanner vcf2parquet [OPTIONS]
+        == """Usage: variantplaner vcf2parquet [OPTIONS]
 
   Convert a vcf in parquet.
 
@@ -140,7 +140,7 @@ def test_show_help_parquet2vcf() -> None:
     assert result.exit_code == 0
     assert (
         result.stdout
-        == """Usage: variantplanner parquet2vcf [OPTIONS]
+        == """Usage: variantplaner parquet2vcf [OPTIONS]
 
   Convert parquet in vcf.
 

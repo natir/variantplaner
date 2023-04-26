@@ -19,7 +19,7 @@ else:
 
 
 # project import
-from variantplanner import cli
+from variantplaner import cli
 
 DATA_DIR = pathlib.Path(__file__).parent / "data"
 

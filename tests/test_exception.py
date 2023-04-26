@@ -7,7 +7,7 @@ import pathlib
 
 # 3rd party import
 # project import
-from variantplanner import exception
+from variantplaner import exception
 
 
 def test_notavcferror() -> None:

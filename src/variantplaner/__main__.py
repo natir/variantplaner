@@ -1,4 +1,4 @@
-"""Entry-point module, in case you use `python -m variantplanner`.
+"""Entry-point module, in case you use `python -m variantplaner`.
 
 Why does this file exist, and why `__main__`? For more info, read:
 
@@ -7,7 +7,7 @@ Why does this file exist, and why `__main__`? For more info, read:
 """
 
 
-from variantplanner.cli import main
+from variantplaner.cli import main
 
 if __name__ == "__main__":
     main()

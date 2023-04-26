@@ -2,6 +2,6 @@
 
 from __future__ import annotations
 
-from variantplanner.struct import genotypes, variants
+from variantplaner.struct import genotypes, variants
 
 __all__: list[str] = ["genotypes", "variants"]

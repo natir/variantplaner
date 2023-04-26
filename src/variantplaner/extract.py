@@ -8,8 +8,8 @@ import logging
 # 3rd party import
 import polars
 
-from variantplanner.exception import NoGenotypeError
-from variantplanner.io.vcf import MINIMAL_COL_NUMBER
+from variantplaner.exception import NoGenotypeError
+from variantplaner.io.vcf import MINIMAL_COL_NUMBER
 
 # project import
 

@@ -2,6 +2,6 @@
 
 from __future__ import annotations
 
-from variantplanner.io import csv, vcf
+from variantplaner.io import csv, vcf
 
 __all__: list[str] = ["csv", "vcf"]

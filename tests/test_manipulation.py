@@ -11,7 +11,7 @@ import polars.testing
 import pytest
 
 # project import
-from variantplanner import exception, extract, io
+from variantplaner import exception, extract, io
 
 DATA_DIR = pathlib.Path(__file__).parent / "data"
 

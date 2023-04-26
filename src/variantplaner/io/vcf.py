@@ -14,8 +14,8 @@ if typing.TYPE_CHECKING:  # pragma: no cover
 import polars
 
 # project import
-from variantplanner import normalization
-from variantplanner.exception import NotAVCFError
+from variantplaner import normalization
+from variantplaner.exception import NotAVCFError
 
 MINIMAL_COL_NUMBER: int = 8
 SAMPLE_COL_BEGIN: int = 9

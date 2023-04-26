@@ -9,11 +9,10 @@ copyright_holder: Pierre Marijon
 copyright_holder_email: pierre.marijon-ext@aphp.fr
 copyright_license: MIT License
 project_description: A tool kit to manage many variant on desktop computer
-project_name: VariantPlanner
-python_package_command_line_name: variantplanner
-python_package_distribution_name: variantplanner
-python_package_import_name: variantplanner
-repository_name: variantplanner
+project_name: variantplaner
+python_package_command_line_name: variantplaner
+python_package_distribution_name: variantplaner
+python_package_import_name: variantplaner
+repository_name: variantplaner
 repository_namespace: natir
 repository_provider: github.com
-

@@ -1,10 +1,10 @@
-site_name: "VariantPlanner"
+site_name: "VariantPlaner"
 site_description: "A tool kit to manage many variant on desktop computer"
-site_url: "https://natir.github.io/variantplanner"
-repo_url: "https://github.com/natir/variantplanner"
-repo_name: "natir/variantplanner"
+site_url: "https://natir.github.io/variantplaner"
+repo_url: "https://github.com/natir/variantplaner"
+repo_name: "natir/variantplaner"
 site_dir: "site"
-watch: [README.md, CONTRIBUTING.md, CHANGELOG.md, src/variantplanner]
+watch: [README.md, CONTRIBUTING.md, CHANGELOG.md, src/variantplaner]
 
 nav:
 - Home:

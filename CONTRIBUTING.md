@@ -7,10 +7,18 @@ Every little bit helps, and credit will always be given.
 
 Nothing easier!
 
+> NOTE:
+> Usage of [pyenv](https://github.com/pyenv/pyenv) is recommended
+>
+> After install pyenv run:
+> ```bash
+> pyenv install 3.9 3.10 3.11
+> ```
+
 Fork and clone the repository, then:
 
 ```bash
-cd variantplanner
+cd variantplaner
 make setup
 ```
 
@@ -32,7 +40,7 @@ make setup
 
 You now have the dependencies installed.
 
-You can run the application with `pdm run variantplanner [ARGS...]`.
+You can run the application with `pdm run variantplaner [ARGS...]`.
 
 Run `make help` to see all the available actions!
 
@@ -140,7 +148,7 @@ git commit --fixup=SHA
 Once all the changes are approved, you can squash your commits:
 
 ```bash
-git rebase -i --autosquash master
+git rebase -i --autosquash main
 ```
 
 And force-push:

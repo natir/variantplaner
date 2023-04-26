@@ -3,7 +3,7 @@ requires = ["pdm-backend"]
 build-backend = "pdm.backend"
 
 [project]
-name = "variantplanner"
+name = "variantplaner"
 description = "A tool kit to manage many variant on desktop computer"
 authors = [{name = "Pierre Marijon", email = "pierre.marijon-ext@aphp.fr"}]
 license = {text = "MIT"}
@@ -32,14 +32,14 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://natir.github.io/variantplanner"
-Documentation = "https://natir.github.io/variantplanner"
-Changelog = "https://natir.github.io/variantplanner/changelog"
-Repository = "https://github.com/natir/variantplanner"
-Issues = "https://github.com/natir/variantplanner/issues"
+Homepage = "https://natir.github.io/variantplaner"
+Documentation = "https://natir.github.io/variantplaner"
+Changelog = "https://natir.github.io/variantplaner/changelog"
+Repository = "https://github.com/natir/variantplaner"
+Issues = "https://github.com/natir/variantplaner/issues"
 
 [project.scripts]
-variantplanner = "variantplanner.cli:main"
+variantplaner = "variantplaner.cli:main"
 
 [tool.pdm]
 version = {source = "scm"}
