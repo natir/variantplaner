@@ -17,7 +17,7 @@ class NotAVCFError(Exception):
     """Exception raise if file read seems not be a vcf."""
 
     def __init__(self, path: pathlib.Path):
-        """Initilize not a vcf error."""
+        """Initialize not a vcf error."""
         super().__init__(f"File {path} seems not be a valid vcf file.")
 
 
@@ -25,5 +25,5 @@ class NoGenotypeError(Exception):
     """Exception raise if file read seems not be a vcf."""
 
     def __init__(self):
-        """Intilize no genotype error."""
+        """Initialize no genotype error."""
         super().__init__("LazyFrame seems not contains genotypes.")

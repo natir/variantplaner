@@ -4,6 +4,18 @@
 from __future__ import annotations
 
 import filecmp
+import typing
+
+if typing.TYPE_CHECKING:  # pragma: no cover
+    import sys
+
+    if sys.version_info >= (3, 11):
+        from typing import ParamSpec
+    else:
+        from typing_extensions import ParamSpec
+
+    T = typing.TypeVar("T")
+    P = ParamSpec("P")
 
 # 3rd party import
 import pathlib
@@ -85,6 +97,33 @@ def test_info2expr_exception() -> None:
 
     with pytest.raises(exception.NotAVCFError):
         io.vcf.info2expr(header[:-1], DATA_DIR / "no_genotypes.vcf")
+
+
+def test_format2expr_no_format_vcf() -> None:
+    """Check format2expr."""
+    header = io.vcf.extract_header(DATA_DIR / "no_genotypes.vcf")
+    assert (
+        io.vcf.format2expr(
+            header,
+            DATA_DIR / "no_genotypes.vcf",
+        )
+        == {}
+    )
+
+
+def test_format2expr() -> None:
+    """Check format2expr."""
+    header = io.vcf.extract_header(DATA_DIR / "no_info.vcf")
+
+    assert set(io.vcf.format2expr(header, DATA_DIR / "no_info.vcf").keys()) == {"AD", "DP", "GQ", "GT"}
+
+
+def test_format2expr_exception() -> None:
+    """Check format2expr."""
+    header = io.vcf.extract_header(DATA_DIR / "no_info.vcf")
+
+    with pytest.raises(exception.NotAVCFError):
+        io.vcf.format2expr(header[:-1], DATA_DIR / "no_info.vcf")
 
 
 def test_sample_index() -> None:
