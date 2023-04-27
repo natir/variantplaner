@@ -11,16 +11,18 @@ A tool kit to manage many variant on desktop computer
 
 With `pip`:
 ```bash
-pip install git+https://github.com/natir/variantplaner.git#egg=variantplaner
+pip install git+https://github.com/natir/variantplaner.git@0.1.0-alpha#egg=variantplaner
 ```
 
 With [`pipx`](https://github.com/pipxproject/pipx):
 ```bash
 python -m pip install --user pipx
-pipx install git+https://github.com/natir/variantplaner.git#egg=variantplaner
+pipx install git+https://github.com/natir/variantplaner.git@0.1.0-alpha#egg=variantplaner
 ```
 
 ## Usage
+
+This section present basic usage for a more complete exemple check our usage
 
 ### Convert vcf in parquet
 
@@ -28,22 +30,7 @@ pipx install git+https://github.com/natir/variantplaner.git#egg=variantplaner
 variantplaner vcf2parquet -i input.vcf -v variants.parquet -g genotypes.parquet
 ```
 
-Convert multiple vcf in parquet
-
-```
-mkdir -p variants genotypes
-for path in $(ls vcf/*.vcf)
-do
-vcf_basename=$(basename ${path} .vcf)
-variantplaner vcf2parquet -i vcf/${vcf_basename}.vcf -v variants/${vcf_basename}.parquet -g genotypes/${vcf_basename}.parquet
-done
-```
-
-or use gnu parallel
-
-```
-find tests/data/ -type f -name *.vcf -exec basename {} .vcf \; | parallel variantplaner vcf2parquet -i vcf/{}.vcf -v variants/{}.parquet -g genotypes/{}.parquet
-```
+`-g` option isn't mandatory if you didn't set it you lose genotyping information.
 
 ### Structuration of data
 
@@ -57,7 +44,7 @@ variantplaner struct -i variants/1.parquet -i variants/2.parquet -i variants/3.p
 
 By default temporary file are write in /tmp you can use TMPDIR, TEMP or TMP to change this behavior.
 
-This command use divide and conquer algorithm to perform merge of variants option `-b|--bytes-memory-limit` control bytes size of chunk of files.
+This command use divide and conquer algorithm to perform merge of variants option `-b|--bytes-memory-limit` control bytes size of chunk of files. Empirically ram usage is ten times bytes memory limit value.
 
 #### Hive genotypes
 

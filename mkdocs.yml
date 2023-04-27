@@ -12,6 +12,7 @@ nav:
   - Changelog: changelog.md
   - Credits: credits.md
   - License: license.md
+- Usages: usages.md
 # defer to gen-files + literate-nav
 - Code Reference: reference/
 - Development:
@@ -52,6 +53,7 @@ markdown_extensions:
 - admonition
 - callouts
 - pymdownx.emoji
+- pymdownx.blocks.details
 - pymdownx.magiclink
 - pymdownx.snippets:
     check_paths: true
