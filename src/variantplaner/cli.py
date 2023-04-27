@@ -88,7 +88,8 @@ def vcf2parquet(input_path: pathlib.Path, variants: pathlib.Path, genotypes: pat
 
     if genotypes:
         try:
-            extract.genotypes(lf).sink_parquet(genotypes)
+            vcf_header = io.vcf.extract_header(input_path)
+            extract.genotypes(lf, io.vcf.format2expr(vcf_header, input_path), "GT:AD:DP:GQ").sink_parquet(genotypes)
         except exception.NoGenotypeError:
             logger.exception("")
             sys.exit(2)

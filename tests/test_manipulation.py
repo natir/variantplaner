@@ -33,7 +33,8 @@ def test_extract_genotypes() -> None:
 
     df = io.vcf.into_lazyframe(DATA_DIR / "no_info.vcf")
 
-    lf = extract.genotypes(df.lazy())
+    vcf_header = io.vcf.extract_header(DATA_DIR / "no_info.vcf")
+    lf = extract.genotypes(df, io.vcf.format2expr(vcf_header, DATA_DIR / "no_info.vcf"))
 
     polars.testing.assert_frame_equal(truth, lf)
 
@@ -41,6 +42,7 @@ def test_extract_genotypes() -> None:
 def test_extract_genotypes_without_genotypes() -> None:
     """Check extract genotypes failled if vcf not containts genotypes."""
     df = io.vcf.into_lazyframe(DATA_DIR / "no_genotypes.vcf")
+    vcf_header = io.vcf.extract_header(DATA_DIR / "no_info.vcf")
 
     with pytest.raises(exception.NoGenotypeError):
-        extract.genotypes(df.lazy())
+        extract.genotypes(df.lazy(), io.vcf.format2expr(vcf_header, DATA_DIR / "no_info.vcf"))

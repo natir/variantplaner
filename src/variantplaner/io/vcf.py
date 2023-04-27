@@ -13,9 +13,9 @@ if typing.TYPE_CHECKING:  # pragma: no cover
     import sys
 
     if sys.version_info >= (3, 11):
-        from typing import Concatenate, ParamSpec
+        from typing import ParamSpec
     else:
-        from typing_extensions import Concatenate, ParamSpec
+        from typing_extensions import ParamSpec
 
     T = typing.TypeVar("T")
     P = ParamSpec("P")
@@ -121,40 +121,40 @@ def info2expr(header: list[str], input_path: pathlib.Path, select_info: set[str]
     raise NotAVCFError(input_path)
 
 
-def __format_gt(expr: polars.Expr, /, *_args: typing.Any, **kargs: typing.Any) -> polars.Expr:
+def __format_gt(expr: polars.Expr, /, name: str) -> polars.Expr:
     """Manage gt field."""
-    return expr.str.count_match("1").cast(polars.UInt8).alias(kargs["name"].lower())
+    return expr.str.count_match("1").cast(polars.UInt8).alias(name.lower())
 
 
-def __format_one_int(expr: polars.Expr, /, *_args: typing.Any, **kargs: typing.Any) -> polars.Expr:
+def __format_one_int(expr: polars.Expr, /, name: str) -> polars.Expr:
     """Manage integer field."""
-    return expr.str.parse_int(10, strict=False).cast(polars.UInt16).alias(kargs["name"].lower())
+    return expr.str.parse_int(10, strict=False).cast(polars.UInt16).alias(name.lower())
 
 
-def __format_one_str(expr: polars.Expr, /, *_args: typing.Any, **kargs: typing.Any) -> polars.Expr:
+def __format_one_str(expr: polars.Expr, /, name: str) -> polars.Expr:
     """Manage string field."""
-    return expr.alias(kargs["name"].lower())
+    return expr.alias(name.lower())
 
 
-def __format_list_int(expr: polars.Expr, /, *_args: typing.Any, **kargs: typing.Any) -> polars.Expr:
+def __format_list_int(expr: polars.Expr, /, name: str) -> polars.Expr:
     """Manage list of integer field."""
     return (
         expr.str.split(",")
         .arr.eval(polars.element().str.parse_int(10, strict=False).cast(polars.UInt16))
-        .alias(kargs["name"].lower())
+        .alias(name.lower())
     )
 
 
-def __format_list_str(expr: polars.Expr, /, *_args: typing.Any, **kargs: typing.Any) -> polars.Expr:
+def __format_list_str(expr: polars.Expr, /, name: str) -> polars.Expr:
     """Manag list string field."""
-    return expr.str.split(",").alias(kargs["name"].lower())
+    return expr.str.split(",").alias(name.lower())
 
 
 def format2expr(
     header: list[str],
     input_path: pathlib.Path,
     select_format: set[str] | None = None,
-) -> dict[str, Callable[Concatenate[polars.Expr, P], polars.Expr]]:
+) -> dict[str, Callable[[polars.Expr, str], polars.Expr]]:
     """Read vcf header to generate a list of polars.Expr to extract genotypes informations.
 
     **Warning**: Float values can't be converted for the moment they are stored as String to keep the information
@@ -174,7 +174,7 @@ def format2expr(
         "ID=(?P<id>[A-Za-z_][0-9A-Za-z_.]*),Number=(?P<number>[ARG0-9\\.]+),Type=(?P<type>Integer|Float|String|Character)",
     )
 
-    expressions: dict[str, Callable[Concatenate[polars.Expr, P], polars.Expr]] = {}
+    expressions: dict[str, Callable[[polars.Expr, str], polars.Expr]] = {}
 
     for line in header:
         if line.startswith("#CHROM"):

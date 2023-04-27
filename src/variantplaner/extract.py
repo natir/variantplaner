@@ -4,14 +4,27 @@
 from __future__ import annotations
 
 import logging
+import typing
+from typing import Callable
 
 # 3rd party import
 import polars
 
+# project import
 from variantplaner.exception import NoGenotypeError
 from variantplaner.io.vcf import MINIMAL_COL_NUMBER
 
-# project import
+# typing import
+if typing.TYPE_CHECKING:  # pragma: no cover
+    import sys
+
+    if sys.version_info >= (3, 11):
+        from typing import ParamSpec
+    else:
+        from typing_extensions import ParamSpec
+
+    T = typing.TypeVar("T")
+    P = ParamSpec("P")
 
 
 LF_COL_NB_NO_GENOTYPE = MINIMAL_COL_NUMBER + 1
@@ -39,13 +52,19 @@ def variants(lf: polars.LazyFrame) -> polars.LazyFrame:
     )
 
 
-def genotypes(lf: polars.LazyFrame) -> polars.LazyFrame:
+def genotypes(
+    lf: polars.LazyFrame,
+    col2expr: dict[str, Callable[[polars.Expr, str], polars.Expr]],
+    format_str: str = "GT:AD:DP:GQ",
+) -> polars.LazyFrame:
     """Extract genotypes information in lazyframe.
 
     Only variant with format column like 'GT:AD:DP:GQ' are support.
 
     Args:
         lf: A lazyframe
+        col2expr: A dict associate colum name and function to apply to create specific column
+        format_str: Only variants match with this string format are considere
 
     Returns:
         A lazyframe with genotype information (id, sample, gt, ad, db, gq)
@@ -60,13 +79,13 @@ def genotypes(lf: polars.LazyFrame) -> polars.LazyFrame:
     lf = lf.select([*lf.columns[MINIMAL_COL_NUMBER:]])
 
     # Clean bad variant
-    lf = lf.filter(polars.col("format").str.starts_with("GT:AD:DP:GQ"))
+    lf = lf.filter(polars.col("format").str.starts_with(format_str))
 
     # Found index of genotype value
     col_index = {
         key: index
         for (index, key) in enumerate(
-            lf.select(["format"]).first().collect()["format"][0].split(":"),
+            format_str.split(":"),
         )
     }
 
@@ -75,43 +94,16 @@ def genotypes(lf: polars.LazyFrame) -> polars.LazyFrame:
         [
             polars.col("id"),
             polars.col("variable").alias("sample"),
+            polars.col("value").str.split(":"),
         ],
     )
 
     # Split genotype column in sub value
-    genotypes = genotypes.select(
-        [
-            polars.col("id"),
-            polars.col("sample"),
-            # gt column
-            polars.col("value")
-            .str.split(":")
-            .arr.get(col_index["GT"])
-            .str.count_match("1")
-            .cast(polars.UInt8)
-            .alias("gt"),
-            # ad column
-            polars.col("value")
-            .str.split(":")
-            .arr.get(col_index["AD"])
-            .str.split(",")
-            .arr.eval(polars.element().str.parse_int(10, strict=False).cast(polars.UInt16))
-            .alias("ad"),
-            # dp column
-            polars.col("value")
-            .str.split(":")
-            .arr.get(col_index["DP"])
-            .str.parse_int(10, strict=False)
-            .cast(polars.UInt16)
-            .alias("dp"),
-            # gq column
-            polars.col("value")
-            .str.split(":")
-            .arr.get(col_index["GQ"])
-            .str.parse_int(10, strict=False)
-            .cast(polars.UInt16)
-            .alias("gq"),
-        ],
+    genotypes = genotypes.with_columns(
+        [polars.col("value").arr.get(index).pipe(function=col2expr[col], name=col) for col, index in col_index.items()],  # type: ignore # noqa: PGH003
     )
+
+    # Select intrusting column
+    genotypes = genotypes.select(["id", "sample", *[col.lower() for col in col_index]])
 
     return genotypes.filter(polars.col("gt") != 0)
