@@ -123,11 +123,13 @@ def test_show_help_vcf2parquet() -> None:
   Convert a vcf in parquet.
 
 Options:
-  -i, --input-path FILE  Path to vcf input file  [required]
-  -v, --variants FILE    Path where the variants will be written in parquet
-                         [required]
-  -g, --genotypes FILE   Path where the genotypes will be written in parquet
-  --help                 Show this message and exit.
+  -i, --input-path FILE     Path to vcf input file  [required]
+  -v, --variants FILE       Path where the variants will be written in parquet
+                            [required]
+  -g, --genotypes FILE      Path where the genotypes will be written in parquet
+  -f, --format-string TEXT  Value of FORMAT column, line not match with this are
+                            ignored  [default: GT:AD:DP:GQ]
+  --help                    Show this message and exit.
 """
     )
 

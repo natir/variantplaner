@@ -71,7 +71,20 @@ def main(threads: int = 1, verbose: int = 0) -> None:
     help="Path where the genotypes will be written in parquet",
     type=click.Path(dir_okay=False, writable=True, path_type=pathlib.Path),
 )
-def vcf2parquet(input_path: pathlib.Path, variants: pathlib.Path, genotypes: pathlib.Path) -> None:
+@click.option(
+    "-f",
+    "--format-string",
+    help="Value of FORMAT column, line not match with this are ignored",
+    type=str,
+    default="GT:AD:DP:GQ",
+    show_default=True,
+)
+def vcf2parquet(
+    input_path: pathlib.Path,
+    variants: pathlib.Path,
+    genotypes: pathlib.Path,
+    format_string: str = "GT:AD:DP:GQ",
+) -> None:
     """Convert a vcf in parquet."""
     logger = logging.getLogger("vcf2parquet")
 
@@ -89,7 +102,7 @@ def vcf2parquet(input_path: pathlib.Path, variants: pathlib.Path, genotypes: pat
     if genotypes:
         try:
             vcf_header = io.vcf.extract_header(input_path)
-            extract.genotypes(lf, io.vcf.format2expr(vcf_header, input_path), "GT:AD:DP:GQ").sink_parquet(genotypes)
+            extract.genotypes(lf, io.vcf.format2expr(vcf_header, input_path), format_string).sink_parquet(genotypes)
         except exception.NoGenotypeError:
             logger.exception("")
             sys.exit(2)
