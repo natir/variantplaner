@@ -76,44 +76,66 @@ def test_write_or_add(tmp_path: pathlib.Path) -> None:
 
 def test_hive(tmp_path: pathlib.Path) -> None:
     """Check partition genotype parquet."""
-    struct.genotypes.hive([DATA_DIR / "no_info.genotypes.parquet"], tmp_path)
+    struct.genotypes.hive(
+        [DATA_DIR / "no_info.genotypes.parquet", DATA_DIR / "no_info.genotypes.parquet"],
+        tmp_path,
+        threads=2,
+    )
 
     partition_paths = set(__scantree(tmp_path))
+
     assert partition_paths == {
-        tmp_path / "id_mod=24/sample_mod=44/0.parquet",
-        tmp_path / "id_mod=27/sample_mod=44/0.parquet",
-        tmp_path / "id_mod=40/sample_mod=44/0.parquet",
-        tmp_path / "id_mod=9/sample_mod=44/0.parquet",
-        tmp_path / "id_mod=22/sample_mod=44/0.parquet",
-        tmp_path / "id_mod=8/sample_mod=44/0.parquet",
-        tmp_path / "id_mod=47/sample_mod=8/0.parquet",
-        tmp_path / "id_mod=34/sample_mod=44/0.parquet",
-        tmp_path / "id_mod=15/sample_mod=8/0.parquet",
-        tmp_path / "id_mod=8/sample_mod=16/0.parquet",
-        tmp_path / "id_mod=17/sample_mod=44/0.parquet",
-        tmp_path / "id_mod=24/sample_mod=16/0.parquet",
-        tmp_path / "id_mod=47/sample_mod=44/0.parquet",
-        tmp_path / "id_mod=29/sample_mod=44/0.parquet",
-        tmp_path / "id_mod=31/sample_mod=44/0.parquet",
-        tmp_path / "id_mod=15/sample_mod=44/0.parquet",
-        tmp_path / "id_mod=49/sample_mod=8/0.parquet",
-        tmp_path / "id_mod=28/sample_mod=8/0.parquet",
-        tmp_path / "id_mod=30/sample_mod=44/0.parquet",
-        tmp_path / "id_mod=23/sample_mod=44/0.parquet",
-        tmp_path / "id_mod=44/sample_mod=8/0.parquet",
-        tmp_path / "id_mod=15/sample_mod=16/0.parquet",
-        tmp_path / "id_mod=49/sample_mod=44/0.parquet",
-        tmp_path / "id_mod=40/sample_mod=8/0.parquet",
-        tmp_path / "id_mod=8/sample_mod=8/0.parquet",
-        tmp_path / "id_mod=28/sample_mod=44/0.parquet",
-        tmp_path / "id_mod=24/sample_mod=8/0.parquet",
-        tmp_path / "id_mod=27/sample_mod=8/0.parquet",
-        tmp_path / "id_mod=44/sample_mod=44/0.parquet",
-        tmp_path / "id_mod=28/sample_mod=16/0.parquet",
+        tmp_path / "id_mod=233/0.parquet",
+        tmp_path / "id_mod=103/0.parquet",
+        tmp_path / "id_mod=98/0.parquet",
+        tmp_path / "id_mod=223/1.parquet",
+        tmp_path / "id_mod=223/0.parquet",
+        tmp_path / "id_mod=233/1.parquet",
+        tmp_path / "id_mod=56/1.parquet",
+        tmp_path / "id_mod=98/1.parquet",
+        tmp_path / "id_mod=56/0.parquet",
+        tmp_path / "id_mod=57/1.parquet",
+        tmp_path / "id_mod=54/1.parquet",
+        tmp_path / "id_mod=57/0.parquet",
+        tmp_path / "id_mod=14/1.parquet",
+        tmp_path / "id_mod=54/0.parquet",
+        tmp_path / "id_mod=112/1.parquet",
+        tmp_path / "id_mod=14/0.parquet",
+        tmp_path / "id_mod=114/1.parquet",
+        tmp_path / "id_mod=70/1.parquet",
+        tmp_path / "id_mod=112/0.parquet",
+        tmp_path / "id_mod=70/0.parquet",
+        tmp_path / "id_mod=212/1.parquet",
+        tmp_path / "id_mod=154/1.parquet",
+        tmp_path / "id_mod=202/1.parquet",
+        tmp_path / "id_mod=179/1.parquet",
+        tmp_path / "id_mod=220/1.parquet",
+        tmp_path / "id_mod=154/0.parquet",
+        tmp_path / "id_mod=114/0.parquet",
+        tmp_path / "id_mod=212/0.parquet",
+        tmp_path / "id_mod=179/0.parquet",
+        tmp_path / "id_mod=4/1.parquet",
+        tmp_path / "id_mod=202/0.parquet",
+        tmp_path / "id_mod=220/0.parquet",
+        tmp_path / "id_mod=4/0.parquet",
+        tmp_path / "id_mod=244/1.parquet",
+        tmp_path / "id_mod=244/0.parquet",
+        tmp_path / "id_mod=79/1.parquet",
+        tmp_path / "id_mod=79/0.parquet",
+        tmp_path / "id_mod=93/1.parquet",
+        tmp_path / "id_mod=50/1.parquet",
+        tmp_path / "id_mod=93/0.parquet",
+        tmp_path / "id_mod=103/1.parquet",
+        tmp_path / "id_mod=50/0.parquet",
     }
 
     value = polars.concat([polars.read_parquet(path) for path in partition_paths]).drop("id_mod")
-    truth = polars.read_parquet(DATA_DIR / "no_info.genotypes.parquet")
+    truth = polars.concat(
+        [
+            polars.read_parquet(DATA_DIR / "no_info.genotypes.parquet"),
+            polars.read_parquet(DATA_DIR / "no_info.genotypes.parquet"),
+        ],
+    )
 
     assert sorted(value.get_column("id").to_list()) == sorted(truth.get_column("id").to_list())
     assert sorted(value.get_column("sample").to_list()) == sorted(truth.get_column("sample").to_list())
