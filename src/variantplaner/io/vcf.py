@@ -307,6 +307,8 @@ if typing.TYPE_CHECKING:  # pragma: no cover
             "QUAL": str,
             "FILTER": str,
             "INFO": dict[str, str],
+            "FORMAT": str,
+            "sample": dict[str, dict[str, str]],
         },
     )
 
@@ -319,6 +321,8 @@ DEFAULT_RENAME: RenameCol = {
     "QUAL": ".",
     "FILTER": ".",
     "INFO": {},
+    "FORMAT": "",
+    "sample": {},
 }
 
 
@@ -331,6 +335,8 @@ def build_rename_column(
     qual: str | None = ".",
     filter_col: str | None = ".",
     info: dict[str, str] | None = None,
+    format_string: str | None = None,
+    sample: dict[str, dict[str, str]] | None = None,
 ) -> RenameCol:
     """Helper to generate rename column for from_lazyframe.
 
@@ -345,8 +351,36 @@ def build_rename_column(
         "ALT": alt,
         "QUAL": "." if qual is None else qual,
         "FILTER": "." if filter_col is None else filter_col,
-        "INFO": info if info is not None else {},
+        "INFO": {} if info is None else info,
+        "FORMAT": "" if format_string is None else format_string,
+        "sample": {} if sample is None else sample,
     }
+
+
+def __lazy2format(sample_name: str, format_string: str, col2type: dict[str, polars.PolarsDataType]) -> polars.Expr:
+    """Use sample name and column name to build sample column."""
+    expression = []
+
+    for col_name in format_string.split(":"):
+        lazy_name = f"{sample_name}_{col_name.lower()}"
+        if col_name == "GT":
+            expression.append(
+                polars.col(lazy_name)
+                .cast(polars.Utf8)
+                .fill_null("./.")
+                .str.replace("1", "0/1")
+                .str.replace("2", "1/1"),
+            )
+        elif isinstance(col2type[lazy_name], polars.List):
+            expression.append(
+                polars.col(lazy_name).cast(polars.List(polars.Utf8)).fill_null(["."]).arr.join(","),
+            )
+        else:
+            expression.append(
+                polars.col(lazy_name).cast(polars.Utf8).fill_null("."),
+            )
+
+    return polars.concat_str(expression, separator=":")
 
 
 def from_lazyframe(
@@ -374,6 +408,8 @@ def from_lazyframe(
     Returns:
         None
     """
+    select_column: list[str] = []
+
     lf = lf.with_columns(
         [
             polars.col(renaming["#CHROM"])
@@ -389,26 +425,42 @@ def from_lazyframe(
         ],
     )
 
-    header = generate_header(lf, renaming["INFO"])
+    select_column.extend(["#CHROM", "POS", "ID", "REF", "ALT"])
+
+    header = generate_header(lf, renaming["INFO"], list(renaming["sample"].keys()), renaming["FORMAT"])
 
     if renaming["QUAL"] != ".":
         lf = lf.with_columns([polars.col(renaming["QUAL"]).alias("QUAL")])
     else:
         lf = lf.with_columns([polars.lit(".").alias("QUAL")])
 
+    select_column.append("QUAL")
+
     if renaming["FILTER"] != ".":
         lf = lf.with_columns([polars.col(renaming["FILTER"]).alias("FILTER")])
     else:
         lf = lf.with_columns([polars.lit(".").alias("FILTER")])
 
-    if "INFO" in renaming and renaming["INFO"]:
-        lf = add_info_column(lf, renaming["INFO"])
-    else:
-        lf = lf.with_columns(
-            polars.lit(".").alias("INFO"),
-        )
+    select_column.append("FILTER")
 
-    lf = lf.select([polars.col(colname) for colname in renaming])
+    lf = add_info_column(lf, renaming["INFO"]) if renaming["INFO"] else lf.with_columns(polars.lit(".").alias("INFO"))
+
+    select_column.append("INFO")
+
+    if renaming["FORMAT"]:
+        lf = lf.with_columns(polars.lit(renaming["FORMAT"]).alias("FORMAT"))
+        select_column.append("FORMAT")
+
+    if renaming["FORMAT"] and renaming["sample"]:
+        for sample_name in renaming["sample"]:
+            lf = lf.with_columns(
+                [
+                    __lazy2format(sample_name, renaming["FORMAT"], dict(zip(lf.columns, lf.dtypes))).alias(sample_name),
+                ],
+            )
+            select_column.append(sample_name)
+
+    lf = lf.select([polars.col(col) for col in select_column])
 
     with open(output_path, "wb") as fh:
         fh.write(header.encode())
@@ -466,7 +518,12 @@ def add_info_column(lf: polars.LazyFrame, vcfinfo2parquet_name: dict[str, str]) 
     return lf
 
 
-def generate_header(lf: polars.LazyFrame, vcfinfo2parquet_name: dict[str, str] | None = None) -> str:
+def generate_header(
+    lf: polars.LazyFrame,
+    vcfinfo2parquet_name: dict[str, str] | None = None,
+    samples: list[str] | None = None,
+    format_string: str | None = None,
+) -> str:
     """Generate header of vcf file.
 
     Args:
@@ -479,9 +536,9 @@ def generate_header(lf: polars.LazyFrame, vcfinfo2parquet_name: dict[str, str] |
     header = """##fileformat=VCFv4.3
 ##source=VariantPlanner
 """
+    col2type = dict(zip(lf.columns, lf.dtypes))
 
     if vcfinfo2parquet_name:
-        col2type = dict(zip(lf.columns, lf.dtypes))
         for vcf_name, col_name in vcfinfo2parquet_name.items():
             number = "." if isinstance(col2type[col_name], polars.List) else "1"
             type_ = "String"
@@ -489,5 +546,17 @@ def generate_header(lf: polars.LazyFrame, vcfinfo2parquet_name: dict[str, str] |
             type_ = "Integer" if isinstance(col2type[col_name], polars.Int64) else type_
 
             header += f'##INFO=<ID={vcf_name},Number={number},Type={type_},Description="Unknow">\n'
+
+    if samples and format_string:
+        sample = samples[0]
+        for col in format_string.split(":"):
+            col_name = f"{sample}_{col.lower()}"
+
+            number = "." if isinstance(col2type[col_name], polars.List) else "1"
+            type_ = "String"
+            type_ = "Float" if isinstance(col2type[col_name], polars.Float64) else type_
+            type_ = "Integer" if isinstance(col2type[col_name], polars.Int64) else type_
+
+            header += f'##FORMAT=<ID={col.upper()},Number={number},Type={type_},Description="Unknow">\n'
 
     return header

@@ -92,7 +92,13 @@ def test_chunk_by_memory() -> None:
             DATA_DIR / "no_info.parquet",
             DATA_DIR / "no_info.parquet2vcf.vcf",
         ],
-        [DATA_DIR / "no_info.tsv", DATA_DIR / "no_info.variants.parquet", DATA_DIR / "no_info.vcf"],
+        [
+            DATA_DIR / "no_info.tsv",
+            DATA_DIR / "no_info.variants.parquet",
+            DATA_DIR / "no_info.vcf",
+            DATA_DIR / "no_info.vcf2parquet2vcf.vcf",
+        ],
+        [],
     ]
 
     assert chunks == truth

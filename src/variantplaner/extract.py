@@ -107,3 +107,30 @@ def genotypes(
     genotypes = genotypes.select(["id", "sample", *[col.lower() for col in col_index]])
 
     return genotypes.filter(polars.col("gt") != 0)
+
+
+def merge_variants_genotypes(
+    variants_lf: polars.LazyFrame,
+    genotypes_lf: polars.LazyFrame,
+    sample_name: list[str],
+) -> polars.LazyFrame:
+    """Merge variants and genotypes lazyframe.
+
+    Args:
+       variants_lf: lazyframe with variants, column: (id, chr, pos, ref, alt).
+       genotypes_lf: lazyframe with genotypes, column: (id, sample, [genotype column]).
+
+    Returns:
+        A lazyframe with all data
+    """
+    for sample in sample_name:
+        geno2sample = (
+            genotypes_lf.filter(polars.col("sample") == sample)
+            .rename(
+                {col: f"{sample}_{col}" for col in genotypes_lf.columns[2:]},
+            )
+            .drop("sample")
+        )
+        variants_lf = variants_lf.join(geno2sample, on="id", how="outer")
+
+    return variants_lf
