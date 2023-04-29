@@ -81,11 +81,12 @@ done
 ```bash
 find vcf -type f -name *.vcf -exec basename {} .vcf \; | \
 parallel variantplaner -t 2 vcf2parquet -i vcf/{}.vcf -v variants/{}.parquet \
--g genotypes/{}.parquet
+-g genotypes/{}.parquet -f GT:PS:DP:ADALL:AD:GQ
 ```
 ///
 
 Parquet variants file contains 5 column:
+
 - chr: Chromosome name, X -> 22, Y -> 23, MT -> 24
 - pos: Position of variant
 - ref: Reference sequence
@@ -106,16 +107,24 @@ pqrs head variants/HG001.parquet
 ///
 
 Parquet genotypes file contains column:
+
 - id: Same as variant id
 - gt: vcf GT value 1 -> heterozygote 2 -> homozygote (phasing information is lost)
-- ad: vcf AD per allele reads depth
+- ps: Phase set in which this variant falls
 - dp: vcf DP coverage of the variant for this sample
+- adall: Net allele depths across all datasets
+- ad: vcf AD per allele reads depth
 - gq: vcf GQ quality of variant for this sample
 
 /// details | genotypes parquet file content
 You can inspect content of parquet file generate with pqrs
 ```bash
-	TODO
+pqrs head genotypes/HG001.parquet
+{id: 17886044532216650390, sample: "HG001", gt: 2, ps: null, dp: 652, adall: [16, 234], ad: [0, 82], gq: 312}
+{id: 7513336577790240873, sample: "HG001", gt: 2, ps: null, dp: 639, adall: [0, 218], ad: [0, 84], gq: 194}
+{id: 17987040642944149052, sample: "HG001", gt: 2, ps: null, dp: 901, adall: [105, 406], ad: [0, 74], gq: 301}
+{id: 10342734968077036194, sample: "HG001", gt: 2, ps: null, dp: 820, adall: [125, 383], ad: [0, 70], gq: 339}
+{id: 890514037559296207, sample: "HG001", gt: 1, ps: null, dp: 760, adall: [161, 142], ad: [25, 37], gq: 147}
 ```
 ///
 
