@@ -24,7 +24,7 @@ import click
 import polars
 
 # project import
-from variantplaner import exception, extract, io, struct
+from variantplaner import exception, extract, generate, io, struct
 
 
 @click.group(name="variantplaner")
@@ -79,10 +79,32 @@ def main(threads: int = 1, verbose: int = 0) -> None:
     default="GT:AD:DP:GQ",
     show_default=True,
 )
+@click.option(
+    "-c",
+    "--childs",
+    help="Sample name of childs",
+    type=str,
+    multiple=True,
+)
+@click.option(
+    "-m",
+    "--mother",
+    help="Sample name of mother, need childs option to be set",
+    type=str,
+)
+@click.option(
+    "-f",
+    "--father",
+    help="Sample name of father, need childs option to be set",
+    type=str,
+)
 def vcf2parquet(
     input_path: pathlib.Path,
     variants: pathlib.Path,
     genotypes: pathlib.Path,
+    childs: list[str] | None,
+    mother: str | None,
+    father: str | None,
     format_string: str = "GT:AD:DP:GQ",
 ) -> None:
     """Convert a vcf in parquet."""
@@ -102,10 +124,16 @@ def vcf2parquet(
     if genotypes:
         try:
             vcf_header = io.vcf.extract_header(input_path)
-            extract.genotypes(lf, io.vcf.format2expr(vcf_header, input_path), format_string).sink_parquet(genotypes)
+            genotypes_lf = extract.genotypes(lf, io.vcf.format2expr(vcf_header, input_path), format_string)
         except exception.NoGenotypeError:
             logger.exception("")
             sys.exit(2)
+
+        if childs:
+            genotypes_lf = generate.origin(genotypes_lf, childs, mother=mother, father=father)
+            genotypes_lf.collect(streaming=True).write_parquet(genotypes)
+        else:
+            genotypes_lf.sink_parquet(genotypes)
 
     logger.info(f"finish write {genotypes}")
 
@@ -280,7 +308,6 @@ def genotypes(ctx: click.Context, prefix_path: pathlib.Path) -> None:
     os.environ["POLARS_MAX_THREADS"] = "1"
 
     logger.debug(f"parameter: {prefix_path=}")
-    print(f"{threads=}, {os.environ['POLARS_MAX_THREADS']=}")
 
     struct.genotypes.hive(input_paths, prefix_path, threads)
 

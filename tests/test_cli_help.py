@@ -129,6 +129,9 @@ Options:
   -g, --genotypes FILE      Path where the genotypes will be written in parquet
   -f, --format-string TEXT  Value of FORMAT column, line not match with this are
                             ignored  [default: GT:AD:DP:GQ]
+  -c, --childs TEXT         Sample name of childs
+  -m, --mother TEXT         Sample name of mother, need childs option to be set
+  -f, --father TEXT         Sample name of father, need childs option to be set
   --help                    Show this message and exit.
 """
     )
