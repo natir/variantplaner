@@ -147,15 +147,17 @@ def test_show_help_parquet2vcf() -> None:
   Convert parquet in vcf.
 
 Options:
-  -i, --input-path FILE   Path to variants in parquet format  [required]
-  -o, --output FILE       Path where the vcf is write  [required]
-  -c, --chromosome TEXT   Name of chromosome column  [default: chr]
-  -p, --position TEXT     Name of position column  [default: pos]
-  -I, --identifier TEXT   Name of identity column  [default: id]
-  -r, --reference TEXT    Name of reference column  [default: ref]
-  -a, --alternative TEXT  Name of alternative column  [default: alt]
-  -q, --quality TEXT      Name of quality column
-  -f, --filter TEXT       Name of filter column
-  --help                  Show this message and exit.
+  -i, --input-path FILE      Path to variants in parquet format  [required]
+  -g, --genotypes-path FILE  Path to genotypes in parquet format
+  -o, --output FILE          Path where the vcf is write  [required]
+  -c, --chromosome TEXT      Name of chromosome column  [default: chr]
+  -p, --position TEXT        Name of position column  [default: pos]
+  -I, --identifier TEXT      Name of identity column  [default: id]
+  -r, --reference TEXT       Name of reference column  [default: ref]
+  -a, --alternative TEXT     Name of alternative column  [default: alt]
+  -q, --quality TEXT         Name of quality column
+  -f, --filter TEXT          Name of filter column
+  -F, --format TEXT          Value of format column
+  --help                     Show this message and exit.
 """
     )

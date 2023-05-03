@@ -477,8 +477,6 @@ def add_info_column(lf: polars.LazyFrame, vcfinfo2parquet_name: dict[str, str]) 
     Returns:
         LazyFrame with INFO column and remove select column
     """
-    polars.Config().set_tbl_cols(100)
-
     lf = lf.with_columns(
         [
             polars.col(name).arr.join(",").fill_null(".").alias(name)

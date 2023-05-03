@@ -147,6 +147,31 @@ def test_parquet2vcf(tmp_path: pathlib.Path) -> None:
     assert filecmp.cmp(variants_path, DATA_DIR / "no_info.parquet2vcf.vcf")
 
 
+def test_parquet2vcf_add_genotype(tmp_path: pathlib.Path) -> None:
+    """parquet2vcf run."""
+    variants_path = tmp_path / "variants.vcf"
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli.main,
+        [
+            "parquet2vcf",
+            "-i",
+            str(DATA_DIR / "no_info.variants.parquet"),
+            "-o",
+            str(variants_path),
+            "-g",
+            str(DATA_DIR / "no_info.genotypes.parquet"),
+            "-F",
+            "GT:AD:DP:GQ",
+        ],
+    )
+
+    assert result.exit_code == 0
+
+    assert filecmp.cmp(variants_path, DATA_DIR / "no_info.parquet2vcf_genotypes.vcf")
+
+
 def test_struct_variants(tmp_path: pathlib.Path) -> None:
     """Basic struct variant run."""
     merge_path = tmp_path / "merge.parquet"
