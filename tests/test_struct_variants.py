@@ -3,7 +3,6 @@
 # std import
 from __future__ import annotations
 
-import os
 import pathlib
 import random
 
@@ -77,11 +76,17 @@ def test_random_string() -> None:
 
 def test_chunk_by_memory() -> None:
     """Check by memory."""
-    paths = sorted(
-        pathlib.Path(entry.path)
-        for entry in os.scandir(DATA_DIR)
-        if entry.is_file() and entry.name.startswith("no_info")
-    )
+    paths = [
+        DATA_DIR / "no_info.csv",
+        DATA_DIR / "no_info.genotypes.parquet",
+        DATA_DIR / "no_info.parquet",
+        DATA_DIR / "no_info.parquet2vcf.vcf",
+        DATA_DIR / "no_info.parquet2vcf_genotypes.vcf",
+        DATA_DIR / "no_info.tsv",
+        DATA_DIR / "no_info.variants.parquet",
+        DATA_DIR / "no_info.vcf",
+        DATA_DIR / "no_info.vcf2parquet2vcf.vcf",
+    ]
 
     chunks = list(struct.variants.__chunk_by_memory(paths, 10000))
 
@@ -92,7 +97,13 @@ def test_chunk_by_memory() -> None:
             DATA_DIR / "no_info.parquet",
             DATA_DIR / "no_info.parquet2vcf.vcf",
         ],
-        [DATA_DIR / "no_info.tsv", DATA_DIR / "no_info.variants.parquet", DATA_DIR / "no_info.vcf"],
+        [
+            DATA_DIR / "no_info.parquet2vcf_genotypes.vcf",
+            DATA_DIR / "no_info.tsv",
+            DATA_DIR / "no_info.variants.parquet",
+            DATA_DIR / "no_info.vcf",
+        ],
+        [DATA_DIR / "no_info.vcf2parquet2vcf.vcf"],
     ]
 
     assert chunks == truth

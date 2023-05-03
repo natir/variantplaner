@@ -24,7 +24,7 @@ import polars
 import pytest
 
 # project import
-from variantplaner import exception, io
+from variantplaner import exception, extract, io
 
 DATA_DIR = pathlib.Path(__file__).parent / "data"
 
@@ -214,9 +214,21 @@ def test_build_rename_column() -> None:
         "QUAL": ".",
         "FILTER": ".",
         "INFO": {},
+        "FORMAT": "",
+        "sample": {},
     }
 
-    assert io.vcf.build_rename_column("chr", "pos", "id", "ref", "alt", "quality", "FILTER", {"GENE": "gene_name"}) == {
+    assert io.vcf.build_rename_column(
+        "chr",
+        "pos",
+        "id",
+        "ref",
+        "alt",
+        "quality",
+        "FILTER",
+        {"GENE": "gene_name"},
+        "GT:AD:DP:GQ",
+    ) == {
         "#CHROM": "chr",
         "POS": "pos",
         "ID": "id",
@@ -225,6 +237,39 @@ def test_build_rename_column() -> None:
         "QUAL": "quality",
         "FILTER": "FILTER",
         "INFO": {"GENE": "gene_name"},
+        "FORMAT": "GT:AD:DP:GQ",
+        "sample": {},
+    }
+
+    assert io.vcf.build_rename_column(
+        "chr",
+        "pos",
+        "id",
+        "ref",
+        "alt",
+        "quality",
+        "FILTER",
+        {"GENE": "gene_name"},
+        "GT:AD:DP:GQ",
+        {
+            "sample": {
+                "gt": "sample_gt",
+                "ad": "sample_ad",
+                "dp": "sample_dp",
+                "gq": "sample_gq",
+            },
+        },
+    ) == {
+        "#CHROM": "chr",
+        "POS": "pos",
+        "ID": "id",
+        "REF": "ref",
+        "ALT": "alt",
+        "QUAL": "quality",
+        "FILTER": "FILTER",
+        "INFO": {"GENE": "gene_name"},
+        "FORMAT": "GT:AD:DP:GQ",
+        "sample": {"sample": {"gt": "sample_gt", "ad": "sample_ad", "dp": "sample_dp", "gq": "sample_gq"}},
     }
 
 
@@ -268,6 +313,50 @@ def test_from_lazyframe_qual_filter_info(tmp_path: pathlib.Path) -> None:
     )
 
     assert filecmp.cmp(output_path, DATA_DIR / "no_genotypes.vcf2parquet2vcf.vcf")
+
+
+def test_from_lazyframe_qual_filter_format(tmp_path: pathlib.Path) -> None:
+    """Check from_lazyframe qual, filter, info."""
+    output_path = tmp_path / "output.vcf"
+    input_path = DATA_DIR / "no_info.vcf"
+
+    format_string = "GT:AD:DP:GQ"
+    vcf = io.vcf.into_lazyframe(input_path)
+    vcf_header = io.vcf.extract_header(input_path)
+    sample_name = io.vcf.sample_index(vcf_header, input_path)
+    if sample_name is None:
+        raise AssertionError  # pragma: no cover Not reachable code
+
+    format2expr = io.vcf.format2expr(vcf_header, input_path)
+
+    variants = extract.variants(vcf)
+    genotypes = extract.genotypes(vcf, format2expr, format_string)
+
+    merge = extract.merge_variants_genotypes(variants, genotypes, list(sample_name.keys()))
+    sample2vcf_col2polars_col: dict[str, dict[str, str]] = {}
+    for sample in sample_name:
+        sample2vcf_col2polars_col[sample] = {}
+        for format_col in format_string.split(":"):
+            sample2vcf_col2polars_col[sample][format_col] = f"{sample}_{format_col.lower()}"
+
+    io.vcf.from_lazyframe(
+        merge,
+        output_path,
+        io.vcf.build_rename_column(
+            "chr",
+            "pos",
+            "id",
+            "ref",
+            "alt",
+            None,
+            None,
+            {},
+            "GT:AD:DP:GQ",
+            sample2vcf_col2polars_col,
+        ),
+    )
+
+    assert filecmp.cmp(output_path, DATA_DIR / "no_info.vcf2parquet2vcf.vcf")
 
 
 def test_add_info_column() -> None:
