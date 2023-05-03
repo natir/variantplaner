@@ -70,17 +70,20 @@ def write_or_add(new_lf: polars.DataFrame, partition_path: pathlib.Path) -> None
         new_lf.write_parquet(partition_path)
 
 
-def __hive_worker(path: pathlib.Path, output_prefix: pathlib.Path, basename: int) -> pathlib.Path:
+def __hive_worker(path: pathlib.Path, output_prefix: pathlib.Path) -> pathlib.Path:
     """Subprocess of hive function run in parallel.
 
     Args:
         path: List of file you want reorganise
         output_prefix: prefix of hive
-        basename: name of parquet file
 
     Returns:
         None
     """
+    basename = multiprocessing.current_process().name.split("-")[-1]
+
+    logger.info(f"{path=} in {basename=}")
+
     polars.scan_parquet(path).with_columns(
         [
             polars.col("id").mod(255).alias("id_mod"),
@@ -113,5 +116,5 @@ def hive(paths: list[pathlib.Path], output_prefix: pathlib.Path, threads: int = 
     """
     threads = min(threads, len(paths))
 
-    with multiprocessing.get_context("spawn").Pool() as pool:
-        pool.starmap(__hive_worker, [(path, output_prefix, i) for i, path in enumerate(paths)])
+    with multiprocessing.get_context("spawn").Pool(threads) as pool:
+        pool.starmap(__hive_worker, [(path, output_prefix) for path in paths])
