@@ -121,39 +121,6 @@ def test_vcf2parquet_not_vcf(tmp_path: pathlib.Path) -> None:
     assert result.exit_code == 1
 
 
-def test_vcf2parquet_add_origin(tmp_path: pathlib.Path) -> None:
-    """vcf2parquet run."""
-    variants_path = tmp_path / "variants.parquet"
-    genotypes_path = tmp_path / "genotypes.parquet"
-
-    runner = CliRunner()
-    result = runner.invoke(
-        cli.main,
-        [
-            "vcf2parquet",
-            "-i",
-            str(DATA_DIR / "no_info.vcf"),
-            "-v",
-            str(variants_path),
-            "-g",
-            str(genotypes_path),
-            "-c",
-            "sample_1",
-            "-f",
-            "sample_2",
-            "-m",
-            "sample_3",
-        ],
-    )
-
-    assert result.exit_code == 0
-    assert filecmp.cmp(DATA_DIR / "no_info.variants.parquet", variants_path)
-
-    truth = polars.scan_parquet(DATA_DIR / "no_info.genotypes.parquet")
-    genotypes = polars.scan_parquet(genotypes_path)
-    polars.testing.assert_frame_equal(truth, genotypes.drop("origin"))
-
-
 def test_vcf2parquet_no_genotype(tmp_path: pathlib.Path) -> None:
     """No genotype in vcf vcf2parquet run."""
     variants_path = tmp_path / "variants.parquet"
@@ -529,3 +496,26 @@ def test_metadata_csv_select(tmp_path: pathlib.Path) -> None:
     value = polars.scan_parquet(metadata_path)
 
     polars.testing.assert_frame_equal(truth, value)
+
+
+def test_generate_origin(tmp_path: pathlib.Path) -> None:
+    """Run generate origin."""
+
+    transmission_path = tmp_path / "transmission_path.parquet"
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli.main,
+        [
+            "generate",
+            "origin",
+            "-i",
+            DATA_DIR / "no_info.genotypes.parquet",
+            "-p",
+            DATA_DIR / "sample.ped",
+            "-t",
+            transmission_path,
+        ]
+    )
+
+    assert result.exit_code == 0

@@ -79,32 +79,10 @@ def main(threads: int = 1, verbose: int = 0) -> None:
     default="GT:AD:DP:GQ",
     show_default=True,
 )
-@click.option(
-    "-c",
-    "--childs",
-    help="Sample name of childs",
-    type=str,
-    multiple=True,
-)
-@click.option(
-    "-m",
-    "--mother",
-    help="Sample name of mother, need childs option to be set",
-    type=str,
-)
-@click.option(
-    "-f",
-    "--father",
-    help="Sample name of father, need childs option to be set",
-    type=str,
-)
 def vcf2parquet(
     input_path: pathlib.Path,
     variants: pathlib.Path,
     genotypes: pathlib.Path,
-    childs: list[str] | None,
-    mother: str | None,
-    father: str | None,
     format_string: str = "GT:AD:DP:GQ",
 ) -> None:
     """Convert a vcf in parquet."""
@@ -129,11 +107,7 @@ def vcf2parquet(
             logger.exception("")
             sys.exit(2)
 
-        if childs:
-            genotypes_lf = generate.origin(genotypes_lf, childs, mother=mother, father=father)
-            genotypes_lf.collect(streaming=True).write_parquet(genotypes)
-        else:
-            genotypes_lf.sink_parquet(genotypes)
+        genotypes_lf.sink_parquet(genotypes)
 
     logger.info(f"finish write {genotypes}")
 
@@ -558,3 +532,46 @@ def metadata_csv(ctx: click.Context, columns: list[str], separator: str = ",") -
         lf = lf.select(columns)
 
     lf.sink_parquet(output_path)
+
+
+############
+# Generate #
+############
+@main.group()
+def generate() -> None:
+    """Subcommand generate thing."""
+    logger = logging.getLogger("generate")
+
+    logger.debug("parameter: ")
+
+
+@generate.command("origin")
+@click.option(
+    "-i",
+    "--input-path",
+    help="Path genotypes parquet file",
+    type=click.Path(exists=True, dir_okay=False, readable=True, allow_dash=True, path_type=pathlib.Path),
+    required=True,
+)
+@click.option(
+    "-p",
+    "--ped-path",
+    help="Path to the ped file",
+    type=click.Path(exists=True, dir_okay=False, readable=True, path_type=pathlib.Path),
+)
+@click.option(
+    "-t",
+    "--transmission-path",
+    help="Path transmission mode will be store",
+    type=click.Path(dir_okay=False, writable=True, path_type=pathlib.Path),
+)
+def origin(input_path: pathlib.Path, ped_path: pathlib.Path, transmission_path: pathlib.Path) -> None:
+    """Convert an metadata csv in parquet."""
+    logger = logging.getLogger("generate-origin")
+
+    logger.debug(f"parameter: {input_path=} {ped_path=} {transmission_path=}")
+
+    genotypes_lf = polars.scan_parquet(input_path)
+
+    #origin = generate.origin(genotypes_lf, childs, mother=mother, father=father)
+    genotypes_lf.collect().write_parquet(transmission_path)
