@@ -1,3 +1,3 @@
 sample	sample_3	unknow	unknow	m	false
 sample	sample_2	unknow	unknow	f	true
-sample	sample_1	unknow	unknow	m	true
+sample	sample_1	sample_2	sample_3	f	true

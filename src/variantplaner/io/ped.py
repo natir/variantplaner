@@ -7,16 +7,6 @@ import typing
 
 if typing.TYPE_CHECKING:  # pragma: no cover
     import pathlib
-    import sys
-
-    if sys.version_info >= (3, 11):
-        from typing import ParamSpec
-    else:
-        from typing_extensions import ParamSpec
-
-    T = typing.TypeVar("T")
-    P = ParamSpec("P")
-
 
 # 3rd party import
 import polars

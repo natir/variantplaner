@@ -7,6 +7,7 @@ import filecmp
 
 # 3rd party import
 import pathlib
+
 import polars
 
 # project import
@@ -26,7 +27,6 @@ def test_into_lazyframe() -> None:
 
 def test_from_lazyframe(tmp_path: pathlib.Path) -> None:
     """Check from_lazyframe."""
-
     output_path = tmp_path / "sample.ped"
     ped_lf = polars.scan_parquet(DATA_DIR / "sample.parquet")
 

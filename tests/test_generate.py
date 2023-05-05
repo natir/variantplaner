@@ -3,6 +3,7 @@
 # std import
 from __future__ import annotations
 
+import filecmp
 import pathlib
 
 # 3rd party import
@@ -15,190 +16,16 @@ from variantplaner import generate
 DATA_DIR = pathlib.Path(__file__).parent / "data"
 
 
-def test_origin() -> None:
+def test_transmission(tmp_path: pathlib.Path) -> None:
     """Check add_origin of genotype."""
-    genotypes = polars.scan_parquet("tests/data/no_info.genotypes.parquet")
+    out_path = tmp_path / "transmission.parquet"
 
-    with_origin = generate.origin(genotypes, ["sample_1"], father="sample_2", mother="sample_3")
-    truth = [
-        4,
-        4,
-        4,
-        4,
-        4,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-    ]
+    genotypes_lf = polars.scan_parquet(DATA_DIR / "no_info.genotypes.parquet")
+    pedigree_lf = polars.scan_parquet(DATA_DIR / "sample.parquet")
 
-    assert truth == with_origin.collect().get_column("origin").to_list()
+    transmission = generate.transmission_ped(genotypes_lf, pedigree_lf)
+    transmission.write_parquet(out_path)
 
-    with_origin = generate.origin(genotypes, ["sample_2"], father="sample_1", mother="sample_3")
-    truth = [
-        0,
-        0,
-        0,
-        0,
-        0,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        4,
-        4,
-        4,
-        4,
-        4,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-    ]
+    truth = DATA_DIR / "transmission.parquet"
 
-    assert truth == with_origin.collect().get_column("origin").to_list()
-
-    with_origin = generate.origin(genotypes, ["sample_2", "sample_3"], mother="sample_3")
-    truth = [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-        2,
-    ]
-
-    assert truth == with_origin.collect().get_column("origin").to_list()
-
-    with_origin = generate.origin(genotypes, ["sample_2", "sample_3"], father="sample_3")
-    truth = [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        3,
-        3,
-        3,
-        3,
-        3,
-        3,
-        3,
-        3,
-        3,
-        3,
-        3,
-        3,
-        3,
-        3,
-        3,
-        3,
-        3,
-        3,
-        3,
-        3,
-        3,
-        3,
-        3,
-    ]
-
-    assert truth == with_origin.collect().get_column("origin").to_list()
+    filecmp.cmp(truth, out_path)

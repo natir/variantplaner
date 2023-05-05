@@ -178,6 +178,6 @@ Options:
   --help  Show this message and exit.
 
 Commands:
-  origin  Convert an metadata csv in parquet.
+  transmission  Generate transmission information.
 """
     )

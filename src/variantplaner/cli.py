@@ -347,7 +347,7 @@ def annotations_vcf(ctx: click.Context, info: set[str] | None = None, rename_id:
         lf = io.vcf.into_lazyframe(input_paths[0])
     except exception.NotAVCFError:
         logger.exception("")
-        sys.exit(1)
+        sys.exit(4)
 
     lf = lf.with_columns(info_parser).drop(["chr", "pos", "ref", "alt", "filter", "qual", "info"])
 
@@ -537,15 +537,15 @@ def metadata_csv(ctx: click.Context, columns: list[str], separator: str = ",") -
 ############
 # Generate #
 ############
-@main.group()
-def generate() -> None:
+@main.group("generate")
+def generate_main() -> None:
     """Subcommand generate thing."""
     logger = logging.getLogger("generate")
 
     logger.debug("parameter: ")
 
 
-@generate.command("origin")
+@generate_main.command("transmission")
 @click.option(
     "-i",
     "--input-path",
@@ -560,18 +560,51 @@ def generate() -> None:
     type=click.Path(exists=True, dir_okay=False, readable=True, path_type=pathlib.Path),
 )
 @click.option(
+    "-I",
+    "--index",
+    help="Sample name of index",
+    type=str,
+)
+@click.option(
+    "-m",
+    "--mother",
+    help="Sample name of mother",
+    type=str,
+)
+@click.option(
+    "-f",
+    "--father",
+    help="Sample name of father",
+    type=str,
+)
+@click.option(
     "-t",
     "--transmission-path",
     help="Path transmission mode will be store",
     type=click.Path(dir_okay=False, writable=True, path_type=pathlib.Path),
 )
-def origin(input_path: pathlib.Path, ped_path: pathlib.Path, transmission_path: pathlib.Path) -> None:
-    """Convert an metadata csv in parquet."""
+def transmission(
+    input_path: pathlib.Path,
+    ped_path: pathlib.Path | None,
+    index: str | None,
+    mother: str | None,
+    father: str | None,
+    transmission_path: pathlib.Path,
+) -> None:
+    """Generate transmission information."""
     logger = logging.getLogger("generate-origin")
 
-    logger.debug(f"parameter: {input_path=} {ped_path=} {transmission_path=}")
+    logger.debug(f"parameter: {input_path=} {ped_path=} {index=} {mother=} {father=} {transmission_path=}")
 
     genotypes_lf = polars.scan_parquet(input_path)
 
-    #origin = generate.origin(genotypes_lf, childs, mother=mother, father=father)
-    genotypes_lf.collect().write_parquet(transmission_path)
+    if ped_path:
+        ped_lf = io.ped.into_lazyframe(ped_path)
+        transmission_lf = generate.transmission_ped(genotypes_lf, ped_lf)
+    elif index and mother and father:
+        transmission_lf = generate.transmission(genotypes_lf, index, mother, father)
+    else:
+        logging.error("You must specify ped file or index, mother and father sample name")
+        sys.exit(5)
+
+    transmission_lf.write_parquet(transmission_path)

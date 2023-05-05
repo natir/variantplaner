@@ -258,7 +258,7 @@ def test_annotations_vcf_not_vcf(tmp_path: pathlib.Path) -> None:
         ],
     )
 
-    assert result.exit_code == 1
+    assert result.exit_code == 4
 
 
 def test_annotations_vcf_select(tmp_path: pathlib.Path) -> None:
@@ -498,9 +498,8 @@ def test_metadata_csv_select(tmp_path: pathlib.Path) -> None:
     polars.testing.assert_frame_equal(truth, value)
 
 
-def test_generate_origin(tmp_path: pathlib.Path) -> None:
+def test_generate_transmission_ped(tmp_path: pathlib.Path) -> None:
     """Run generate origin."""
-
     transmission_path = tmp_path / "transmission_path.parquet"
 
     runner = CliRunner()
@@ -508,14 +507,70 @@ def test_generate_origin(tmp_path: pathlib.Path) -> None:
         cli.main,
         [
             "generate",
-            "origin",
+            "transmission",
             "-i",
-            DATA_DIR / "no_info.genotypes.parquet",
+            str(DATA_DIR / "no_info.genotypes.parquet"),
             "-p",
-            DATA_DIR / "sample.ped",
+            str(DATA_DIR / "sample.ped"),
             "-t",
-            transmission_path,
-        ]
+            str(transmission_path),
+        ],
     )
 
     assert result.exit_code == 0
+
+    truth = polars.read_parquet(DATA_DIR / "transmission.parquet").sort("id")
+    value = polars.read_parquet(transmission_path).sort("id")
+
+    polars.testing.assert_frame_equal(truth, value)
+
+
+def test_generate_transmission_no_ped(tmp_path: pathlib.Path) -> None:
+    """Run generate origin."""
+    transmission_path = tmp_path / "transmission_path.parquet"
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli.main,
+        [
+            "generate",
+            "transmission",
+            "-i",
+            str(DATA_DIR / "no_info.genotypes.parquet"),
+            "-I",
+            "sample_1",
+            "-m",
+            "sample_3",
+            "-f",
+            "sample_2",
+            "-t",
+            str(transmission_path),
+        ],
+    )
+
+    assert result.exit_code == 0
+
+    truth = polars.read_parquet(DATA_DIR / "transmission.parquet").sort("id")
+    value = polars.read_parquet(transmission_path).sort("id")
+
+    polars.testing.assert_frame_equal(truth, value)
+
+
+def test_generate_transmission_nothing(tmp_path: pathlib.Path) -> None:
+    """Run generate origin."""
+    transmission_path = tmp_path / "transmission_path.parquet"
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli.main,
+        [
+            "generate",
+            "transmission",
+            "-i",
+            str(DATA_DIR / "no_info.genotypes.parquet"),
+            "-t",
+            str(transmission_path),
+        ],
+    )
+
+    assert result.exit_code == 5
