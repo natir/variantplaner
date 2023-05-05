@@ -24,7 +24,7 @@ import click
 import polars
 
 # project import
-from variantplaner import exception, extract, io, struct
+from variantplaner import exception, extract, generate, io, struct
 
 
 @click.group(name="variantplaner")
@@ -102,10 +102,12 @@ def vcf2parquet(
     if genotypes:
         try:
             vcf_header = io.vcf.extract_header(input_path)
-            extract.genotypes(lf, io.vcf.format2expr(vcf_header, input_path), format_string).sink_parquet(genotypes)
+            genotypes_lf = extract.genotypes(lf, io.vcf.format2expr(vcf_header, input_path), format_string)
         except exception.NoGenotypeError:
             logger.exception("")
             sys.exit(2)
+
+        genotypes_lf.sink_parquet(genotypes)
 
     logger.info(f"finish write {genotypes}")
 
@@ -330,7 +332,6 @@ def genotypes(ctx: click.Context, prefix_path: pathlib.Path) -> None:
     os.environ["POLARS_MAX_THREADS"] = "1"
 
     logger.debug(f"parameter: {prefix_path=}")
-    print(f"{threads=}, {os.environ['POLARS_MAX_THREADS']=}")
 
     struct.genotypes.hive(input_paths, prefix_path, threads)
 
@@ -396,7 +397,7 @@ def annotations_vcf(ctx: click.Context, info: set[str] | None = None, rename_id:
         lf = io.vcf.into_lazyframe(input_paths[0])
     except exception.NotAVCFError:
         logger.exception("")
-        sys.exit(1)
+        sys.exit(4)
 
     lf = lf.with_columns(info_parser).drop(["chr", "pos", "ref", "alt", "filter", "qual", "info"])
 
@@ -581,3 +582,79 @@ def metadata_csv(ctx: click.Context, columns: list[str], separator: str = ",") -
         lf = lf.select(columns)
 
     lf.sink_parquet(output_path)
+
+
+############
+# Generate #
+############
+@main.group("generate")
+def generate_main() -> None:
+    """Subcommand generate thing."""
+    logger = logging.getLogger("generate")
+
+    logger.debug("parameter: ")
+
+
+@generate_main.command("transmission")
+@click.option(
+    "-i",
+    "--input-path",
+    help="Path genotypes parquet file",
+    type=click.Path(exists=True, dir_okay=False, readable=True, allow_dash=True, path_type=pathlib.Path),
+    required=True,
+)
+@click.option(
+    "-p",
+    "--ped-path",
+    help="Path to the ped file",
+    type=click.Path(exists=True, dir_okay=False, readable=True, path_type=pathlib.Path),
+)
+@click.option(
+    "-I",
+    "--index",
+    help="Sample name of index",
+    type=str,
+)
+@click.option(
+    "-m",
+    "--mother",
+    help="Sample name of mother",
+    type=str,
+)
+@click.option(
+    "-f",
+    "--father",
+    help="Sample name of father",
+    type=str,
+)
+@click.option(
+    "-t",
+    "--transmission-path",
+    help="Path transmission mode will be store",
+    type=click.Path(dir_okay=False, writable=True, path_type=pathlib.Path),
+)
+def transmission(
+    input_path: pathlib.Path,
+    ped_path: pathlib.Path | None,
+    index: str | None,
+    mother: str | None,
+    father: str | None,
+    transmission_path: pathlib.Path,
+) -> None:
+    """Generate transmission information."""
+    logger = logging.getLogger("generate-origin")
+
+    logger.debug(f"parameter: {input_path=} {ped_path=} {index=} {mother=} {father=} {transmission_path=}")
+
+    genotypes_lf = polars.scan_parquet(input_path)
+
+    if ped_path:
+        ped_lf = io.ped.into_lazyframe(ped_path)
+        transmission_lf = generate.transmission_ped(genotypes_lf, ped_lf)
+    elif index and mother and father:
+        transmission_lf = generate.transmission(genotypes_lf, index, mother, father)
+    else:
+        logging.error("You must specify ped file or index, mother and father sample name")
+        sys.exit(5)
+
+    transmission_lf.write_parquet(transmission_path)

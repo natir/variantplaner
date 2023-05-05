@@ -29,6 +29,7 @@ Options:
 
 Commands:
   annotations  Convert an annotation variation file in parquet.
+  generate     Subcommand generate thing.
   metadata     Convert an metadata file in parquet.
   parquet2vcf  Convert parquet in vcf.
   struct       Struct operation on parquet file.
@@ -159,5 +160,26 @@ Options:
   -f, --filter TEXT          Name of filter column
   -F, --format TEXT          Value of format column
   --help                     Show this message and exit.
+"""
+    )
+
+
+def test_show_help_generate() -> None:
+    """Call cli 'generate --help'."""
+    runner = CliRunner()
+    result = runner.invoke(cli.main, ["generate", "--help"])
+
+    assert result.exit_code == 0
+    assert (
+        result.stdout
+        == """Usage: variantplaner generate [OPTIONS] COMMAND [ARGS]...
+
+  Subcommand generate thing.
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  transmission  Generate transmission information.
 """
     )
