@@ -31,10 +31,8 @@ def test_transmission(tmp_path: pathlib.Path) -> None:
     filecmp.cmp(truth, out_path)
 
 
-def test_transmission_missing_mother(tmp_path: pathlib.Path) -> None:
+def test_transmission_missing_mother() -> None:
     """Check add_origin of genotype."""
-    out_path = tmp_path / "transmission.parquet"
-
     genotypes_lf = polars.scan_parquet(DATA_DIR / "no_info.genotypes.parquet")
     genotypes_lf = genotypes_lf.filter(polars.col("sample") != "sample_3")
 
@@ -50,10 +48,8 @@ def test_transmission_missing_mother(tmp_path: pathlib.Path) -> None:
     assert transmission.get_column("mother_gq").to_list() == [None, None, None, None, None]
 
 
-def test_transmission_missing_father(tmp_path: pathlib.Path) -> None:
+def test_transmission_missing_father() -> None:
     """Check add_origin of genotype."""
-    out_path = tmp_path / "transmission.parquet"
-
     genotypes_lf = polars.scan_parquet(DATA_DIR / "no_info.genotypes.parquet")
     genotypes_lf = genotypes_lf.filter(polars.col("sample") != "sample_2")
 
