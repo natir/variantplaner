@@ -22,3 +22,10 @@ def test_nogenotypeerror() -> None:
     e = exception.NoGenotypeError()
 
     assert f"{e}" == "LazyFrame seems not contains genotypes."
+
+
+def test_nogterror() -> None:
+    """Check exception NoGTError."""
+    e = exception.NoGTError("prout")
+
+    assert f"{e}" == "In prout gt column is missing."

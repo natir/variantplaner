@@ -27,3 +27,11 @@ class NoGenotypeError(Exception):
     def __init__(self):
         """Initialize no genotype error."""
         super().__init__("LazyFrame seems not contains genotypes.")
+
+
+class NoGTError(Exception):
+    """Exception raise if genotype polars.LazyFrame not contains gt column."""
+
+    def __init__(self, message: str):
+        """Initialize no gt error."""
+        super().__init__(f"In {message} gt column is missing.")

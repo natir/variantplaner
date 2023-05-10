@@ -9,6 +9,7 @@ import logging
 import polars
 
 # project import
+from variantplaner.exception import NoGTError
 
 logger = logging.getLogger("generate")
 
@@ -22,12 +23,14 @@ def transmission_ped(
     **Warning**: only the first sample with two parent are consider.
 
     Args:
-        genotypes_lf: Genotypes LazyFrame.
+        genotypes_lf: Genotypes LazyFrame, `gt` column are required.
         pedigree_lf: Pedigree LazyFrame.
-
 
     Returns:
          DataFrame with transmission information
+
+    Raises:
+        NoGTError: if genotypes_lf not containts gt column.
     """
     pedigree_lf = pedigree_lf.filter(polars.col("father_id") != "unknow").filter(polars.col("mother_id") != "unknow")
 
@@ -42,20 +45,27 @@ def transmission(
     mother_name: str,
     father_name: str,
 ) -> polars.DataFrame:
-    """Compute transmission of each variants.
+    """Compute how each variant are transmite to index case.
 
     Args:
-        genotypes_lf: Genotypes LazyFrame.
-        index_name: Sample name of index case
-        mother_name: Sample name of mother
-        father_name: Sample name of father
+        genotypes_lf: Genotypes polars.LazyFrame, `gt` column are required.
+        index_name: Sample name of index case.
+        mother_name: Sample name of mother.
+        father_name: Sample name of father.
 
     Returns:
          DataFrame with transmission information.
-         With gt, ad, dp and gq for index, mother and father.
+         With genotyping information for index, mother and father.
          If any of them isn't present value are set to polars.Null (0 for gt)
          Columns transmission contains: index_gt * 100 + mother_gt * 10 + father_gt
+
+    Raises:
+        NoGTError: if genotypes_lf not containts gt column.
     """
+    genotypes_column = list(genotypes_lf.columns[2:])
+    if "gt" not in genotypes_column:
+        raise NoGTError("genotype polars.LazyFrame")
+
     group_lf = genotypes_lf.groupby("id").all().collect()
     group_lf = group_lf.filter(polars.col("sample").arr.contains(index_name))
 
@@ -67,46 +77,37 @@ def transmission(
     logger.debug(f"{sample2index}")
 
     transmission_lf = group_lf.with_columns(
-        polars.col("gt").arr.get(sample2index[index_name]).alias("index_gt"),
-        polars.col("ad").arr.get(sample2index[index_name]).alias("index_ad"),
-        polars.col("dp").arr.get(sample2index[index_name]).alias("index_dp"),
-        polars.col("gq").arr.get(sample2index[index_name]).alias("index_gq"),
+        [polars.col(col).arr.get(sample2index[index_name]).alias(f"index_{col}") for col in genotypes_column],
     )
 
     if mother_name in sample2index:
         transmission_lf = transmission_lf.with_columns(
-            polars.col("gt").arr.get(sample2index[mother_name]).alias("mother_gt"),
-            polars.col("ad").arr.get(sample2index[mother_name]).alias("mother_ad"),
-            polars.col("dp").arr.get(sample2index[mother_name]).alias("mother_dp"),
-            polars.col("gq").arr.get(sample2index[mother_name]).alias("mother_gq"),
+            [polars.col(col).arr.get(sample2index[mother_name]).alias(f"mother_{col}") for col in genotypes_column],
         )
     else:
         transmission_lf = transmission_lf.with_columns(
-            polars.lit(0).alias("mother_gt"),
-            polars.lit(None).alias("mother_ad"),
-            polars.lit(None).alias("mother_dp"),
-            polars.lit(None).alias("mother_gq"),
+            [
+                polars.lit(0).alias("mother_gt"),
+                *[polars.lit(None).alias(f"mother_{col}") for col in genotypes_column if col != "gt"],
+            ],
         )
 
     if father_name in sample2index:
         transmission_lf = transmission_lf.with_columns(
-            polars.col("gt").arr.get(sample2index[father_name]).alias("father_gt"),
-            polars.col("ad").arr.get(sample2index[father_name]).alias("father_ad"),
-            polars.col("dp").arr.get(sample2index[father_name]).alias("father_dp"),
-            polars.col("gq").arr.get(sample2index[father_name]).alias("father_gq"),
+            [polars.col(col).arr.get(sample2index[father_name]).alias(f"father_{col}") for col in genotypes_column],
         )
     else:
         transmission_lf = transmission_lf.with_columns(
-            polars.lit(0).alias("father_gt"),
-            polars.lit(None).alias("father_ad"),
-            polars.lit(None).alias("father_dp"),
-            polars.lit(None).alias("father_gq"),
+            [
+                polars.lit(0).alias("father_gt"),
+                *[polars.lit(None).alias(f"father_{col}") for col in genotypes_column if col != "gt"],
+            ],
         )
 
     transmission_lf = transmission_lf.with_columns(
         (polars.col("index_gt") * 100 + polars.col("mother_gt") * 10 + polars.col("father_gt")).alias("origin"),
     )
 
-    transmission_lf = transmission_lf.drop(["sample", "gt", "ad", "dp", "gq"])
+    transmission_lf = transmission_lf.drop(["sample", *genotypes_column])
 
     return transmission_lf

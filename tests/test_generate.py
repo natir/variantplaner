@@ -9,9 +9,10 @@ import pathlib
 # 3rd party import
 import polars
 import polars.testing
+import pytest
 
 # project import
-from variantplaner import generate
+from variantplaner import exception, generate
 
 DATA_DIR = pathlib.Path(__file__).parent / "data"
 
@@ -29,6 +30,45 @@ def test_transmission(tmp_path: pathlib.Path) -> None:
     truth = DATA_DIR / "transmission.parquet"
 
     filecmp.cmp(truth, out_path)
+
+
+def test_transmission_missing_ad(tmp_path: pathlib.Path) -> None:
+    """Check add_origin of genotype."""
+    tmp_path / "transmission.parquet"
+
+    genotypes_lf = polars.scan_parquet(DATA_DIR / "no_info.genotypes.parquet")
+    pedigree_lf = polars.scan_parquet(DATA_DIR / "sample.parquet")
+
+    genotypes_lf = genotypes_lf.drop("ad")
+
+    transmission = generate.transmission_ped(genotypes_lf, pedigree_lf)
+
+    assert transmission.columns == [
+        "id",
+        "index_gt",
+        "index_dp",
+        "index_gq",
+        "mother_gt",
+        "mother_dp",
+        "mother_gq",
+        "father_gt",
+        "father_dp",
+        "father_gq",
+        "origin",
+    ]
+
+
+def test_transmission_nogt(tmp_path: pathlib.Path) -> None:
+    """Check add_origin of genotype."""
+    tmp_path / "transmission.parquet"
+
+    genotypes_lf = polars.scan_parquet(DATA_DIR / "no_info.genotypes.parquet")
+    pedigree_lf = polars.scan_parquet(DATA_DIR / "sample.parquet")
+
+    genotypes_lf = genotypes_lf.drop("gt")
+
+    with pytest.raises(exception.NoGTError):
+        generate.transmission_ped(genotypes_lf, pedigree_lf)
 
 
 def test_transmission_missing_mother() -> None:
