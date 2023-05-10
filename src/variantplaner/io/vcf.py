@@ -37,6 +37,8 @@ logger = logging.getLogger("io.vcf")
 def extract_header(input_path: pathlib.Path) -> list[str]:
     """Extract all header information of vcf file.
 
+    Line between start of file and first line start with '#CHROM' or not start with '#'
+
     Args:
         input_path: Path to vcf file.
 
@@ -45,7 +47,7 @@ def extract_header(input_path: pathlib.Path) -> list[str]:
 
     Raises:
         NotAVCFError: If a line not starts with '#'
-        NotAVCFError: If all line not start by '#CHR'
+        NotAVCFError: If all line not start by '#CHROM'
     """
     headers = []
     with open(input_path) as fh:
@@ -53,7 +55,7 @@ def extract_header(input_path: pathlib.Path) -> list[str]:
             if not line.startswith("#"):
                 raise NotAVCFError(input_path)
 
-            if line.startswith("#CHR"):
+            if line.startswith("#CHROM"):
                 headers.append(line)
                 return headers
 
@@ -157,12 +159,12 @@ def format2expr(
 ) -> dict[str, Callable[[polars.Expr, str], polars.Expr]]:
     """Read vcf header to generate a list of polars.Expr to extract genotypes informations.
 
-    **Warning**: Float values can't be converted for the moment they are stored as String to keep the information
+    **Warning**: Float values can't be converted for the moment they are stored as String to keep information
 
     Args:
-        header: Line of vcf header
+        header: Line of vcf header.
         input_path: Path to vcf file.
-        select_format: List of target format field
+        select_format: List of target format field.
 
     Returns:
         A dict to link format id to pipeable function with Polars.Expr
@@ -306,7 +308,7 @@ if typing.TYPE_CHECKING:  # pragma: no cover
             "ALT": str,
             "QUAL": str,
             "FILTER": str,
-            "INFO": dict[str, str],
+            "INFO": list[tuple[str, str]],
             "FORMAT": str,
             "sample": dict[str, dict[str, str]],
         },
@@ -320,7 +322,7 @@ DEFAULT_RENAME: RenameCol = {
     "ALT": "alt",
     "QUAL": ".",
     "FILTER": ".",
-    "INFO": {},
+    "INFO": [],
     "FORMAT": "",
     "sample": {},
 }
@@ -334,11 +336,11 @@ def build_rename_column(
     alt: str,
     qual: str | None = ".",
     filter_col: str | None = ".",
-    info: dict[str, str] | None = None,
+    info: list[tuple[str, str]] | None = None,
     format_string: str | None = None,
     sample: dict[str, dict[str, str]] | None = None,
 ) -> RenameCol:
-    """Helper to generate rename column for from_lazyframe.
+    """An helper function to generate rename column dict for io.vcf.from_lazyframe function parameter.
 
     Returns:
         A rename column dictionary.
@@ -351,7 +353,7 @@ def build_rename_column(
         "ALT": alt,
         "QUAL": "." if qual is None else qual,
         "FILTER": "." if filter_col is None else filter_col,
-        "INFO": {} if info is None else info,
+        "INFO": [] if info is None else info,
         "FORMAT": "" if format_string is None else format_string,
         "sample": {} if sample is None else sample,
     }
@@ -388,18 +390,16 @@ def from_lazyframe(
     output_path: pathlib.Path,
     renaming: RenameCol = DEFAULT_RENAME,
 ) -> None:
-    """Write lazyframe in vcf format.
-
-    Only variants information is write no info or genotype.
+    """Write polars.LazyFrame in vcf format.
 
     Chromosome name mapping table:
-        - 23: X
-        - 24: Y
-        - 25: MT
+      - 23: X
+      - 24: Y
+      - 25: MT
 
-    All other number isn't change.
+    All other chromosome number isn't change.
 
-    Warning: This function perform LazyFrame.collect() before write csv, this can have a significant impact on memory usage
+    Warning: This function perform LazyFrame.collect() before write csv, this can have a significant impact on memory usage.
 
     Args:
         lf: LazyFrame contains information.
@@ -427,7 +427,7 @@ def from_lazyframe(
 
     select_column.extend(["#CHROM", "POS", "ID", "REF", "ALT"])
 
-    header = generate_header(lf, renaming["INFO"], list(renaming["sample"].keys()), renaming["FORMAT"])
+    header = __generate_header(lf, renaming["INFO"], list(renaming["sample"].keys()), renaming["FORMAT"])
 
     if renaming["QUAL"] != ".":
         lf = lf.with_columns([polars.col(renaming["QUAL"]).alias("QUAL")])
@@ -467,15 +467,15 @@ def from_lazyframe(
         fh.write(lf.collect().write_csv(separator="\t").encode())
 
 
-def add_info_column(lf: polars.LazyFrame, vcfinfo2parquet_name: dict[str, str]) -> polars.LazyFrame:
-    """Add INFO column in polars lazyframe.
+def add_info_column(lf: polars.LazyFrame, vcfinfo2parquet_name: list[tuple[str, str]]) -> polars.LazyFrame:
+    """Construct an INFO column from multiple columns of lf.
 
     Args:
-        lf: The dataframe
-        vcfinfo2parquet_name: vcf column name link to column name
+        lf: A dataframe.
+        vcfinfo2parquet_name: List of vcf column name and lf column name.
 
     Returns:
-        LazyFrame with INFO column and remove select column
+        LazyFrame with INFO column and remove lf column use.
     """
     lf = lf.with_columns(
         [
@@ -504,21 +504,21 @@ def add_info_column(lf: polars.LazyFrame, vcfinfo2parquet_name: dict[str, str]) 
                             polars.col(parquet_name),
                         ],
                     )
-                    for vcf_name, parquet_name in vcfinfo2parquet_name.items()
+                    for vcf_name, parquet_name in vcfinfo2parquet_name
                 ],
                 separator=";",
             ).alias("INFO"),
         ],
     )
 
-    lf = lf.drop(list(vcfinfo2parquet_name.values()))
+    lf = lf.drop([p for (v, p) in vcfinfo2parquet_name])
 
     return lf
 
 
-def generate_header(
+def __generate_header(
     lf: polars.LazyFrame,
-    vcfinfo2parquet_name: dict[str, str] | None = None,
+    vcfinfo2parquet_name: list[tuple[str, str]] | None = None,
     samples: list[str] | None = None,
     format_string: str | None = None,
 ) -> str:
@@ -537,7 +537,7 @@ def generate_header(
     col2type = dict(zip(lf.columns, lf.dtypes))
 
     if vcfinfo2parquet_name:
-        for vcf_name, col_name in vcfinfo2parquet_name.items():
+        for vcf_name, col_name in vcfinfo2parquet_name:
             number = "." if isinstance(col2type[col_name], polars.List) else "1"
             type_ = "String"
             type_ = "Float" if isinstance(col2type[col_name], polars.Float64) else type_

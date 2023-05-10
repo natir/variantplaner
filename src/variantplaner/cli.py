@@ -235,7 +235,7 @@ def parquet2vcf(
                 alternative,
                 quality,
                 filter_col,
-                {},
+                [],
                 format_str,
                 sample2vcf_col2polars_col,
             ),

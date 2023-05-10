@@ -143,7 +143,7 @@ File `variants.parquet` containt all uniq variants present in dataset.
 
 ### Genotypes structuration
 
-```
+```bash
 input=$(find variants -type f -name *.parquet -exec echo "-i" {} \; | tr '\n' ' ')
 variantplaner -t 8 struct ${input} genotypes -p hive/
 ```
@@ -155,6 +155,22 @@ All genotypes information are split in an [hive structure](https://duckdb.org/do
 To work on your variant you probably need and annotations.
 
 ### Snpeff annotations
+
+First convert your unique variants in parquet format (`variants.parquet`) in vcf:
+```bash
+variantplaner -t 8 parquet2vcf -i variants.parquet -o variants.vcf
+```
+
+`parquet2vcf` subcommand have many more option but we didn't need it now.
+
+Next annotate this `variants.vcf` [with snpeff](https://pcingola.github.io/SnpEff/), we assume you generate a file call `variants.snpeff.vcf`.
+
+To convert annotated vcf in parquet, keep 'ANN' info column and rename vcf id column in snpeff\_id you can run:
+```bash
+variantplaner -t 8 annotations -i variants.snpeff.vcf -o snpeff.parquet vcf -i ANN -r snpeff_id
+```
+
+If you didn't set any value of option `-i` in vcf subsubcommand all info column are keep.
 
 ### Clinvar annotations
 

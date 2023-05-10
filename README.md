@@ -4,8 +4,7 @@
 [![doc](https://img.shields.io/badge/docs-mkdocs%20material-blue.svg?style=flat)](https://natir.github.io/variantplaner/)
 [![pypi version](https://img.shields.io/pypi/v/variantplaner.svg)](https://pypi.org/project/variantplaner/)
 
-
-A tool kit to manage many variant on desktop computer
+A tool kit to manage many variant without many cpu and ram ressource.
 
 ## Installation
 
@@ -22,7 +21,9 @@ pipx install git+https://github.com/natir/variantplaner.git@0.1.0-alpha#egg=vari
 
 ## Usage
 
-This section present basic usage for a more complete exemple check our usage
+This section present basic usage for a more complete exemple check our [usage page](https://natir.github.io/variantplaner/usages/)
+
+**WARNING**: variantplaner support only not compressed file, sorry it's a downstream trouble.
 
 ### Convert vcf in parquet
 

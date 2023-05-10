@@ -15,7 +15,7 @@ import polars
 
 
 def into_lazyframe(input_path: pathlib.Path) -> polars.LazyFrame:
-    """Read a pedigre file and convert it in lazyframe.
+    """Read a pedigre file and convert it in polars.LazyFrame.
 
     Args:
         input_path: Path to pedigre file.
@@ -41,7 +41,7 @@ def into_lazyframe(input_path: pathlib.Path) -> polars.LazyFrame:
 
 
 def from_lazyframe(lf: polars.LazyFrame, output_path: pathlib.Path) -> None:
-    """Write pedigre lazyframe in ped format.
+    """Write pedigre polars.LazyFrame in ped format.
 
     Warning: This function perform LazyFrame.collect() before write csv, this can have a significant impact on memory usage
 

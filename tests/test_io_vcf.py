@@ -226,7 +226,7 @@ def test_build_rename_column() -> None:
         "alt",
         "quality",
         "FILTER",
-        {"GENE": "gene_name"},
+        [("GENE", "gene_name")],
         "GT:AD:DP:GQ",
     ) == {
         "#CHROM": "chr",
@@ -236,7 +236,7 @@ def test_build_rename_column() -> None:
         "ALT": "alt",
         "QUAL": "quality",
         "FILTER": "FILTER",
-        "INFO": {"GENE": "gene_name"},
+        "INFO": [("GENE", "gene_name")],
         "FORMAT": "GT:AD:DP:GQ",
         "sample": {},
     }
@@ -249,7 +249,7 @@ def test_build_rename_column() -> None:
         "alt",
         "quality",
         "FILTER",
-        {"GENE": "gene_name"},
+        [("GENE", "gene_name")],
         "GT:AD:DP:GQ",
         {
             "sample": {
@@ -267,7 +267,7 @@ def test_build_rename_column() -> None:
         "ALT": "alt",
         "QUAL": "quality",
         "FILTER": "FILTER",
-        "INFO": {"GENE": "gene_name"},
+        "INFO": [("GENE", "gene_name")],
         "FORMAT": "GT:AD:DP:GQ",
         "sample": {"sample": {"gt": "sample_gt", "ad": "sample_ad", "dp": "sample_dp", "gq": "sample_gq"}},
     }
@@ -308,7 +308,7 @@ def test_from_lazyframe_qual_filter_info(tmp_path: pathlib.Path) -> None:
             "alt",
             "qual",
             "filter",
-            {col_name: col_name for col_name in lf.columns if col_name.isupper()},
+            [(col_name, col_name) for col_name in lf.columns if col_name.isupper()],
         ),
     )
 
@@ -350,7 +350,7 @@ def test_from_lazyframe_qual_filter_format(tmp_path: pathlib.Path) -> None:
             "alt",
             None,
             None,
-            {},
+            [],
             "GT:AD:DP:GQ",
             sample2vcf_col2polars_col,
         ),
@@ -365,7 +365,7 @@ def test_add_info_column() -> None:
     info_parser = io.vcf.info2expr(vcf_header, DATA_DIR / "no_genotypes.vcf")
     lf = io.vcf.into_lazyframe(DATA_DIR / "no_genotypes.vcf").with_columns(info_parser)
 
-    info = io.vcf.add_info_column(lf, {col_name: col_name for col_name in lf.columns if col_name.isupper()})
+    info = io.vcf.add_info_column(lf, [(col_name, col_name) for col_name in lf.columns if col_name.isupper()])
 
     truth = [
         "AF_ESP=.;AF_EXAC=.;AF_TGP=.;ALLELEID=2193183;CLNDN=Inborn_genetic_diseases;CLNDNINCL=.;CLNDISDB=MeSH:D030342,MedGen:C0950123;CLNDISDBINCL=.;CLNHGVS=NC_000001.11:g.69134A>G;CLNREVSTAT=criteria_provided,_single_submitter;CLNSIG=Likely_benign;CLNSIGCONF=.;CLNSIGINCL=.;CLNVC=single_nucleotide_variant;CLNVCSO=SO:0001483;CLNVI=.;DBVARID=.;GENEINFO=OR4F5:79501;MC=SO:0001583|missense_variant;ORIGIN=1;RS=.",
@@ -403,15 +403,15 @@ def test_generate_header() -> None:
     lf = io.vcf.into_lazyframe(DATA_DIR / "no_genotypes.vcf").with_columns(info_parser)
 
     assert (
-        io.vcf.generate_header(lf)
+        io.vcf.__generate_header(lf)
         == """##fileformat=VCFv4.3
 ##source=VariantPlanner
 """
     )
 
-    info = {col_name: col_name for col_name in lf.columns if col_name.isupper()}
+    info = [(col_name, col_name) for col_name in lf.columns if col_name.isupper()]
 
-    header = io.vcf.generate_header(lf, info)
+    header = io.vcf.__generate_header(lf, info)
     truth = """##fileformat=VCFv4.3
 ##source=VariantPlanner
 ##INFO=<ID=AF_ESP,Number=1,Type=String,Description="Unknow">

@@ -14,7 +14,7 @@ if typing.TYPE_CHECKING:  # pragma: no cover
 
 
 class NotAVCFError(Exception):
-    """Exception raise if file read seems not be a vcf."""
+    """Exception raise if file read seems not be a vcf, generaly not contains a line starts with '#CHROM'."""
 
     def __init__(self, path: pathlib.Path):
         """Initialize not a vcf error."""
@@ -22,7 +22,7 @@ class NotAVCFError(Exception):
 
 
 class NoGenotypeError(Exception):
-    """Exception raise if file read seems not be a vcf."""
+    """Exception raise if vcf file seems not contains genotypes information."""
 
     def __init__(self):
         """Initialize no genotype error."""

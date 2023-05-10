@@ -19,7 +19,7 @@ if typing.TYPE_CHECKING:  # pragma: no cover
         from typing_extensions import Unpack
 
     class ScanCsv(typing.TypedDict, total=False):
-        """ScanCsv typehint."""
+        """A struct to check type of parameter give to polars.scan_csv."""
 
         has_header: bool
         separator: str

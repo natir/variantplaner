@@ -18,7 +18,7 @@ import polars
 logger = logging.getLogger("struct.genotypes")
 
 
-def manage_group(
+def __manage_group(
     prefix: pathlib.Path,
     group_columns: list[str],
     basename: str,
@@ -45,14 +45,14 @@ def manage_group(
             / f"{basename}.parquet"
         )
 
-        write_or_add(group, path)
+        __write_or_add(group, path)
 
         return polars.DataFrame()
 
     return inner
 
 
-def write_or_add(new_lf: polars.DataFrame, partition_path: pathlib.Path) -> None:
+def __write_or_add(new_lf: polars.DataFrame, partition_path: pathlib.Path) -> None:
     """Create or add new data in parquet partition.
 
     Args:
@@ -91,7 +91,7 @@ def __hive_worker(path: pathlib.Path, output_prefix: pathlib.Path) -> pathlib.Pa
     ).groupby(
         "id_mod",
     ).apply(
-        manage_group(
+        __manage_group(
             output_prefix,
             [
                 "id_mod",
@@ -105,7 +105,7 @@ def __hive_worker(path: pathlib.Path, output_prefix: pathlib.Path) -> pathlib.Pa
 
 
 def hive(paths: list[pathlib.Path], output_prefix: pathlib.Path, threads: int = 1) -> None:
-    """Reorganise genotypes struct in hive like struct.
+    """Read all genotypes parquet file and use information to generate a hive like struct with genotype informations.
 
     Args:
         paths: List of file you want reorganise

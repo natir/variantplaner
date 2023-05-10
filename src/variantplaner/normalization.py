@@ -13,9 +13,9 @@ def chromosome2integer(lf: polars.LazyFrame) -> polars.LazyFrame:
     """Convert chromosome string in number.
 
     Chromosome name mapping table:
-        - X: 23
-        - Y: 24
-        - MT: 25
+      - X:  23
+      - Y:  24
+      - MT: 25
 
     If chromosome value can't be convert in number row is remove.
 

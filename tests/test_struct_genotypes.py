@@ -37,7 +37,7 @@ def test_manage_group(tmp_path: pathlib.Path) -> None:
     """Check manage group."""
     prefix = tmp_path / "manage_group"
 
-    func = struct.genotypes.manage_group(prefix, ["sample", "gt"], "1")
+    func = struct.genotypes.__manage_group(prefix, ["sample", "gt"], "1")
 
     df = polars.read_parquet(DATA_DIR / "no_info.genotypes.parquet")
 
@@ -61,11 +61,11 @@ def test_write_or_add(tmp_path: pathlib.Path) -> None:
 
     df = polars.read_parquet(DATA_DIR / "no_info.genotypes.parquet")
 
-    struct.genotypes.write_or_add(df, path)
+    struct.genotypes.__write_or_add(df, path)
 
     assert path.exists()
 
-    struct.genotypes.write_or_add(df, path)
+    struct.genotypes.__write_or_add(df, path)
 
     truth = polars.concat([df, df])
 

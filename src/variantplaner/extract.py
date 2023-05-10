@@ -1,4 +1,4 @@
-"""Function to manage variant data."""
+"""Function to extract information of polars.LazyFrame produce by raw vcf file."""
 
 # std import
 from __future__ import annotations
@@ -57,17 +57,17 @@ def genotypes(
     col2expr: dict[str, Callable[[polars.Expr, str], polars.Expr]],
     format_str: str = "GT:AD:DP:GQ",
 ) -> polars.LazyFrame:
-    """Extract genotypes information in lazyframe.
+    """Extract genotypes information of raw polars.LazyFrame.
 
-    Only variant with format column like 'GT:AD:DP:GQ' are support.
+    Only line with format value match `format_str` are consider.
 
     Args:
-        lf: A lazyframe
-        col2expr: A dict associate colum name and function to apply to create specific column
+        lf: The target lazyframe
+        col2expr: A dict associate column name and function to apply to create polars.LazyFrame column (produce by io.vcf.format2expr)
         format_str: Only variants match with this string format are considere
 
     Returns:
-        A lazyframe with genotype information (id, sample, gt, ad, db, gq)
+        A polars.LazyFrame with variant id, sample information and genotypes information
 
     Raises:
         NoGenotypeError: If number of column in lf indicate no format or genotype (9)

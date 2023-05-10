@@ -113,7 +113,7 @@ def test_concat_uniq_by_id(tmp_path: pathlib.Path) -> None:
     """Check concat_uniq_by_id."""
     tmp_file = tmp_path / "merge_by_id.parquet"
 
-    struct.variants.concat_uniq_by_id(
+    struct.variants.__concat_uniq_by_id(
         [DATA_DIR / "no_genotypes.variants.parquet", DATA_DIR / "no_info.variants.parquet"],
         tmp_file,
     )

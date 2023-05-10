@@ -86,6 +86,7 @@ plugins:
           merge_init_into_class: true
           docstring_options:
             ignore_init_summary: true
+          filters: ["!^_"]
 
 extra:
   social:
