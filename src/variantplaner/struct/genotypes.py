@@ -98,7 +98,7 @@ def __hive_worker(path: pathlib.Path, output_prefix: pathlib.Path) -> pathlib.Pa
             ],
             str(basename),
         ),
-        schema=None,
+        schema={},
     ).collect()
 
     return path
