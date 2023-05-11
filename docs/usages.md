@@ -30,7 +30,6 @@ curl ${URI_ROOT}/NA12878_HG001/latest/GRCh38/HG001_GRCh38_1_22_v4.2.1_benchmark.
 curl ${URI_ROOT}/AshkenazimTrio/HG002_NA24385_son/latest/GRCh38/HG002_GRCh38_1_22_v4.2.1_benchmark.vcf.gz | gunzip - > vcf/HG002.vcf
 curl ${URI_ROOT}/AshkenazimTrio/HG003_NA24149_father/latest/GRCh38/HG003_GRCh38_1_22_v4.2.1_benchmark.vcf.gz | gunzip - > vcf/HG003.vcf
 curl ${URI_ROOT}/AshkenazimTrio/HG004_NA24143_mother/latest/GRCh38/HG004_GRCh38_1_22_v4.2.1_benchmark.vcf.gz | gunzip - > vcf/HG004.vcf
-curl ${URI_ROOT}/ChineseTrio/HG005_NA24631_son/latest/GRCh38/HG005_GRCh38_1_22_v4.2.1_benchmark.vcf.gz | gunzip - > vcf/HG005.vcf
 curl ${URI_ROOT}/ChineseTrio/HG006_NA24694_father/latest/GRCh38/HG006_GRCh38_1_22_v4.2.1_benchmark.vcf.gz | gunzip - > vcf/HG006.vcf
 curl ${URI_ROOT}/ChineseTrio/HG007_NA24695_mother/latest/GRCh38/HG007_GRCh38_1_22_v4.2.1_benchmark.vcf.gz | gunzip - > vcf/HG007.vcf
 ```
@@ -73,7 +72,8 @@ do
 vcf_basename=$(basename ${vcf_path} .vcf)
 variantplaner -t 4 vcf2parquet -i ${vcf_path} \
 -v variants/${vcf_basename}.parquet \
--g genotypes/${vcf_basename}.parquet
+-g genotypes/${vcf_basename}.parquet \
+-f GT:PS:DP:ADALL:AD:GQ
 done
 ```
 
@@ -135,7 +135,7 @@ pqrs head genotypes/HG001.parquet
 We can now aggregate all variant present in our dataset to perform this operation we use divide to conquer merge methode by generate temporary file. By default file are write in `/tmp` but you can control where these files are write by set `TMPDIR`, `TEMP` or `TMP` directory.
 
 ```bash
-input=$(find variants -type f -name *.parquet -exec echo "-i" {} \; | tr '\n' ' ')
+input=$(ls variants/ | xargs -I {} -x echo "-i variants/"{} | tr '\n' ' ')
 variantplaner -t 8 struct ${input} variants -o variants.parquet
 ```
 
@@ -144,7 +144,7 @@ File `variants.parquet` containt all uniq variants present in dataset.
 ### Genotypes structuration
 
 ```bash
-input=$(find variants -type f -name *.parquet -exec echo "-i" {} \; | tr '\n' ' ')
+input=$(ls genotypes/ | xargs -I {} -x echo "-i genotypes/"{} | tr '\n' ' ')
 variantplaner -t 8 struct ${input} genotypes -p hive/
 ```
 
@@ -234,3 +234,40 @@ Produce a `annotations/clinvar.parquet` with columns:
 
 
 ## Querying
+
+You could use [polars-cli](https://crates.io/crates/polars-cli) or [duckdb](https://duckdb.org/) to interogate your variants database.
+
+### polars-cli
+
+#### Count variants
+
+```sql
+select count(*) from read_parquet('variants.parquet');
+```
+
+/// details | check result with `pqrs`
+We can check we have same result with pqrs
+
+```bash
+pqrs rowcount variants.parquet
+File Name: variants.parquet: 7907891 rows
+```
+///
+
+#### Filter variants from annotations:
+
+Get all variant with a AF_ESP upper than 0.9999
+
+```sql
+select chr, pos, ref, alt, AF_ESP from read_parquet('variants.parquet') as v left join read_parquet('annotations/clinvar.parquet') as c on c.id=v.id where AF_ESP>0.9999;
+```
+
+#### Get sample have variant
+
+Get all variant and sample with GENEINFO equal to 'SAMD11:148398'
+
+```sql
+select distinct chr, pos, ref, alt, sample from read_parquet('variants.parquet') as v left join read_parquet('genotypes/*') as g on v.id=g.id left join read_parquet('annotations/clinvar.parquet') as a on v.id=a.id WHERE GENEINFO='SAMD11:148398';
+```
+
+### duckdb
