@@ -213,7 +213,7 @@ def test_build_rename_column() -> None:
         "ALT": "alt",
         "QUAL": ".",
         "FILTER": ".",
-        "INFO": {},
+        "INFO": [],
         "FORMAT": "",
         "sample": {},
     }
