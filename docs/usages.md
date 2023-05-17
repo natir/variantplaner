@@ -19,6 +19,11 @@ Optional:
 - [pqrs](https://github.com/manojkarthick/pqrs)
 - gnu-parallel
 
+Quering dataset:
+
+- [polars-cli](https://crates.io/crates/polars-cli)
+- [duckdb](https://duckdb.org/)
+
 
 ## Download data
 
@@ -56,14 +61,14 @@ Commands:
 ```
 
 
-## Vcf2Parquet
+## vcf2parquet
 
 First step is convert vcf data in [parquet](https://en.wikipedia.org/wiki/Apache_Parquet) it's a column oriented format with better performance.
 
 We split vcf in two part on for variant information and another for genotype information.
 
 ```bash
-mkdir -p variants genotypes
+mkdir -p variants genotypes/samples/
 ```
 
 ```
@@ -72,7 +77,7 @@ do
 vcf_basename=$(basename ${vcf_path} .vcf)
 variantplaner -t 4 vcf2parquet -i ${vcf_path} \
 -v variants/${vcf_basename}.parquet \
--g genotypes/${vcf_basename}.parquet \
+-g genotypes/samples/${vcf_basename}.parquet \
 -f GT:PS:DP:ADALL:AD:GQ
 done
 ```
@@ -81,7 +86,7 @@ done
 ```bash
 find vcf -type f -name *.vcf -exec basename {} .vcf \; | \
 parallel variantplaner -t 2 vcf2parquet -i vcf/{}.vcf -v variants/{}.parquet \
--g genotypes/{}.parquet -f GT:PS:DP:ADALL:AD:GQ
+-g genotypes/samples/{}.parquet -f GT:PS:DP:ADALL:AD:GQ
 ```
 ///
 
@@ -136,19 +141,30 @@ We can now aggregate all variant present in our dataset to perform this operatio
 
 ```bash
 input=$(ls variants/ | xargs -I {} -x echo "-i variants/"{} | tr '\n' ' ')
-variantplaner -t 8 struct ${input} variants -o variants.parquet
+variantplaner -t 8 struct $(echo $input) variants -o variants.parquet
 ```
 
 File `variants.parquet` containt all uniq variants present in dataset.
 
 ### Genotypes structuration
 
+### By samples
+
+This structurations data is already down in vcf2parquet setp check content of `genotypes/samples`:
 ```bash
-input=$(ls genotypes/ | xargs -I {} -x echo "-i genotypes/"{} | tr '\n' ' ')
-variantplaner -t 8 struct ${input} genotypes -p hive/
+➜ ls genotypes/samples
+HG001.parquet  HG002.parquet  HG003.parquet  HG004.parquet  HG006.parquet  HG007.parquet
 ```
 
-All genotypes information are split in an [hive structure](https://duckdb.org/docs/data/partitioning/hive_partitioning) to optimize request on data.
+### By variants
+
+```bash
+mkdir -p genotypes/variants/
+input=$(ls genotypes/samples/ | xargs -I {} -x echo "-i genotypes/samples/"{} | tr '\n' ' ')
+variantplaner -t 8 struct $(echo $input) genotypes -p genotypes/variants/
+```
+
+All genotypes information are split in [hive like structure](https://duckdb.org/docs/data/partitioning/hive_partitioning) to optimize request on data.
 
 ## Add annotations
 
@@ -210,7 +226,7 @@ pqrs head annotations/clinvar.parquet
 With option of subcommand vcf `-i` you can select which column are include in parquet file
 For example command:
 ```bash
-variantplaner annotations -i annotations/clinvar.vcf -o annotations/clinvar.parquet vcf -r clinvar_id -i ALLELEID -i CLNDN
+variantplaner annotations -i annotations/clinvar.vcf -o annotations/clinvar.parquet vcf -r clinvar_id -i ALLELEID -i CLNDN -i AF_ESP -i GENEINFO
 ```
 
 Produce a `annotations/clinvar.parquet` with columns:
@@ -242,15 +258,23 @@ You could use [polars-cli](https://crates.io/crates/polars-cli) or [duckdb](http
 #### Count variants
 
 ```sql
-select count(*) from read_parquet('variants.parquet');
+〉select count(*) from read_parquet('variants.parquet');
+┌─────────┐
+│ count   │
+│ ---     │
+│ u32     │
+╞═════════╡
+│ 7852699 │
+└─────────┘
 ```
+
 
 /// details | check result with `pqrs`
 We can check we have same result with pqrs
 
 ```bash
-pqrs rowcount variants.parquet
-File Name: variants.parquet: 7907891 rows
+➜ pqrs rowcount variants.parquet
+File Name: variants.parquet: 7852699 rows
 ```
 ///
 
@@ -259,7 +283,15 @@ File Name: variants.parquet: 7907891 rows
 Get all variant with a AF_ESP upper than 0.9999
 
 ```sql
-select chr, pos, ref, alt, AF_ESP from read_parquet('variants.parquet') as v left join read_parquet('annotations/clinvar.parquet') as c on c.id=v.id where AF_ESP>0.9999;
+〉select chr, pos, ref, alt, AF_ESP from read_parquet('variants.parquet') as v left join read_parquet('annotations/clinvar.parquet') as c on c.id=v.id where AF_ESP>0.9999;
+┌─────┬──────────┬─────┬─────┬─────────┐
+│ chr ┆ pos      ┆ ref ┆ alt ┆ AF_ESP  │
+│ --- ┆ ---      ┆ --- ┆ --- ┆ ---     │
+│ u8  ┆ u64      ┆ str ┆ str ┆ f64     │
+╞═════╪══════════╪═════╪═════╪═════════╡
+│ 10  ┆ 16901372 ┆ G   ┆ C   ┆ 0.99992 │
+│ 11  ┆ 78121030 ┆ T   ┆ A   ┆ 0.99992 │
+└─────┴──────────┴─────┴─────┴─────────┘
 ```
 
 #### Get sample have variant
@@ -267,7 +299,85 @@ select chr, pos, ref, alt, AF_ESP from read_parquet('variants.parquet') as v lef
 Get all variant and sample with GENEINFO equal to 'SAMD11:148398'
 
 ```sql
-select distinct chr, pos, ref, alt, sample from read_parquet('variants.parquet') as v left join read_parquet('genotypes/*') as g on v.id=g.id left join read_parquet('annotations/clinvar.parquet') as a on v.id=a.id WHERE GENEINFO='SAMD11:148398';
+〉select distinct chr, pos, ref, alt, sample from read_parquet('variants.parquet') as v left join read_parquet('genotypes/samples/*') as g on v.id=g.id left join read_parquet('annotations/clinvar.parquet') as a on v.id=a.id WHERE GENEINFO='SAMD11:148398';
+┌─────┬────────┬─────┬─────┬────────┐
+│ chr ┆ pos    ┆ ref ┆ alt ┆ sample │
+│ --- ┆ ---    ┆ --- ┆ --- ┆ ---    │
+│ u8  ┆ u64    ┆ str ┆ str ┆ str    │
+╞═════╪════════╪═════╪═════╪════════╡
+│ 1   ┆ 942451 ┆ T   ┆ C   ┆ HG003  │
+│ 1   ┆ 942451 ┆ T   ┆ C   ┆ HG001  │
+│ 1   ┆ 942451 ┆ T   ┆ C   ┆ HG007  │
+│ 1   ┆ 942451 ┆ T   ┆ C   ┆ HG004  │
+│ …   ┆ …      ┆ …   ┆ …   ┆ …      │
+│ 1   ┆ 942934 ┆ G   ┆ C   ┆ HG003  │
+│ 1   ┆ 943937 ┆ C   ┆ T   ┆ HG004  │
+│ 1   ┆ 942451 ┆ T   ┆ C   ┆ HG002  │
+│ 1   ┆ 942451 ┆ T   ┆ C   ┆ HG006  │
+└─────┴────────┴─────┴─────┴────────┘
 ```
 
 ### duckdb
+
+
+#### Count variants
+
+```sql
+D select count(*) from read_parquet('variants.parquet');
+┌──────────────┐
+│ count_star() │
+│    int64     │
+├──────────────┤
+│      7852699 │
+└──────────────┘
+```
+
+
+/// details | check result with `pqrs`
+We can check we have same result with pqrs
+
+```bash
+➜ pqrs rowcount variants.parquet
+File Name: variants.parquet: 7852699 rows
+```
+///
+
+#### Filter variants from annotations:
+
+Get all variant with a AF_ESP upper than 0.9999
+
+```sql
+D select chr, pos, ref, alt, AF_ESP from read_parquet('variants.parquet') as v left join read_parquet('annotations/clinvar.parquet') as c on c.id=v.id where AF_ESP>0.9999;
+┌───────┬──────────┬─────────┬─────────┬─────────┐
+│  chr  │   pos    │   ref   │   alt   │ AF_ESP  │
+│ uint8 │  uint64  │ varchar │ varchar │ double  │
+├───────┼──────────┼─────────┼─────────┼─────────┤
+│    10 │ 16901372 │ G       │ C       │ 0.99992 │
+│    11 │ 78121030 │ T       │ A       │ 0.99992 │
+└───────┴──────────┴─────────┴─────────┴─────────┘
+```
+
+#### Get sample have variant
+
+Get all variant and sample with GENEINFO equal to 'SAMD11:148398'
+
+```sql
+D select distinct chr, pos, ref, alt, sample from read_parquet('variants.parquet') as v left join read_parquet('genotypes/samples/*') as g on v.id=g.id left join read_parquet('annotations/clinvar.parquet') as a on v.id=a.id WHERE GENEINFO='SAMD11:148398';
+┌───────┬────────┬─────────┬─────────┬─────────┐
+│  chr  │  pos   │   ref   │   alt   │ sample  │
+│ uint8 │ uint64 │ varchar │ varchar │ varchar │
+├───────┼────────┼─────────┼─────────┼─────────┤
+│     1 │ 942451 │ T       │ C       │ HG002   │
+│     1 │ 942934 │ G       │ C       │ HG002   │
+│     1 │ 942451 │ T       │ C       │ HG003   │
+│     1 │ 942934 │ G       │ C       │ HG003   │
+│     1 │ 942451 │ T       │ C       │ HG007   │
+│     1 │ 943937 │ C       │ T       │ HG007   │
+│     1 │ 942451 │ T       │ C       │ HG001   │
+│     1 │ 942451 │ T       │ C       │ HG004   │
+│     1 │ 943937 │ C       │ T       │ HG004   │
+│     1 │ 942451 │ T       │ C       │ HG006   │
+├───────┴────────┴─────────┴─────────┴─────────┤
+│ 10 rows                            5 columns │
+└──────────────────────────────────────────────┘
+```
