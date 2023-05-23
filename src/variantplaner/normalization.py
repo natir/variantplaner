@@ -3,10 +3,15 @@
 # std import
 from __future__ import annotations
 
+import logging
+
 # 3rd party import
 import polars
 
 # project import
+
+
+logger = logging.getLogger("normalization")
 
 
 def chromosome2integer(lf: polars.LazyFrame) -> polars.LazyFrame:
@@ -59,6 +64,15 @@ def add_variant_id(lf: polars.LazyFrame) -> polars.LazyFrame:
         LazyFrame with chr column normalized
 
     """
+    no_alt_dna = (
+        lf.filter(polars.col("alt").str.replace(r"^[ACTG\.*actg]+$", "").inspect().str.lengths() != 0)
+        .collect()
+        .get_column("alt")
+    )
+
+    if no_alt_dna.len() != 0:
+        logger.warning("Alternative column contains not classic sequence this can create variant collisions")
+
     return lf.with_columns(
         polars.concat_str(
             [
