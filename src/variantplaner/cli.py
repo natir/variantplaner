@@ -72,6 +72,12 @@ def main(threads: int = 1, verbose: int = 0) -> None:
     type=click.Path(dir_okay=False, writable=True, path_type=pathlib.Path),
 )
 @click.option(
+    "-a",
+    "--annotations",
+    help="Path where the annotations will be written in parquet (if no info file is empty)",
+    type=click.Path(dir_okay=False, writable=True, path_type=pathlib.Path),
+)
+@click.option(
     "-f",
     "--format-string",
     help="Value of FORMAT column, line not match with this are ignored",
@@ -82,7 +88,8 @@ def main(threads: int = 1, verbose: int = 0) -> None:
 def vcf2parquet(
     input_path: pathlib.Path,
     variants: pathlib.Path,
-    genotypes: pathlib.Path,
+    genotypes: pathlib.Path | None,
+    annotations: pathlib.Path | None,
     format_string: str = "GT:AD:DP:GQ",
 ) -> None:
     """Convert a vcf in parquet."""
@@ -94,7 +101,7 @@ def vcf2parquet(
         lf = io.vcf.into_lazyframe(input_path)
     except exception.NotAVCFError:
         logger.exception("")
-        sys.exit(1)
+        sys.exit(11)
 
     extract.variants(lf).sink_parquet(variants)
     logger.info(f"finish write {variants}")
@@ -105,9 +112,21 @@ def vcf2parquet(
             genotypes_lf = extract.genotypes(lf, io.vcf.format2expr(vcf_header, input_path), format_string)
         except exception.NoGenotypeError:
             logger.exception("")
-            sys.exit(2)
+            sys.exit(12)
 
         genotypes_lf.sink_parquet(genotypes)
+
+    if annotations:
+        try:
+            vcf_header = io.vcf.extract_header(input_path)
+            info_parser = io.vcf.info2expr(vcf_header, input_path, None)
+            annotations_lf = io.vcf.into_lazyframe(input_path)
+            annotations_lf = lf.with_columns(info_parser).drop(["chr", "pos", "ref", "alt", "filter", "qual", "info"])
+        except exception.NotAVCFError:  # pragma: no cover
+            logger.exception("")  # This code isn't reachable
+            sys.exit(13)
+
+        annotations_lf.sink_parquet(annotations)
 
     logger.info(f"finish write {genotypes}")
 
@@ -397,7 +416,7 @@ def annotations_vcf(ctx: click.Context, info: set[str] | None = None, rename_id:
         lf = io.vcf.into_lazyframe(input_paths[0])
     except exception.NotAVCFError:
         logger.exception("")
-        sys.exit(4)
+        sys.exit(21)
 
     lf = lf.with_columns(info_parser).drop(["chr", "pos", "ref", "alt", "filter", "qual", "info"])
 
@@ -655,6 +674,6 @@ def transmission(
         transmission_lf = generate.transmission(genotypes_lf, index, mother, father)
     else:
         logging.error("You must specify ped file or index, mother and father sample name")
-        sys.exit(5)
+        sys.exit(31)
 
     transmission_lf.write_parquet(transmission_path)

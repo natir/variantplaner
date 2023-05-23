@@ -92,6 +92,30 @@ def test_vcf2parquet(tmp_path: pathlib.Path) -> None:
     assert filecmp.cmp(DATA_DIR / "no_info.genotypes.parquet", genotypes_path)
 
 
+def test_vcf2parquet_ask_annotations(tmp_path: pathlib.Path) -> None:
+    """Ask annotations vcf2parquet run."""
+    variants_path = tmp_path / "variants.parquet"
+    annotations_path = tmp_path / "annotations.parquet"
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli.main,
+        [
+            "vcf2parquet",
+            "-i",
+            str(DATA_DIR / "no_genotypes.vcf"),
+            "-v",
+            str(variants_path),
+            "-a",
+            str(annotations_path),
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert filecmp.cmp(DATA_DIR / "no_genotypes.variants.parquet", variants_path)
+    assert filecmp.cmp(DATA_DIR / "no_genotypes.annotations.parquet", annotations_path)
+
+
 def test_vcf2parquet_not_ask_genotypes(tmp_path: pathlib.Path) -> None:
     """Not ask genotype vcf2parquet run."""
     variants_path = tmp_path / "variants.parquet"
@@ -118,7 +142,7 @@ def test_vcf2parquet_not_vcf(tmp_path: pathlib.Path) -> None:
         ["vcf2parquet", "-i", str(DATA_DIR / "no_info.tsv"), "-v", str(variants_path), "-g", str(genotypes_path)],
     )
 
-    assert result.exit_code == 1
+    assert result.exit_code == 11
 
 
 def test_vcf2parquet_no_genotype(tmp_path: pathlib.Path) -> None:
@@ -132,7 +156,7 @@ def test_vcf2parquet_no_genotype(tmp_path: pathlib.Path) -> None:
         ["vcf2parquet", "-i", str(DATA_DIR / "no_genotypes.vcf"), "-v", str(variants_path), "-g", str(genotypes_path)],
     )
 
-    assert result.exit_code == 2
+    assert result.exit_code == 12
 
 
 def test_parquet2vcf(tmp_path: pathlib.Path) -> None:
@@ -283,7 +307,7 @@ def test_annotations_vcf_not_vcf(tmp_path: pathlib.Path) -> None:
         ],
     )
 
-    assert result.exit_code == 4
+    assert result.exit_code == 21
 
 
 def test_annotations_vcf_select(tmp_path: pathlib.Path) -> None:
@@ -598,4 +622,4 @@ def test_generate_transmission_nothing(tmp_path: pathlib.Path) -> None:
         ],
     )
 
-    assert result.exit_code == 5
+    assert result.exit_code == 31

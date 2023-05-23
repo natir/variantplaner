@@ -128,6 +128,8 @@ Options:
   -v, --variants FILE       Path where the variants will be written in parquet
                             [required]
   -g, --genotypes FILE      Path where the genotypes will be written in parquet
+  -a, --annotations FILE    Path where the annotations will be written in
+                            parquet (if no info file is empty)
   -f, --format-string TEXT  Value of FORMAT column, line not match with this are
                             ignored  [default: GT:AD:DP:GQ]
   --help                    Show this message and exit.
