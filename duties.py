@@ -13,7 +13,7 @@ from duty.callables import black, blacken_docs, coverage, lazy, mkdocs, mypy, py
 if TYPE_CHECKING:
     from duty.context import Context
 
-PY_SRC_PATHS = (Path(_) for _ in ("src", "tests", "duties.py", "scripts"))
+PY_SRC_PATHS = (Path(_) for _ in ("src", "tests", "benchmark", "duties.py", "scripts"))
 PY_SRC_LIST = tuple(str(_) for _ in PY_SRC_PATHS)
 PY_SRC = " ".join(PY_SRC_LIST)
 TESTING = os.environ.get("TESTING", "0") in {"1", "true"}
@@ -248,4 +248,18 @@ def test(ctx: Context, match: str = "") -> None:
     ctx.run(
         pytest.run("-n", "auto", "tests", config_file="config/pytest.ini", select=match),
         title=pyprefix("Running tests"),
+    )
+
+
+@duty
+def bench(ctx: Context, match: str = "") -> None:
+    """Run the benchmark test suite.
+
+    Parameters:
+        ctx: The context instance (passed automatically).
+        match: A pytest expression to filter selected tests.
+    """
+    ctx.run(
+        pytest.run("benchmark", config_file="config/benchmark.ini", select=match),
+        title=pyprefix("Running benchmark"),
     )

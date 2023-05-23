@@ -24,7 +24,8 @@ QUALITY_DUTIES = \
 	check-quality \
 	check-docs \
 	check-types \
-	test
+	test \
+	bench
 
 .PHONY: help
 help:
