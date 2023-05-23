@@ -4,7 +4,7 @@ site_url: "https://natir.github.io/variantplaner"
 repo_url: "https://github.com/natir/variantplaner"
 repo_name: "natir/variantplaner"
 site_dir: "site"
-watch: [README.md, CONTRIBUTING.md, CHANGELOG.md, src/variantplaner]
+watch: [README.md, CONTRIBUTING.md, CHANGELOG.md, src/variantplaner, scripts]
 
 nav:
 - Home:
@@ -19,6 +19,7 @@ nav:
   - Contributing: contributing.md
   - Code of Conduct: code_of_conduct.md
   - Coverage report: coverage.md
+  - Benchmark: benchmark.md
 
 theme:
   name: material

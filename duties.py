@@ -95,7 +95,7 @@ def check_dependencies(ctx: Context) -> None:
     ctx.run(safety.check(requirements), title="Checking dependencies")
 
 
-@duty
+@duty(pre=["bench", "cov"])
 def check_docs(ctx: Context) -> None:
     """Check if the documentation builds correctly.
 
@@ -159,7 +159,7 @@ def clean(ctx: Context) -> None:
     ctx.run("find . -name '*.rej' -delete")
 
 
-@duty
+@duty(pre=["bench", "cov"])
 def docs(ctx: Context, host: str = "127.0.0.1", port: int = 8000) -> None:
     """Serve the documentation (localhost:8000).
 
@@ -251,7 +251,7 @@ def test(ctx: Context, match: str = "") -> None:
     )
 
 
-@duty
+@duty(skip_if=Path(".benchmarks").exists())
 def bench(ctx: Context, match: str = "") -> None:
     """Run the benchmark test suite.
 
