@@ -105,7 +105,9 @@ def transmission(
         )
 
     transmission_lf = transmission_lf.with_columns(
-        (polars.col("index_gt") * 100 + polars.col("mother_gt") * 10 + polars.col("father_gt")).cast(polars.UInt8).alias("origin"),
+        (polars.col("index_gt") * 100 + polars.col("mother_gt") * 10 + polars.col("father_gt"))
+        .cast(polars.UInt8)
+        .alias("origin"),
     )
 
     transmission_lf = transmission_lf.drop(["sample", *genotypes_column])
