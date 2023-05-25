@@ -82,7 +82,7 @@ def test_transmission_missing_mother() -> None:
 
     polars.Config.set_tbl_cols(500)
 
-    assert transmission.get_column("mother_gt").to_list() == [0, 0, 0, 0, 0]
+    assert transmission.get_column("mother_gt").to_list() == [3, 3, 3, 3, 3]
     assert transmission.get_column("mother_ad").to_list() == [None, None, None, None, None]
     assert transmission.get_column("mother_dp").to_list() == [None, None, None, None, None]
     assert transmission.get_column("mother_gq").to_list() == [None, None, None, None, None]
@@ -99,7 +99,7 @@ def test_transmission_missing_father() -> None:
 
     polars.Config.set_tbl_cols(500)
 
-    assert transmission.get_column("father_gt").to_list() == [0, 0, 0, 0, 0]
+    assert transmission.get_column("father_gt").to_list() == [3, 3, 3, 3, 3]
     assert transmission.get_column("father_ad").to_list() == [None, None, None, None, None]
     assert transmission.get_column("father_dp").to_list() == [None, None, None, None, None]
     assert transmission.get_column("father_gq").to_list() == [None, None, None, None, None]
