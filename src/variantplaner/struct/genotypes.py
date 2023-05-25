@@ -86,7 +86,7 @@ def __hive_worker(path: pathlib.Path, output_prefix: pathlib.Path) -> pathlib.Pa
 
     polars.scan_parquet(path).with_columns(
         [
-            polars.col("id").mod(255).alias("id_mod"),
+            polars.col("id").mod(256).alias("id_mod"),
         ],
     ).groupby(
         "id_mod",
