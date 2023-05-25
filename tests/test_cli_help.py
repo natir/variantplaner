@@ -51,7 +51,7 @@ def test_show_help_annotations() -> None:
   Convert an annotation variation file in parquet.
 
 Options:
-  -i, --input-paths FILE  Path to input file  [required]
+  -i, --input-path FILE   Path to input file  [required]
   -o, --output-path PATH  Path where variants annotations will be written in
                           parquet  [required]
   --help                  Show this message and exit.
