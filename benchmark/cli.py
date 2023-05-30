@@ -229,7 +229,7 @@ def full(
     tmp_path: pathlib.Path,
     benchmark: pytest_benchmark.BenchmarkSession,
 ) -> None:
-    """Benchmark struct.genotypes without other."""
+    """Benchmark conversion of annotations vcf."""
     annotations_path = tmp_path / "annotations.parquet"
 
     runner = CliRunner()
@@ -254,7 +254,7 @@ def full_rename(
     tmp_path: pathlib.Path,
     benchmark: pytest_benchmark.BenchmarkSession,
 ) -> None:
-    """Benchmark struct.genotypes without other."""
+    """Benchmark conversion of annotations vcf."""
     annotations_path = tmp_path / "annotations.parquet"
 
     runner = CliRunner()
@@ -281,7 +281,7 @@ def one(
     tmp_path: pathlib.Path,
     benchmark: pytest_benchmark.BenchmarkSession,
 ) -> None:
-    """Benchmark struct.genotypes without other."""
+    """Benchmark conversion of annotations vcf."""
     annotations_path = tmp_path / "annotations.parquet"
 
     runner = CliRunner()
@@ -306,7 +306,7 @@ def two(
     tmp_path: pathlib.Path,
     benchmark: pytest_benchmark.BenchmarkSession,
 ) -> None:
-    """Benchmark struct.genotypes without other."""
+    """Benchmark conversion of annotations vcf."""
     annotations_path = tmp_path / "annotations.parquet"
 
     runner = CliRunner()
@@ -331,7 +331,7 @@ def three(
     tmp_path: pathlib.Path,
     benchmark: pytest_benchmark.BenchmarkSession,
 ) -> None:
-    """Benchmark struct.genotypes without other."""
+    """Benchmark conversion of annotations vcf."""
     annotations_path = tmp_path / "annotations.parquet"
 
     runner = CliRunner()
@@ -356,7 +356,7 @@ def four(
     tmp_path: pathlib.Path,
     benchmark: pytest_benchmark.BenchmarkSession,
 ) -> None:
-    """Benchmark struct.genotypes without other."""
+    """Benchmark conversion of annotations vcf."""
     annotations_path = tmp_path / "annotations.parquet"
 
     runner = CliRunner()
@@ -381,7 +381,7 @@ def five(
     tmp_path: pathlib.Path,
     benchmark: pytest_benchmark.BenchmarkSession,
 ) -> None:
-    """Benchmark struct.genotypes without other."""
+    """Benchmark conversion of annotations vcf."""
     annotations_path = tmp_path / "annotations.parquet"
 
     runner = CliRunner()
@@ -406,7 +406,7 @@ def six(
     tmp_path: pathlib.Path,
     benchmark: pytest_benchmark.BenchmarkSession,
 ) -> None:
-    """Benchmark struct.genotypes without other."""
+    """Benchmark conversion of annotations vcf."""
     annotations_path = tmp_path / "annotations.parquet"
 
     runner = CliRunner()
@@ -431,7 +431,7 @@ def seven(
     tmp_path: pathlib.Path,
     benchmark: pytest_benchmark.BenchmarkSession,
 ) -> None:
-    """Benchmark struct.genotypes without other."""
+    """Benchmark conversion of annotations vcf."""
     annotations_path = tmp_path / "annotations.parquet"
 
     runner = CliRunner()
@@ -456,7 +456,7 @@ def height(
     tmp_path: pathlib.Path,
     benchmark: pytest_benchmark.BenchmarkSession,
 ) -> None:
-    """Benchmark struct.genotypes without other."""
+    """Benchmark conversion of annotations vcf."""
     annotations_path = tmp_path / "annotations.parquet"
 
     runner = CliRunner()
@@ -481,7 +481,7 @@ def nine(
     tmp_path: pathlib.Path,
     benchmark: pytest_benchmark.BenchmarkSession,
 ) -> None:
-    """Benchmark struct.genotypes without other."""
+    """Benchmark conversion of annotations vcf."""
     annotations_path = tmp_path / "annotations.parquet"
 
     runner = CliRunner()
@@ -506,7 +506,7 @@ def ten(
     tmp_path: pathlib.Path,
     benchmark: pytest_benchmark.BenchmarkSession,
 ) -> None:
-    """Benchmark struct.genotypes without other."""
+    """Benchmark conversion of annotations vcf."""
     annotations_path = tmp_path / "annotations.parquet"
 
     runner = CliRunner()
@@ -531,7 +531,7 @@ def eleven(
     tmp_path: pathlib.Path,
     benchmark: pytest_benchmark.BenchmarkSession,
 ) -> None:
-    """Benchmark struct.genotypes without other."""
+    """Benchmark conversion of annotations vcf."""
     annotations_path = tmp_path / "annotations.parquet"
 
     runner = CliRunner()
@@ -556,7 +556,7 @@ def twelve(
     tmp_path: pathlib.Path,
     benchmark: pytest_benchmark.BenchmarkSession,
 ) -> None:
-    """Benchmark struct.genotypes without other."""
+    """Benchmark conversion of annotations vcf."""
     annotations_path = tmp_path / "annotations.parquet"
 
     runner = CliRunner()
@@ -581,7 +581,7 @@ def thirteen(
     tmp_path: pathlib.Path,
     benchmark: pytest_benchmark.BenchmarkSession,
 ) -> None:
-    """Benchmark struct.genotypes without other."""
+    """Benchmark conversion of annotations vcf."""
     annotations_path = tmp_path / "annotations.parquet"
 
     runner = CliRunner()
@@ -606,7 +606,7 @@ def fourteen(
     tmp_path: pathlib.Path,
     benchmark: pytest_benchmark.BenchmarkSession,
 ) -> None:
-    """Benchmark struct.genotypes without other."""
+    """Benchmark conversion of annotations vcf."""
     annotations_path = tmp_path / "annotations.parquet"
 
     runner = CliRunner()
@@ -631,7 +631,7 @@ def fiveteen(
     tmp_path: pathlib.Path,
     benchmark: pytest_benchmark.BenchmarkSession,
 ) -> None:
-    """Benchmark struct.genotypes without other."""
+    """Benchmark conversion of annotations vcf."""
     annotations_path = tmp_path / "annotations.parquet"
 
     runner = CliRunner()
@@ -656,7 +656,7 @@ def sixteen(
     tmp_path: pathlib.Path,
     benchmark: pytest_benchmark.BenchmarkSession,
 ) -> None:
-    """Benchmark struct.genotypes without other."""
+    """Benchmark conversion of annotations vcf."""
     annotations_path = tmp_path / "annotations.parquet"
 
     runner = CliRunner()
@@ -681,7 +681,7 @@ def seventeen(
     tmp_path: pathlib.Path,
     benchmark: pytest_benchmark.BenchmarkSession,
 ) -> None:
-    """Benchmark struct.genotypes without other."""
+    """Benchmark conversion of annotations vcf."""
     annotations_path = tmp_path / "annotations.parquet"
 
     runner = CliRunner()
@@ -706,7 +706,7 @@ def eighteen(
     tmp_path: pathlib.Path,
     benchmark: pytest_benchmark.BenchmarkSession,
 ) -> None:
-    """Benchmark struct.genotypes without other."""
+    """Benchmark conversion of annotations vcf."""
     annotations_path = tmp_path / "annotations.parquet"
 
     runner = CliRunner()
@@ -731,7 +731,7 @@ def nineteen(
     tmp_path: pathlib.Path,
     benchmark: pytest_benchmark.BenchmarkSession,
 ) -> None:
-    """Benchmark struct.genotypes without other."""
+    """Benchmark conversion of annotations vcf."""
     annotations_path = tmp_path / "annotations.parquet"
 
     runner = CliRunner()
@@ -756,7 +756,7 @@ def twenty(
     tmp_path: pathlib.Path,
     benchmark: pytest_benchmark.BenchmarkSession,
 ) -> None:
-    """Benchmark struct.genotypes without other."""
+    """Benchmark conversion of annotations vcf."""
     annotations_path = tmp_path / "annotations.parquet"
 
     runner = CliRunner()

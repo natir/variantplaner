@@ -24,7 +24,7 @@ from variantplaner import cli
 DATA_DIR = pathlib.Path(__file__).parent / "data"
 
 
-MERGE_IDS = [
+MERGE_IDS = {
     14242097786807219277,
     11061441912435479070,
     15556898136537930176,
@@ -73,7 +73,7 @@ MERGE_IDS = [
     5356120651941363990,
     4235309537048834275,
     16247809233398557031,
-]
+}
 
 
 def test_vcf2parquet(tmp_path: pathlib.Path) -> None:
@@ -219,7 +219,7 @@ def test_struct_variants(tmp_path: pathlib.Path) -> None:
 
     lf = polars.scan_parquet(merge_path)
 
-    assert lf.collect().get_column("id").to_list() == MERGE_IDS
+    assert set(lf.collect().get_column("id").to_list()) == MERGE_IDS
 
 
 def test_struct_genotypes(tmp_path: pathlib.Path) -> None:

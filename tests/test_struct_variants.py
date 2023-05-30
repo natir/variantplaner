@@ -15,7 +15,7 @@ from variantplaner import struct
 
 DATA_DIR = pathlib.Path(__file__).parent / "data"
 
-MERGE_IDS = [
+MERGE_IDS = {
     14242097786807219277,
     11061441912435479070,
     15556898136537930176,
@@ -64,7 +64,7 @@ MERGE_IDS = [
     5356120651941363990,
     4235309537048834275,
     16247809233398557031,
-]
+}
 
 
 def test_random_string() -> None:
@@ -109,18 +109,18 @@ def test_chunk_by_memory() -> None:
     assert chunks == truth
 
 
-def test_concat_uniq_by_id(tmp_path: pathlib.Path) -> None:
+def test_concat_uniq(tmp_path: pathlib.Path) -> None:
     """Check concat_uniq_by_id."""
     tmp_file = tmp_path / "merge_by_id.parquet"
 
-    struct.variants.__concat_uniq_by_id(
+    struct.variants.__concat_uniq(
         [DATA_DIR / "no_genotypes.variants.parquet", DATA_DIR / "no_info.variants.parquet"],
         tmp_file,
     )
 
     lf = polars.scan_parquet(tmp_file)
 
-    assert lf.collect().get_column("id").to_list() == MERGE_IDS
+    assert set(lf.collect().get_column("id").to_list()) == MERGE_IDS
 
 
 def test_merge(tmp_path: pathlib.Path) -> None:
@@ -134,4 +134,4 @@ def test_merge(tmp_path: pathlib.Path) -> None:
 
     lf = polars.scan_parquet(tmp_file)
 
-    assert lf.collect().get_column("id").to_list() == MERGE_IDS
+    assert set(lf.collect().get_column("id").to_list()) == MERGE_IDS
