@@ -26,7 +26,7 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-    "polars[pandas,numpy,pyarrow,fsspec,xlsx2csv,deltalake,timezone]>=0.17.8",
+    "polars[pandas,numpy,pyarrow,fsspec,xlsx2csv,deltalake,timezone]>=0.18",
     "click>=8.1.3",
     "typing-extensions>=4.5.0",
 ]

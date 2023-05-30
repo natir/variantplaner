@@ -68,7 +68,7 @@ def transmission(
         raise NoGTError("genotype polars.LazyFrame")
 
     group_lf = genotypes_lf.groupby("id").all().collect()
-    group_lf = group_lf.filter(polars.col("sample").arr.contains(index_name))
+    group_lf = group_lf.filter(polars.col("sample").list.contains(index_name))
 
     logger.debug(f"{group_lf.row(0)}")
 
@@ -78,12 +78,12 @@ def transmission(
     logger.debug(f"{sample2index}")
 
     transmission_lf = group_lf.with_columns(
-        [polars.col(col).arr.get(sample2index[index_name]).alias(f"index_{col}") for col in genotypes_column],
+        [polars.col(col).list.get(sample2index[index_name]).alias(f"index_{col}") for col in genotypes_column],
     )
 
     if mother_name in sample2index:
         transmission_lf = transmission_lf.with_columns(
-            [polars.col(col).arr.get(sample2index[mother_name]).alias(f"mother_{col}") for col in genotypes_column],
+            [polars.col(col).list.get(sample2index[mother_name]).alias(f"mother_{col}") for col in genotypes_column],
         )
     else:
         transmission_lf = transmission_lf.with_columns(
@@ -95,7 +95,7 @@ def transmission(
 
     if father_name in sample2index:
         transmission_lf = transmission_lf.with_columns(
-            [polars.col(col).arr.get(sample2index[father_name]).alias(f"father_{col}") for col in genotypes_column],
+            [polars.col(col).list.get(sample2index[father_name]).alias(f"father_{col}") for col in genotypes_column],
         )
     else:
         transmission_lf = transmission_lf.with_columns(
