@@ -362,11 +362,10 @@ def genotypes(ctx: click.Context, prefix_path: pathlib.Path) -> None:
 @click.pass_context
 @click.option(
     "-i",
-    "--input-paths",
+    "--input-path",
     help="Path to input file",
     type=click.Path(exists=True, dir_okay=False, readable=True, allow_dash=True, path_type=pathlib.Path),
     required=True,
-    multiple=True,
 )
 @click.option(
     "-o",
@@ -375,13 +374,13 @@ def genotypes(ctx: click.Context, prefix_path: pathlib.Path) -> None:
     type=click.Path(writable=True, path_type=pathlib.Path),
     required=True,
 )
-def annotations_main(ctx: click.Context, input_paths: list[pathlib.Path], output_path: pathlib.Path) -> None:
+def annotations_main(ctx: click.Context, input_path: pathlib.Path, output_path: pathlib.Path) -> None:
     """Convert an annotation variation file in parquet."""
     logger = logging.getLogger("annotations")
 
-    ctx.obj = {"input_paths": input_paths, "output_path": output_path}
+    ctx.obj = {"input_path": input_path, "output_path": output_path}
 
-    logger.debug(f"parameter: {input_paths=} {output_path=}")
+    logger.debug(f"parameter: {input_path=} {output_path=}")
 
 
 @annotations_main.command("vcf")
@@ -405,15 +404,15 @@ def annotations_vcf(ctx: click.Context, info: set[str] | None = None, rename_id:
 
     ctx.ensure_object(dict)
 
-    input_paths = ctx.obj["input_paths"]
+    input_path = ctx.obj["input_path"]
     output_path = ctx.obj["output_path"]
 
-    logger.debug(f"parameter: {input_paths=} {output_path=} {info=}")
+    logger.debug(f"parameter: {input_path=} {output_path=} {info=}")
 
     try:
-        vcf_header = io.vcf.extract_header(input_paths[0])
-        info_parser = io.vcf.info2expr(vcf_header, input_paths[0], info)
-        lf = io.vcf.into_lazyframe(input_paths[0])
+        vcf_header = io.vcf.extract_header(input_path)
+        info_parser = io.vcf.info2expr(vcf_header, input_path, info)
+        lf = io.vcf.into_lazyframe(input_path)
     except exception.NotAVCFError:
         logger.exception("")
         sys.exit(21)
@@ -486,24 +485,21 @@ def annotations_csv(
 
     ctx.ensure_object(dict)
 
-    input_paths = ctx.obj["input_paths"]
+    input_path = ctx.obj["input_path"]
     output_path = ctx.obj["output_path"]
 
     logger.debug(
-        f"parameter: {input_paths=} {output_path=} {chromosome=} {position=} {reference=} {alternative=} {info=}",
+        f"parameter: {input_path=} {output_path=} {chromosome=} {position=} {reference=} {alternative=} {info=}",
     )
 
-    lf = polars.concat(
-        io.csv.into_lazyframe(
-            path,
-            chromosome,
-            position,
-            reference,
-            alternative,
-            info,
-            separator=separator,
-        )
-        for path in input_paths
+    lf = io.csv.into_lazyframe(
+        input_path,
+        chromosome,
+        position,
+        reference,
+        alternative,
+        info,
+        separator=separator,
     )
 
     lf = lf.drop([chromosome, position, reference, alternative])

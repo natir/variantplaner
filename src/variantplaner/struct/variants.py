@@ -62,7 +62,7 @@ def __chunk_by_memory(
     yield ret
 
 
-def __concat_uniq_by_id(paths: list[pathlib.Path], output: pathlib.Path) -> None:
+def __concat_uniq(paths: list[pathlib.Path], output: pathlib.Path) -> None:
     """Merge multiple parquet file.
 
     Only one copy of each variants is kept, based on id.
@@ -76,7 +76,7 @@ def __concat_uniq_by_id(paths: list[pathlib.Path], output: pathlib.Path) -> None
     """
     lf = polars.concat([polars.scan_parquet(path) for path in paths])
 
-    lf = lf.unique(subset="id")
+    lf = lf.unique(subset=("chr", "pos", "ref", "alt"))
 
     lf.sink_parquet(output)
 
@@ -107,7 +107,7 @@ def merge(paths: list[pathlib.Path], output: pathlib.Path, memory_limit: int = 1
                 temp_output = temp_prefix / __random_string()
 
                 new_inputs.append(temp_output)
-                __concat_uniq_by_id(input_chunk, temp_output)
+                __concat_uniq(input_chunk, temp_output)
 
             elif len(input_chunk) == 1:
                 # if chunk containt only one file it's last file of inputs

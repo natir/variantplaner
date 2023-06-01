@@ -142,7 +142,7 @@ def __format_list_int(expr: polars.Expr, /, name: str) -> polars.Expr:
     """Manage list of integer field."""
     return (
         expr.str.split(",")
-        .arr.eval(polars.element().str.parse_int(10, strict=False).cast(polars.UInt16))
+        .list.eval(polars.element().str.parse_int(10, strict=False).cast(polars.UInt16))
         .alias(name.lower())
     )
 
@@ -375,7 +375,7 @@ def __lazy2format(sample_name: str, format_string: str, col2type: dict[str, pola
             )
         elif isinstance(col2type[lazy_name], polars.List):
             expression.append(
-                polars.col(lazy_name).cast(polars.List(polars.Utf8)).fill_null(["."]).arr.join(","),
+                polars.col(lazy_name).cast(polars.List(polars.Utf8)).fill_null(["."]).list.join(","),
             )
         else:
             expression.append(
@@ -479,7 +479,7 @@ def add_info_column(lf: polars.LazyFrame, vcfinfo2parquet_name: list[tuple[str, 
     """
     lf = lf.with_columns(
         [
-            polars.col(name).arr.join(",").fill_null(".").alias(name)
+            polars.col(name).list.join(",").fill_null(".").alias(name)
             for name, dtype in zip(lf.columns, lf.dtypes)
             if isinstance(dtype, polars.List)
         ],

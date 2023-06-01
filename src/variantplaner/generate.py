@@ -56,8 +56,9 @@ def transmission(
     Returns:
          DataFrame with transmission information.
          With genotyping information for index, mother and father.
-         If any of them isn't present value are set to polars.Null (0 for gt)
-         Columns transmission contains: index_gt * 100 + mother_gt * 10 + father_gt
+         If any of them isn't present value are set to polars.Null (3 for gt)
+         Columns transmission contains: index_gt * 100 + mother_gt * 10 + father_gt.
+         Transmission: 230 mean homozygote variant not present in father but with no information about mother
 
     Raises:
         NoGTError: if genotypes_lf not containts gt column.
@@ -67,7 +68,7 @@ def transmission(
         raise NoGTError("genotype polars.LazyFrame")
 
     group_lf = genotypes_lf.groupby("id").all().collect()
-    group_lf = group_lf.filter(polars.col("sample").arr.contains(index_name))
+    group_lf = group_lf.filter(polars.col("sample").list.contains(index_name))
 
     logger.debug(f"{group_lf.row(0)}")
 
@@ -77,29 +78,29 @@ def transmission(
     logger.debug(f"{sample2index}")
 
     transmission_lf = group_lf.with_columns(
-        [polars.col(col).arr.get(sample2index[index_name]).alias(f"index_{col}") for col in genotypes_column],
+        [polars.col(col).list.get(sample2index[index_name]).alias(f"index_{col}") for col in genotypes_column],
     )
 
     if mother_name in sample2index:
         transmission_lf = transmission_lf.with_columns(
-            [polars.col(col).arr.get(sample2index[mother_name]).alias(f"mother_{col}") for col in genotypes_column],
+            [polars.col(col).list.get(sample2index[mother_name]).alias(f"mother_{col}") for col in genotypes_column],
         )
     else:
         transmission_lf = transmission_lf.with_columns(
             [
-                polars.lit(0).alias("mother_gt"),
+                polars.lit(3).alias("mother_gt"),
                 *[polars.lit(None).alias(f"mother_{col}") for col in genotypes_column if col != "gt"],
             ],
         )
 
     if father_name in sample2index:
         transmission_lf = transmission_lf.with_columns(
-            [polars.col(col).arr.get(sample2index[father_name]).alias(f"father_{col}") for col in genotypes_column],
+            [polars.col(col).list.get(sample2index[father_name]).alias(f"father_{col}") for col in genotypes_column],
         )
     else:
         transmission_lf = transmission_lf.with_columns(
             [
-                polars.lit(0).alias("father_gt"),
+                polars.lit(3).alias("father_gt"),
                 *[polars.lit(None).alias(f"father_{col}") for col in genotypes_column if col != "gt"],
             ],
         )
