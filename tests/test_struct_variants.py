@@ -95,9 +95,9 @@ def test_chunk_by_memory() -> None:
             DATA_DIR / "no_info.csv",
             DATA_DIR / "no_info.genotypes.parquet",
             DATA_DIR / "no_info.parquet",
-            DATA_DIR / "no_info.parquet2vcf.vcf",
         ],
         [
+            DATA_DIR / "no_info.parquet2vcf.vcf",
             DATA_DIR / "no_info.parquet2vcf_genotypes.vcf",
             DATA_DIR / "no_info.tsv",
             DATA_DIR / "no_info.variants.parquet",

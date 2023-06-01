@@ -51,6 +51,7 @@ def add_variant_id(lf: polars.LazyFrame) -> polars.LazyFrame:
     """Add a column id of variants.
 
     This id is compute by 64 bit hash on chromosome, position, reference sequence and alternative sequence.
+    If lf.columns contains SVTYPE and SVLEN variant with regex group in alt <([^:]+):anything:weird> match SVTYPE are replace by concatenation of SVTYPE and SVLEN first value.
 
     Colision risk:
         - human genome size: 3,117,275,501 bp
@@ -62,16 +63,25 @@ def add_variant_id(lf: polars.LazyFrame) -> polars.LazyFrame:
 
     Returns:
         LazyFrame with chr column normalized
-
     """
-    no_alt_dna = (
-        lf.filter(polars.col("alt").str.replace(r"^[ACTG\.*actg]+$", "").inspect().str.lengths() != 0)
-        .collect()
-        .get_column("alt")
-    )
-
-    if no_alt_dna.len() != 0:
-        logger.warning("Alternative column contains not classic sequence this can create variant collisions")
+    if "SVTYPE" in lf.columns and "SVLEN" in lf.columns:
+        lf = lf.with_columns(
+            polars.when(
+                polars.col("alt").str.replace("<(?<type>[^:]+).*>", "$type") == polars.col("SVTYPE"),
+            )
+            .then(
+                polars.col("alt").str.replace(
+                    ".+",
+                    polars.concat_str(
+                        [polars.col("SVTYPE"), polars.col("SVLEN").list.get(0)],
+                        separator="-",
+                    ),
+                ),
+            )
+            .otherwise(
+                polars.col("alt"),
+            ),
+        )
 
     return lf.with_columns(
         polars.concat_str(
