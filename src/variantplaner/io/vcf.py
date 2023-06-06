@@ -3,6 +3,7 @@
 # std import
 from __future__ import annotations
 
+import enum
 import logging
 import re
 import typing
@@ -32,6 +33,13 @@ MINIMAL_COL_NUMBER: int = 8
 SAMPLE_COL_BEGIN: int = 9
 
 logger = logging.getLogger("io.vcf")
+
+
+class IntoLazyFrameExtension(enum.Enum):
+    """Enumration use to control behavior of IntoLazyFrame."""
+
+    NOTHING = 0
+    MANAGE_SV = 1
 
 
 def extract_header(input_path: pathlib.Path) -> list[str]:
@@ -266,7 +274,10 @@ def __column_name(header: list[str], input_path: pathlib.Path) -> list[str]:
     raise NotAVCFError(input_path)
 
 
-def into_lazyframe(input_path: pathlib.Path) -> polars.LazyFrame:
+def into_lazyframe(
+    input_path: pathlib.Path,
+    extension: IntoLazyFrameExtension = IntoLazyFrameExtension.NOTHING,
+) -> polars.LazyFrame:
     """Read a vcf file and convert it in lazyframe.
 
     Args:
@@ -290,9 +301,16 @@ def into_lazyframe(input_path: pathlib.Path) -> polars.LazyFrame:
 
     lf = lf.rename(col_name)
 
+    if extension == IntoLazyFrameExtension.MANAGE_SV:
+        lf = lf.with_columns(info2expr(header, input_path, {"SVTYPE", "SVLEN"}))
+
     lf = normalization.chromosome2integer(lf)
 
     lf = normalization.add_variant_id(lf)
+
+    if extension == IntoLazyFrameExtension.MANAGE_SV:
+        drop_column = {"SVTYPE", "SVLEN"}
+        lf = lf.collect().select([col for col in lf.columns if col not in drop_column]).lazy()
 
     return lf
 

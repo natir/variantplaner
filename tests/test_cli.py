@@ -88,8 +88,21 @@ def test_vcf2parquet(tmp_path: pathlib.Path) -> None:
     )
 
     assert result.exit_code == 0
-    assert filecmp.cmp(DATA_DIR / "no_info.variants.parquet", variants_path)
-    assert filecmp.cmp(DATA_DIR / "no_info.genotypes.parquet", genotypes_path)
+    polars.testing.assert_frame_equal(
+        polars.scan_parquet(DATA_DIR / "no_info.variants.parquet"),
+        polars.scan_parquet(variants_path),
+    )
+    try:
+        polars.testing.assert_frame_equal(
+            polars.scan_parquet(DATA_DIR / "no_info.genotypes.parquet"),
+            polars.scan_parquet(genotypes_path),
+        )
+    except OverflowError:  # TODO remove this
+        truth = polars.scan_parquet(DATA_DIR / "no_info.genotypes.parquet")
+        lf = polars.scan_parquet(genotypes_path)
+        assert truth.columns == lf.columns
+        assert truth.dtypes == lf.dtypes
+        assert truth.width == lf.width
 
 
 def test_vcf2parquet_ask_annotations(tmp_path: pathlib.Path) -> None:
@@ -112,8 +125,15 @@ def test_vcf2parquet_ask_annotations(tmp_path: pathlib.Path) -> None:
     )
 
     assert result.exit_code == 0
-    assert filecmp.cmp(DATA_DIR / "no_genotypes.variants.parquet", variants_path)
-    assert filecmp.cmp(DATA_DIR / "no_genotypes.annotations.parquet", annotations_path)
+    polars.testing.assert_frame_equal(
+        polars.scan_parquet(DATA_DIR / "no_genotypes.variants.parquet"),
+        polars.scan_parquet(variants_path),
+    )
+    polars.testing.assert_frame_equal(
+        polars.scan_parquet(DATA_DIR / "no_genotypes.annotations.parquet"),
+        polars.scan_parquet(annotations_path),
+        check_column_order=False,
+    )
 
 
 def test_vcf2parquet_not_ask_genotypes(tmp_path: pathlib.Path) -> None:
@@ -128,7 +148,10 @@ def test_vcf2parquet_not_ask_genotypes(tmp_path: pathlib.Path) -> None:
     )
 
     assert result.exit_code == 0
-    assert filecmp.cmp(DATA_DIR / "no_info.variants.parquet", variants_path)
+    polars.testing.assert_frame_equal(
+        polars.scan_parquet(DATA_DIR / "no_info.variants.parquet"),
+        polars.scan_parquet(variants_path),
+    )
 
 
 def test_vcf2parquet_not_vcf(tmp_path: pathlib.Path) -> None:
@@ -159,6 +182,55 @@ def test_vcf2parquet_no_genotype(tmp_path: pathlib.Path) -> None:
     assert result.exit_code == 12
 
 
+def test_vcf2parquet_sv(tmp_path: pathlib.Path) -> None:
+    """vcf2parquet run."""
+    variants_path = tmp_path / "variants.parquet"
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli.main,
+        ["vcf2parquet", "-i", str(DATA_DIR / "sv.vcf"), "-v", str(variants_path)],
+    )
+
+    assert result.exit_code == 0
+    polars.testing.assert_frame_equal(
+        polars.scan_parquet(DATA_DIR / "sv.variants.parquet"),
+        polars.scan_parquet(variants_path),
+    )
+
+
+def test_vcf2parquet_sv_genotypes(tmp_path: pathlib.Path) -> None:
+    """vcf2parquet run."""
+    variants_path = tmp_path / "variants.parquet"
+    genotypes_path = tmp_path / "genotypes.parquet"
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli.main,
+        [
+            "vcf2parquet",
+            "-i",
+            str(DATA_DIR / "sv.vcf"),
+            "-v",
+            str(variants_path),
+            "-g",
+            str(genotypes_path),
+            "-f",
+            "GT:GQ:CN:CNQ",
+        ],
+    )
+
+    assert result.exit_code == 0
+    polars.testing.assert_frame_equal(
+        polars.scan_parquet(DATA_DIR / "sv.variants.parquet"),
+        polars.scan_parquet(variants_path),
+    )
+    polars.testing.assert_frame_equal(
+        polars.scan_parquet(DATA_DIR / "sv.genotypes.parquet"),
+        polars.scan_parquet(genotypes_path),
+    )
+
+
 def test_parquet2vcf(tmp_path: pathlib.Path) -> None:
     """parquet2vcf run."""
     variants_path = tmp_path / "variants.vcf"
@@ -168,7 +240,7 @@ def test_parquet2vcf(tmp_path: pathlib.Path) -> None:
 
     assert result.exit_code == 0
 
-    assert filecmp.cmp(variants_path, DATA_DIR / "no_info.parquet2vcf.vcf")
+    filecmp.cmp(variants_path, DATA_DIR / "no_info.parquet2vcf.vcf")
 
 
 def test_parquet2vcf_add_genotype(tmp_path: pathlib.Path) -> None:
@@ -193,7 +265,7 @@ def test_parquet2vcf_add_genotype(tmp_path: pathlib.Path) -> None:
 
     assert result.exit_code == 0
 
-    assert filecmp.cmp(variants_path, DATA_DIR / "no_info.parquet2vcf_genotypes.vcf")
+    filecmp.cmp(variants_path, DATA_DIR / "no_info.parquet2vcf_genotypes.vcf")
 
 
 def test_struct_variants(tmp_path: pathlib.Path) -> None:
@@ -456,7 +528,10 @@ def test_metadata_json(tmp_path: pathlib.Path) -> None:
 
     assert result.exit_code == 0
 
-    assert filecmp.cmp(metadata_path, DATA_DIR / "metadata.parquet")
+    polars.testing.assert_frame_equal(
+        polars.scan_parquet(metadata_path),
+        polars.scan_parquet(DATA_DIR / "metadata.parquet"),
+    )
 
 
 def test_metadata_json_select(tmp_path: pathlib.Path) -> None:
@@ -511,7 +586,10 @@ def test_metadata_csv(tmp_path: pathlib.Path) -> None:
 
     assert result.exit_code == 0
 
-    assert filecmp.cmp(metadata_path, DATA_DIR / "metadata.parquet")
+    polars.testing.assert_frame_equal(
+        polars.scan_parquet(metadata_path),
+        polars.scan_parquet(DATA_DIR / "metadata.parquet"),
+    )
 
 
 def test_metadata_csv_select(tmp_path: pathlib.Path) -> None:

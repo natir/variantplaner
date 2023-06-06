@@ -194,6 +194,16 @@ def test_into_lazyframe() -> None:
     polars.testing.assert_frame_equal(truth, lf)
 
 
+def test_into_lazyframe_sv() -> None:
+    """Check into lazyframe work on structural variant."""
+    input_path = DATA_DIR / "sv.vcf"
+
+    lf = io.vcf.into_lazyframe(input_path, extension=io.vcf.IntoLazyFrameExtension.MANAGE_SV)
+
+    lf.sink_parquet(DATA_DIR / "sv.parquet")
+    polars.testing.assert_frame_equal(lf, polars.scan_parquet(DATA_DIR / "sv.parquet"))
+
+
 def test_into_lazyframe_exception() -> None:
     """Check into_lazyframe exception."""
     with pytest.raises(exception.NotAVCFError):

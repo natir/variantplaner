@@ -12,7 +12,6 @@ import polars
 
 # project import
 from variantplaner.exception import NoGenotypeError
-from variantplaner.io.vcf import MINIMAL_COL_NUMBER
 
 # typing import
 if typing.TYPE_CHECKING:  # pragma: no cover
@@ -25,9 +24,6 @@ if typing.TYPE_CHECKING:  # pragma: no cover
 
     T = typing.TypeVar("T")
     P = ParamSpec("P")
-
-
-LF_COL_NB_NO_GENOTYPE = MINIMAL_COL_NUMBER + 1
 
 logger = logging.getLogger("manipulation")
 
@@ -70,13 +66,12 @@ def genotypes(
         A polars.LazyFrame with variant id, sample information and genotypes information
 
     Raises:
-        NoGenotypeError: If number of column in lf indicate no format or genotype (9)
+        NoGenotypeError: If none of the lf columns is equal to FORMAT
     """
-    if len(lf.columns) <= LF_COL_NB_NO_GENOTYPE:
+    if "format" not in lf.columns:
         raise NoGenotypeError
 
-    # Select genotype columns (side effect last columns are: format, [genotypes,…] and id)
-    lf = lf.select([*lf.columns[MINIMAL_COL_NUMBER:]])
+    lf = lf.select([*lf.columns[lf.columns.index("format") :]])
 
     # Clean bad variant
     lf = lf.filter(polars.col("format").str.starts_with(format_str))

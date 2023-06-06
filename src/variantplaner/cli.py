@@ -98,17 +98,19 @@ def vcf2parquet(
     logger.debug(f"parameter: {input_path=} {variants=} {genotypes=}")
 
     try:
-        lf = io.vcf.into_lazyframe(input_path)
+        vcf_header = io.vcf.extract_header(input_path)
     except exception.NotAVCFError:
         logger.exception("")
         sys.exit(11)
+
+    # Read vcf and manage structural variant
+    lf = io.vcf.into_lazyframe(input_path, extension=io.vcf.IntoLazyFrameExtension.MANAGE_SV)
 
     extract.variants(lf).sink_parquet(variants)
     logger.info(f"finish write {variants}")
 
     if genotypes:
         try:
-            vcf_header = io.vcf.extract_header(input_path)
             genotypes_lf = extract.genotypes(lf, io.vcf.format2expr(vcf_header, input_path), format_string)
         except exception.NoGenotypeError:
             logger.exception("")
@@ -117,15 +119,8 @@ def vcf2parquet(
         genotypes_lf.sink_parquet(genotypes)
 
     if annotations:
-        try:
-            vcf_header = io.vcf.extract_header(input_path)
-            info_parser = io.vcf.info2expr(vcf_header, input_path, None)
-            annotations_lf = io.vcf.into_lazyframe(input_path)
-            annotations_lf = lf.with_columns(info_parser).drop(["chr", "pos", "ref", "alt", "filter", "qual", "info"])
-        except exception.NotAVCFError:  # pragma: no cover
-            logger.exception("")  # This code isn't reachable
-            sys.exit(13)
-
+        annotations_lf = lf.with_columns(io.vcf.info2expr(vcf_header, input_path))
+        annotations_lf = annotations_lf.drop(["chr", "pos", "ref", "alt", "filter", "qual", "info"])
         annotations_lf.sink_parquet(annotations)
 
     logger.info(f"finish write {genotypes}")
