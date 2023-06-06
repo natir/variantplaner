@@ -28,10 +28,30 @@ This section present basic usage for a more complete exemple check our [usage pa
 ### Convert vcf in parquet
 
 ```
-variantplaner vcf2parquet -i input.vcf -v variants.parquet -g genotypes.parquet
+variantplaner vcf2parquet -i input.vcf -v variants.parquet -g genotypes.parquet -a annotations.parquet
 ```
 
 `-g` option isn't mandatory if you didn't set it you lose genotyping information.
+`-a` option isn't mandatory if you didn't set it you lose "INFO" fields information.
+
+
+Genotyping encoding:
+
+| `gt` parquet value | translation |
+| --- | --- |
+| 0  | variants not present |
+| 1  | heterozygote |
+| 2  | homozygote |
+| 3  | no information (only use in transmission file) |
+
+### Convert parquet in vcf
+
+```
+variantplaner parquet2vcf -i variants.parquet -g genotypes.parquet -o output.vcf
+```
+
+`-g` option isn't mandatory if you didn't set it information isn't add.
+This options have many options to control behavior of this subcommand, sorry for this complexity.
 
 ### Structuration of data
 
@@ -47,12 +67,12 @@ By default temporary file are write in /tmp you can use TMPDIR, TEMP or TMP to c
 
 This command use divide and conquer algorithm to perform merge of variants option `-b|--bytes-memory-limit` control bytes size of chunk of files. Empirically ram usage is ten times bytes memory limit value.
 
-#### Hive genotypes
+#### Partitioning genotypes
 
 **Warning**: this command could have huge disk usage
 
 ```
-variantplaner struct -i genotypes/1.parquet -i genotypes/2.parquet -i genotypes/3.parquet … -i genotypes/n.parquet genotypes -p hive_prefix/
+variantplaner struct -i genotypes/1.parquet -i genotypes/2.parquet -i genotypes/3.parquet … -i genotypes/n.parquet genotypes -p partition_prefix/
 ```
 
 ### Annotations
@@ -88,6 +108,36 @@ variantplaner metadata -i metadata.json -o metadata.parquet json -f sample -f li
 ```
 variantplaner metadata -i metadata.csv -o metadata.parquet csv -c sample -c link -c kindex
 ```
+
+### Generate
+
+#### Variants transmission
+
+It is sometimes useful to calculate the familial origin of variants.
+
+```
+variantplaner generate transmission -i genotypes.parquet -I index_sample_name -m mother_sample_name -f father_sample_name -t transmission.parquet
+```
+
+`genotypes.parquet` file with variant of all family this file must contains `gt` and `samples` columns.
+
+In `transmission.parquet` each line contains an index sample variants, index, mother, father genotypes sample information and also column origin.
+
+Origin column contains a number with 3 digit:
+```
+231
+││└ father genotype
+│└─ mother genotype
+└── index genotype
+```
+
+You can also use pedigree file:
+```
+variantplaner generate transmission -i genotypes.parquet -p family.ped -t transmission.parquet
+```
+
+**Warning**: this command could have important RAM usage (propotionaly to number of sample index variants)
+
 
 ## Contribution
 
