@@ -34,6 +34,9 @@ jobs:
       - name: Run coverage
         run: pdm run duty coverage
 
+      - name: Run benchmark
+        run: rm -rf .benchmarks && pdm run duty bench
+
       - name: Build documentation
         run: pdm run duty check-docs
 
