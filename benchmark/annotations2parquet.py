@@ -32,7 +32,7 @@ def __generate_annotations_extractions(
         """Parsing a vcf."""
         input_path = tmp_path / f"{1_000}.vcf"
 
-        info_names = list(sorted(__generate_info()[1].keys()))
+        info_names = sorted(__generate_info()[1].keys())
         __generate_vcf(input_path, 1_000)
 
         def worker() -> polars.DataFrame:

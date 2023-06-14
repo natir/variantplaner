@@ -88,7 +88,7 @@ def info2expr(header: list[str], input_path: pathlib.Path, select_info: set[str]
         NotSupportType: If header line indicate a not support type
     """
     info_re = re.compile(
-        r"ID=(?P<id>([A-Za-z_][0-9A-Za-z_.]*|1000G)),Number=(?P<number>[ARG0-9\.]+),Type=(?P<type>Integer|Float|String)",
+        r"ID=(?P<id>([A-Za-z_][0-9A-Za-z_.]*|1000G)),Number=(?P<number>[ARG0-9\.]+),Type=(?P<type>Integer|Float|String|Character)",
     )
 
     expressions: list[polars.Expr] = []
@@ -110,8 +110,8 @@ def info2expr(header: list[str], input_path: pathlib.Path, select_info: set[str]
                     local_expr = local_expr.cast(polars.Int64)
                 elif search["type"] == "Float":
                     local_expr = local_expr.cast(polars.Float64)
-                elif search["type"] == "String":
-                    pass  # Not do anything on string
+                elif search["type"] == "String" or search["type"] == "Character":
+                    pass  # Not do anything on string or character
                 else:
                     pass  # Not reachable
 
@@ -121,8 +121,8 @@ def info2expr(header: list[str], input_path: pathlib.Path, select_info: set[str]
                     local_expr = local_expr.cast(polars.List(polars.Int64))
                 elif search["type"] == "Float":
                     local_expr = local_expr.cast(polars.List(polars.Float64))
-                elif search["type"] == "String":
-                    pass  # Not do anything on string
+                elif search["type"] == "String" or search["type"] == "Character":
+                    pass  # Not do anything on string or character
                 else:
                     pass  # Not reachable
 
