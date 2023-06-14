@@ -16,9 +16,9 @@ if typing.TYPE_CHECKING:  # pragma: no cover
 # project import
 from variantplaner import cli
 
-from benchmark import __generate_vcf
+from benchmark import __generate_format, __generate_vcf
 
-DATA_DIR = pathlib.Path(__file__).parent / "data"
+DATA_DIR = pathlib.Path(__file__).parent.parent / "tests" / "data"
 NUMBER_OF_VARIANT = 1_000
 
 
@@ -35,12 +35,14 @@ def variants(
 
     runner = CliRunner()
 
-    benchmark(
+    result = benchmark(
         lambda: runner.invoke(
             cli.main,
             ["vcf2parquet", "-i", str(input_path), "-v", str(variants_path)],
         ),
     )
+
+    assert result.exit_code == 0
 
 
 @pytest.mark.benchmark(group="vcf2parquet")
@@ -58,7 +60,7 @@ def variants_annotations(
 
     runner = CliRunner()
 
-    benchmark(
+    result = benchmark(
         lambda: runner.invoke(
             cli.main,
             [
@@ -73,6 +75,8 @@ def variants_annotations(
         ),
     )
 
+    assert result.exit_code == 0
+
 
 @pytest.mark.benchmark(group="vcf2parquet")
 def variants_genotypes(
@@ -86,15 +90,29 @@ def variants_genotypes(
     genotypes_path = tmp_path / "genotypes.parquet"
 
     __generate_vcf(input_path, NUMBER_OF_VARIANT)
+    _, format_name2value = __generate_format()
+    format_key = sorted(format_name2value.keys())
 
     runner = CliRunner()
 
-    benchmark(
+    result = benchmark(
         lambda: runner.invoke(
             cli.main,
-            ["vcf2parquet", "-i", str(input_path), "-v", str(variants_path), "-g", str(genotypes_path)],
+            [
+                "vcf2parquet",
+                "-i",
+                str(input_path),
+                "-v",
+                str(variants_path),
+                "-g",
+                str(genotypes_path),
+                "-f",
+                ":".join(format_key),
+            ],
         ),
     )
+
+    assert result.exit_code == 0
 
 
 @pytest.mark.benchmark(group="vcf2parquet")
@@ -110,10 +128,12 @@ def variants_genotypes_annotations(
     annotations_path = tmp_path / "annotations.parquet"
 
     __generate_vcf(input_path, NUMBER_OF_VARIANT)
+    _, format_name2value = __generate_format()
+    format_key = sorted(format_name2value.keys())
 
     runner = CliRunner()
 
-    benchmark(
+    result = benchmark(
         lambda: runner.invoke(
             cli.main,
             [
@@ -126,9 +146,13 @@ def variants_genotypes_annotations(
                 str(genotypes_path),
                 "-a",
                 str(annotations_path),
+                "-f",
+                ":".join(format_key),
             ],
         ),
     )
+
+    assert result.exit_code == 0
 
 
 @pytest.mark.benchmark(group="parquet2vcf")
@@ -140,12 +164,14 @@ def basic(
     variants_path = tmp_path / "variants.vcf"
 
     runner = CliRunner()
-    benchmark(
+    result = benchmark(
         lambda: runner.invoke(
             cli.main,
             ["parquet2vcf", "-i", str(DATA_DIR / "no_info.parquet"), "-o", str(variants_path)],
         ),
     )
+
+    assert result.exit_code == 0
 
 
 @pytest.mark.benchmark(group="parquet2vcf")
@@ -157,7 +183,7 @@ def add_genotype(
     variants_path = tmp_path / "variants.vcf"
 
     runner = CliRunner()
-    benchmark(
+    result = benchmark(
         lambda: runner.invoke(
             cli.main,
             [
@@ -174,6 +200,8 @@ def add_genotype(
         ),
     )
 
+    assert result.exit_code == 0
+
 
 @pytest.mark.benchmark(group="struct_variants")
 def struct_variants(
@@ -184,7 +212,7 @@ def struct_variants(
     merge_path = tmp_path / "merge.parquet"
 
     runner = CliRunner()
-    benchmark(
+    result = benchmark(
         lambda: runner.invoke(
             cli.main,
             [
@@ -200,6 +228,8 @@ def struct_variants(
         ),
     )
 
+    assert result.exit_code == 0
+
 
 @pytest.mark.benchmark(group="struct_genotypes")
 def struct_genotypes(
@@ -210,7 +240,7 @@ def struct_genotypes(
     prefix_path = tmp_path / "hive"
 
     runner = CliRunner()
-    benchmark(
+    result = benchmark(
         lambda: runner.invoke(
             cli.main,
             [
@@ -223,3 +253,5 @@ def struct_genotypes(
             ],
         ),
     )
+
+    assert result.exit_code == 0

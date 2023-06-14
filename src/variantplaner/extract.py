@@ -101,7 +101,10 @@ def genotypes(
     # Select intrusting column
     genotypes = genotypes.select(["id", "sample", *[col.lower() for col in col_index]])
 
-    return genotypes.filter(polars.col("gt") != 0)
+    if "gt" in genotypes.columns:
+        return genotypes.filter(polars.col("gt") != 0)
+
+    return genotypes
 
 
 def merge_variants_genotypes(

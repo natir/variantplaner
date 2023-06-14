@@ -158,7 +158,7 @@ def __generate_vcf(tmp_path: Path, number_of_var: int) -> None:
     header += info_header
     header += format_header
 
-    header += "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\ts_1\ts_2\n"
+    header += "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\ts_1\ts_2"
 
     chroms = [*list(range(22)), "Y", "X", "MT"]
     nuc = ["A", "C", "T", "G"]
