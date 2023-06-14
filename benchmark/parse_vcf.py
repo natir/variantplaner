@@ -42,6 +42,6 @@ def __generate_parse_vcf(
     return inner
 
 
-for i in range(10, 20):
+for i in range(5, 15):
     number_of_line = 2**i
     globals()[f"parse_vcf_{number_of_line}"] = __generate_parse_vcf(number_of_line)

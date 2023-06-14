@@ -46,34 +46,10 @@ def nothing(data: pandas.DataFrame, name: str) -> tuple[pandas.DataFrame, str]:
     return data, name
 
 
-def annotations_vcf_func(data: pandas.DataFrame, _name: str) -> tuple[pandas.DataFrame, str]:
-    """Update dataframe and group name for annotations vcf group."""
-    rename = {
-        "one": 1,
-        "two": 2,
-        "three": 3,
-        "four": 4,
-        "five": 5,
-        "six": 6,
-        "seven": 7,
-        "height": 8,
-        "nine": 9,
-        "ten": 10,
-        "eleven": 11,
-        "twelve": 12,
-        "thirteen": 13,
-        "fourteen": 14,
-        "fiveteen": 15,
-        "sixteen": 16,
-        "seventeen": 17,
-        "eighteen": 18,
-        "nineteen": 19,
-        "twenty": 20,
-        "full": 21,
-        "full_rename": 22,
-    }
-
-    data = data.sort_values(by=["method"], key=lambda col: col.apply(lambda x: rename[x]))
+def annotations_extractions_func(data: pandas.DataFrame, _name: str) -> tuple[pandas.DataFrame, str]:
+    """Update dataframe and group name for annotations extractions group."""
+    data["method"] = data["method"].apply(lambda x: int(x.split("_")[2]))
+    data = data.sort_values(by=["method"])
 
     return data, "Effect of number of columns use in annotations conversion"
 
