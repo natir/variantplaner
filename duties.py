@@ -95,7 +95,7 @@ def check_dependencies(ctx: Context) -> None:
     ctx.run(safety.check(requirements), title="Checking dependencies")
 
 
-@duty(pre=["bench", "cov"])
+@duty
 def check_docs(ctx: Context) -> None:
     """Check if the documentation builds correctly.
 
@@ -104,6 +104,8 @@ def check_docs(ctx: Context) -> None:
     """
     Path("htmlcov").mkdir(parents=True, exist_ok=True)
     Path("htmlcov/index.html").touch(exist_ok=True)
+    Path(".benchmarks").mkdir(parents=True, exist_ok=True)
+    Path(".benchmarks/tmp.json").touch(exist_ok=True)
     ctx.run(mkdocs.build(strict=True), title=pyprefix("Building documentation"))
 
 
@@ -159,7 +161,7 @@ def clean(ctx: Context) -> None:
     ctx.run("find . -name '*.rej' -delete")
 
 
-@duty(pre=["bench", "cov"])
+@duty
 def docs(ctx: Context, host: str = "127.0.0.1", port: int = 8000) -> None:
     """Serve the documentation (localhost:8000).
 
@@ -251,7 +253,7 @@ def test(ctx: Context, match: str = "") -> None:
     )
 
 
-@duty(skip_if=Path(".benchmarks").exists())
+@duty
 def bench(ctx: Context, match: str = "") -> None:
     """Run the benchmark test suite.
 

@@ -10,27 +10,34 @@ import typing
 import pytest
 from click.testing import CliRunner
 
-# project import
-from variantplaner import cli
-
 if typing.TYPE_CHECKING:  # pragma: no cover
     import pytest_benchmark
 
+# project import
+from variantplaner import cli
+
+from benchmark import __generate_vcf
 
 DATA_DIR = pathlib.Path(__file__).parent / "data"
 
 
 @pytest.mark.benchmark(group="vcf2parquet")
-def variants(tmp_path: pathlib.Path, benchmark: pytest_benchmark.BenchmarkSession) -> None:
-    """Benchmark vcf2parquet variants."""
+def variants(
+    tmp_path: pathlib.Path,
+    benchmark: pytest_benchmark.BenchmarkSession,
+) -> None:
+    """Benchmark vcf2parquet variants and genotypes."""
+    input_path = tmp_path / f"{10_000}.vcf"
     variants_path = tmp_path / "variants.parquet"
+
+    __generate_vcf(input_path, 10_000)
 
     runner = CliRunner()
 
     benchmark(
         lambda: runner.invoke(
             cli.main,
-            ["vcf2parquet", "-i", str(DATA_DIR / "all_info.vcf"), "-v", str(variants_path)],
+            ["vcf2parquet", "-i", str(input_path), "-v", str(variants_path)],
         ),
     )
 

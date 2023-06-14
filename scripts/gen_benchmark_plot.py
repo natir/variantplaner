@@ -22,11 +22,18 @@ if typing.TYPE_CHECKING:  # pragma: no cover
 # project import
 
 
-def last_benchark() -> pathlib.Path:
+def generate_python_version() -> typing.Iterator[tuple[str, str]]:
+    """Generate python version available."""
+    for entry in os.scandir(".benchmarks"):
+        if entry.is_dir() and "Python" in entry.name:
+            yield entry.name, entry.name.split("-")[2]
+
+
+def last_benchark(versiondir: str) -> pathlib.Path:
     """Found last benchmark data."""
     change_entry = []
     for entry in os.scandir(".benchmarks"):
-        if entry.is_dir():
+        if entry.is_dir() and entry.name == versiondir:
             for subentry in os.scandir(entry.path):
                 if subentry.is_file():
                     change_entry.append((subentry.stat().st_mtime, subentry.path))
@@ -78,6 +85,14 @@ def vcf2parquet_func(data: pandas.DataFrame, _name: str) -> tuple[pandas.DataFra
     return data, "Vcf2Parquet mode evaluation"
 
 
+def vcf_parsing_func(data: pandas.DataFrame, _name: str) -> tuple[pandas.DataFrame, str]:
+    """Update dataframe and group name for vcf2parquet run group."""
+    data["method"] = data["method"].apply(lambda x: int(x.split("_")[2]))
+    data = data.sort_values(by=["method"])
+
+    return data, "Vcf parsing scaling"
+
+
 def create_plot(
     data: pandas.DataFrame,
     name: str,
@@ -91,10 +106,11 @@ def create_plot(
 
     line = (
         altair.Chart(df)
-        .mark_line()
+        .mark_line(point=True)
         .encode(
             x=altair.X("method", sort=None),
             y=altair.Y("median", sort=None),
+            color="version",
         )
     )
 
@@ -109,6 +125,7 @@ def create_plot(
             ),
             altair.Y2("iqr0:Q"),
             altair.X("method", sort=None),
+            color="version",
         )
         .properties(
             title=title,
@@ -120,15 +137,17 @@ def create_plot(
 
 def render_plot() -> str:
     """Generate benchmark plot."""
-    with open(last_benchark()) as fh:
-        json_data = json.load(fh)["benchmarks"]
+    bench_data: typing.Mapping[str, list] = {"version": [], "benchmark": [], "method": [], "median": [], "iqr": []}
+    for dirname, version in generate_python_version():
+        with open(last_benchark(dirname)) as fh:
+            json_data = json.load(fh)["benchmarks"]
 
-    bench_data: typing.Mapping[str, list] = {"benchmark": [], "method": [], "median": [], "iqr": []}
-    for obj in json_data:
-        bench_data["benchmark"].append(obj["group"])
-        bench_data["method"].append(obj["name"])
-        bench_data["median"].append(obj["stats"]["median"])
-        bench_data["iqr"].append(obj["stats"]["iqr"])
+            for obj in json_data:
+                bench_data["version"].append(version)
+                bench_data["benchmark"].append(obj["group"])
+                bench_data["method"].append(obj["name"])
+                bench_data["median"].append(obj["stats"]["median"])
+                bench_data["iqr"].append(obj["stats"]["iqr"])
 
     df = polars.DataFrame(bench_data)
 
