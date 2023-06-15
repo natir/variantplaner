@@ -13,6 +13,7 @@ import polars
 import pytest
 
 # project import
+from variantplaner import normalization
 
 if typing.TYPE_CHECKING:  # pragma: no cover
     import pytest_benchmark
@@ -52,7 +53,7 @@ def __generate_variant(common: int = 10_000, diff: int = 1000) -> polars.LazyFra
         },
     )
 
-    return polars.concat([lf1, lf1, lf2, lf3])
+    return normalization.add_variant_id(polars.concat([lf1, lf2, lf1, lf3, lf1]))
 
 
 def __generate_variant_merge(
