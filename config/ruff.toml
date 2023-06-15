@@ -92,6 +92,7 @@ ignore = [
     "FBT001",  # Boolean positional arg in function definition
     "PLR2004",  # Magic value used in comparison
     "S101",  # Use of assert detected
+    "S311",  # Use of random but for not cryptographic
 ]
 
 [flake8-quotes]

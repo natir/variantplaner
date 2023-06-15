@@ -126,7 +126,14 @@ def create_plot(
 
 def render_plot() -> str:
     """Generate benchmark plot."""
-    bench_data: typing.Mapping[str, list] = {"version": [], "benchmark": [], "method": [], "median": [], "q1": [], "q3": []}
+    bench_data: typing.Mapping[str, list] = {
+        "version": [],
+        "benchmark": [],
+        "method": [],
+        "median": [],
+        "q1": [],
+        "q3": [],
+    }
     for dirname, version in generate_python_version():
         with open(last_benchark(dirname)) as fh:
             json_data = json.load(fh)["benchmarks"]

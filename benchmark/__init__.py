@@ -32,50 +32,50 @@ def __generate_info() -> tuple[str, dict[str, typing.Callable[[], str]]]:
             header += f'##INFO=<ID={id_name},Number={number},Type={info_type},Description="description">\n'
             if info_type == "Integer":
                 if number == "A" and number == "1":
-                    info_name2value[id_name] = lambda: str(random.randint(0, 2 ^ 32))  # noqa: S311
+                    info_name2value[id_name] = lambda: str(random.randint(0, 2 ^ 32))
                 elif number == "R" and number == "G" and number == "2":
                     info_name2value[id_name] = lambda: ",".join(
-                        [str(random.randint(0, 2 ^ 32)), str(random.randint(0, 2 ^ 32))],  # noqa: S311
+                        [str(random.randint(0, 2 ^ 32)), str(random.randint(0, 2 ^ 32))],
                     )
                 else:
                     info_name2value[id_name] = lambda: ",".join(
-                        [str(random.randint(0, 2 ^ 32)) for _ in range(5)],  # noqa: S311
+                        [str(random.randint(0, 2 ^ 32)) for _ in range(5)],
                     )
             elif info_type == "Float":
                 if number == "A" and number == "1":
-                    info_name2value[id_name] = lambda: str(random.uniform(0, 2 ^ 32))  # noqa: S311
+                    info_name2value[id_name] = lambda: str(random.uniform(0, 2 ^ 32))
                 elif number == "R" and number == "G" and number == "2":
                     info_name2value[id_name] = lambda: ",".join(
-                        [str(random.uniform(0, 2 ^ 32)), str(random.uniform(0, 2 ^ 32))],  # noqa: S311
+                        [str(random.uniform(0, 2 ^ 32)), str(random.uniform(0, 2 ^ 32))],
                     )
                 else:
                     info_name2value[id_name] = lambda: ",".join(
-                        [str(random.uniform(0, 2 ^ 32)) for _ in range(5)],  # noqa: S311
+                        [str(random.uniform(0, 2 ^ 32)) for _ in range(5)],
                     )
             elif info_type == "Character":
                 if number == "A" and number == "1":
-                    info_name2value[id_name] = lambda: random.choice(string.ascii_letters)  # noqa: S311
+                    info_name2value[id_name] = lambda: random.choice(string.ascii_letters)
                 elif number == "R" and number == "G" and number == "2":
                     info_name2value[id_name] = lambda: ",".join(
-                        [random.choice(string.ascii_letters), random.choice(string.ascii_letters)],  # noqa: S311
+                        [random.choice(string.ascii_letters), random.choice(string.ascii_letters)],
                     )
                 else:
                     info_name2value[id_name] = lambda: ",".join(
-                        [random.choice(string.ascii_letters) for _ in range(5)],  # noqa: S311
+                        [random.choice(string.ascii_letters) for _ in range(5)],
                     )
             elif info_type == "String":
                 if number == "A" and number == "1":
-                    info_name2value[id_name] = lambda: "".join(random.choices(string.ascii_letters, k=10))  # noqa: S311
+                    info_name2value[id_name] = lambda: "".join(random.choices(string.ascii_letters, k=10))
                 elif number == "R" and number == "G" and number == "2":
                     info_name2value[id_name] = lambda: ",".join(
                         [
-                            "".join(random.choices(string.ascii_letters, k=10)),  # noqa: S311
-                            "".join(random.choices(string.ascii_letters, k=10)),  # noqa: S311
+                            "".join(random.choices(string.ascii_letters, k=10)),
+                            "".join(random.choices(string.ascii_letters, k=10)),
                         ],
                     )
                 else:
                     info_name2value[id_name] = lambda: ",".join(
-                        ["".join(random.choices(string.ascii_letters, k=10)) for _ in range(5)],  # noqa: S311
+                        ["".join(random.choices(string.ascii_letters, k=10)) for _ in range(5)],
                     )
 
     return header, info_name2value
@@ -93,52 +93,52 @@ def __generate_format() -> tuple[str, dict[str, typing.Callable[[], str]]]:
 
             if format_type == "Integer":
                 if number == "A" and number == "1":
-                    format_name2value[format_name] = lambda: str(random.randint(0, 2 ^ 32))  # noqa: S311
+                    format_name2value[format_name] = lambda: str(random.randint(0, 2 ^ 32))
                 elif number == "R" and number == "G" and number == "2":
                     format_name2value[format_name] = lambda: ",".join(
-                        [str(random.randint(0, 2 ^ 32)), str(random.randint(0, 2 ^ 32))],  # noqa: S311
+                        [str(random.randint(0, 2 ^ 32)), str(random.randint(0, 2 ^ 32))],
                     )
                 else:
                     format_name2value[format_name] = lambda: ",".join(
-                        [str(random.randint(0, 2 ^ 32)) for _ in range(5)],  # noqa: S311
+                        [str(random.randint(0, 2 ^ 32)) for _ in range(5)],
                     )
             elif format_type == "Float":
                 if number == "A" and number == "1":
-                    format_name2value[format_name] = lambda: str(random.uniform(0, 2 ^ 32))  # noqa: S311
+                    format_name2value[format_name] = lambda: str(random.uniform(0, 2 ^ 32))
                 elif number == "R" and number == "G" and number == "2":
                     format_name2value[format_name] = lambda: ",".join(
-                        [str(random.uniform(0, 2 ^ 32)), str(random.uniform(0, 2 ^ 32))],  # noqa: S311
+                        [str(random.uniform(0, 2 ^ 32)), str(random.uniform(0, 2 ^ 32))],
                     )
                 else:
                     format_name2value[format_name] = lambda: ",".join(
-                        [str(random.uniform(0, 2 ^ 32)) for _ in range(5)],  # noqa: S311
+                        [str(random.uniform(0, 2 ^ 32)) for _ in range(5)],
                     )
             elif format_type == "Character":
                 if number == "A" and number == "1":
-                    format_name2value[format_name] = lambda: random.choice(string.ascii_letters)  # noqa: S311
+                    format_name2value[format_name] = lambda: random.choice(string.ascii_letters)
                 elif number == "R" and number == "G" and number == "2":
                     format_name2value[format_name] = lambda: ",".join(
-                        [random.choice(string.ascii_letters), random.choice(string.ascii_letters)],  # noqa: S311
+                        [random.choice(string.ascii_letters), random.choice(string.ascii_letters)],
                     )
                 else:
                     format_name2value[format_name] = lambda: ",".join(
-                        [random.choice(string.ascii_letters) for _ in range(5)],  # noqa: S311
+                        [random.choice(string.ascii_letters) for _ in range(5)],
                     )
             elif format_type == "String":
                 if number == "A" and number == "1":
                     format_name2value[format_name] = lambda: "".join(
-                        random.choices(string.ascii_letters, k=10),  # noqa: S311
+                        random.choices(string.ascii_letters, k=10),
                     )
                 elif number == "R" and number == "G" and number == "2":
                     format_name2value[format_name] = lambda: ",".join(
                         [
-                            "".join(random.choices(string.ascii_letters, k=10)),  # noqa: S311
-                            "".join(random.choices(string.ascii_letters, k=10)),  # noqa: S311
+                            "".join(random.choices(string.ascii_letters, k=10)),
+                            "".join(random.choices(string.ascii_letters, k=10)),
                         ],
                     )
                 else:
                     format_name2value[format_name] = lambda: ",".join(
-                        ["".join(random.choices(string.ascii_letters, k=10)) for _ in range(5)],  # noqa: S311
+                        ["".join(random.choices(string.ascii_letters, k=10)) for _ in range(5)],
                     )
 
     return header, format_name2value
@@ -166,11 +166,11 @@ def __generate_vcf(tmp_path: Path, number_of_var: int) -> None:
     with open(tmp_path, "w") as fh:
         print(header, file=fh)
         for _ in range(number_of_var):
-            chrom = random.choice(chroms)  # noqa: S311
-            pos = random.randint(0, 2 ^ 32)  # noqa: S311
-            vid = f"rid_{random.randint(100000, 1000000)}"  # noqa: S311
-            ref = "".join(random.choices(nuc, k=random.randint(1, 7)))  # noqa: S311
-            alt = "".join(random.choices(nuc, k=random.randint(1, 7)))  # noqa: S311
+            chrom = random.choice(chroms)
+            pos = random.randint(0, 2 ^ 32)
+            vid = f"rid_{random.randint(100000, 1000000)}"
+            ref = "".join(random.choices(nuc, k=random.randint(1, 7)))
+            alt = "".join(random.choices(nuc, k=random.randint(1, 7)))
             info_str = ";".join([info_name2value[key]() for key in info_name2value])
             format_str = ":".join(format_key)
             s_1 = ":".join([format_name2value[key]() for key in format_key])
