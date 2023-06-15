@@ -69,6 +69,22 @@ def vcf_parsing_func(data: pandas.DataFrame, _name: str) -> tuple[pandas.DataFra
     return data, "Vcf parsing scaling"
 
 
+def merge_id_func(data: pandas.DataFrame, _name: str) -> tuple[pandas.DataFrame, str]:
+    """Update variant merge by id."""
+    data["method"] = data["method"].apply(lambda x: int(x.split("_")[3]))
+    data = data.sort_values(by=["method"])
+
+    return data, "Merging time by id in number of variant"
+
+
+def merge_variant_func(data: pandas.DataFrame, _name: str) -> tuple[pandas.DataFrame, str]:
+    """Update variant merge by variant."""
+    data["method"] = data["method"].apply(lambda x: int(x.split("_")[3]))
+    data = data.sort_values(by=["method"])
+
+    return data, "Merging time by variant in number of variant"
+
+
 def create_plot(
     data: pandas.DataFrame,
     name: str,
