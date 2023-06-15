@@ -93,9 +93,6 @@ def create_plot(
     """Create plot."""
     df, title = name2func[name](data.to_pandas(), name)
 
-    df["iqr0"] = df["median"] - df["iqr"]
-    df["iqr1"] = df["median"] + df["iqr"]
-
     line = (
         altair.Chart(df)
         .mark_line(point=True)
@@ -111,11 +108,11 @@ def create_plot(
         .mark_errorband()
         .encode(
             altair.Y(
-                "iqr1:Q",
+                "q1:Q",
                 scale=altair.Scale(zero=False),
                 title="Times in (s)",
             ),
-            altair.Y2("iqr0:Q"),
+            altair.Y2("q3:Q"),
             altair.X("method", sort=None),
             color="version",
         )
@@ -129,7 +126,7 @@ def create_plot(
 
 def render_plot() -> str:
     """Generate benchmark plot."""
-    bench_data: typing.Mapping[str, list] = {"version": [], "benchmark": [], "method": [], "median": [], "iqr": []}
+    bench_data: typing.Mapping[str, list] = {"version": [], "benchmark": [], "method": [], "median": [], "q1": [], "q3": []}
     for dirname, version in generate_python_version():
         with open(last_benchark(dirname)) as fh:
             json_data = json.load(fh)["benchmarks"]
@@ -139,7 +136,8 @@ def render_plot() -> str:
                 bench_data["benchmark"].append(obj["group"])
                 bench_data["method"].append(obj["name"])
                 bench_data["median"].append(obj["stats"]["median"])
-                bench_data["iqr"].append(obj["stats"]["iqr"])
+                bench_data["q1"].append(obj["stats"]["q1"])
+                bench_data["q3"].append(obj["stats"]["q3"])
 
     df = polars.DataFrame(bench_data)
 
