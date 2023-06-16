@@ -74,7 +74,7 @@ def genotypes(
     lf = lf.select([*lf.columns[lf.columns.index("format") :]])
 
     # Clean bad variant
-    lf = lf.filter(polars.col("format").str.starts_with(format_str))
+    lf = lf.filter(polars.col("format").str.starts_with(format_str)).select(*lf.columns[1:])
 
     # Found index of genotype value
     col_index = {

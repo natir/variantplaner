@@ -44,6 +44,23 @@ def test_extract_genotypes() -> None:
         assert truth.width == lf.width
 
 
+def test_extract_genotypes_no_gt() -> None:
+    """Check extract genotypes without gt value."""
+    truth = polars.scan_parquet(DATA_DIR / "no_info_no_gt.genotypes.parquet")
+
+    input_path = DATA_DIR / "no_info_no_gt.vcf"
+
+    lf = io.vcf.into_lazyframe(input_path)
+
+    vcf_header = io.vcf.extract_header(input_path)
+
+    format2expr = io.vcf.format2expr(vcf_header, input_path)
+
+    lf = extract.genotypes(lf, format2expr, format_str="AD:DP:GQ")
+
+    polars.testing.assert_frame_equal(truth, lf)
+
+
 def test_extract_genotypes_without_genotypes() -> None:
     """Check extract genotypes failled if vcf not containts genotypes."""
     df = io.vcf.into_lazyframe(DATA_DIR / "no_genotypes.vcf")
