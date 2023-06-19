@@ -4,18 +4,20 @@
 [![doc](https://img.shields.io/badge/docs-mkdocs%20material-blue.svg?style=flat)](https://natir.github.io/variantplaner/)
 [![pypi version](https://img.shields.io/pypi/v/variantplaner.svg)](https://pypi.org/project/variantplaner/)
 
-A tool kit to manage many variant of many sample, with limited resources.
+A tool kit to manage many variants from many samples, with limited resources.
 
 `variantplaner` was initially built for a project concerning the human genome, but the project is evolving to be able to be used for any organism. This feature is planned for version 0.2.0.
 
 ## Installation
 
 With `pip`:
+
 ```bash
 pip install git+https://github.com/natir/variantplaner.git@0.1.0-alpha#egg=variantplaner
 ```
 
 With [`pipx`](https://github.com/pipxproject/pipx):
+
 ```bash
 python -m pip install --user pipx
 pipx install git+https://github.com/natir/variantplaner.git@0.1.0-alpha#egg=variantplaner
@@ -25,11 +27,11 @@ pipx install git+https://github.com/natir/variantplaner.git@0.1.0-alpha#egg=vari
 
 This section present basic usage for a more complete exemple check our [usage page](https://natir.github.io/variantplaner/usages/)
 
-**WARNING**: variantplaner support only not compressed file, sorry it's a downstream trouble.
+**WARNING**: `variantplaner` support only not compressed file, sorry it's a downstream trouble.
 
 ### Convert vcf in parquet
 
-```
+```bash
 variantplaner vcf2parquet -i input.vcf -v variants.parquet -g genotypes.parquet -a annotations.parquet
 ```
 
@@ -39,17 +41,16 @@ variantplaner vcf2parquet -i input.vcf -v variants.parquet -g genotypes.parquet 
 
 Genotyping encoding:
 
-| `gt` parquet value | translation |
-| --- | --- |
-| 0  | variants not present |
-| 1  | heterozygote |
-| 2  | homozygote |
-| 3  | no information (only use in transmission file) |
-
+| `gt` parquet value | translation                                    |
+| ------------------ | ---------------------------------------------- |
+| 0                  | variants not present                           |
+| 1                  | heterozygote                                   |
+| 2                  | homozygote                                     |
+| 3                  | no information (only use in transmission file) |
 
 ### Convert parquet in vcf
 
-```
+```bash
 variantplaner parquet2vcf -i variants.parquet -g genotypes.parquet -o output.vcf
 ```
 
@@ -62,11 +63,11 @@ This options have many options to control behavior of this subcommand, sorry for
 
 **Warning**: this command could have huge memory and disk usage
 
-```
+```bash
 variantplaner struct -i variants/1.parquet -i variants/2.parquet -i variants/3.parquet … -i variants/n.parquet variants -o variants.parquet
 ```
 
-By default temporary file are write in /tmp you can use TMPDIR, TEMP or TMP to change this behavior.
+By default temporary file are write in /tmp you can use `TMPDIR`, `TEMP` or `TMP` to change this behavior.
 
 This command use divide and conquer algorithm to perform merge of variants option `-b|--bytes-memory-limit` control bytes size of chunk of files. Empirically ram usage is ten times bytes memory limit value.
 
@@ -74,7 +75,7 @@ This command use divide and conquer algorithm to perform merge of variants optio
 
 **Warning**: this command could have huge disk usage
 
-```
+```bash
 variantplaner struct -i genotypes/1.parquet -i genotypes/2.parquet -i genotypes/3.parquet … -i genotypes/n.parquet genotypes -p partition_prefix/
 ```
 
@@ -82,7 +83,7 @@ variantplaner struct -i genotypes/1.parquet -i genotypes/2.parquet -i genotypes/
 
 #### Vcf format
 
-```
+```bash
 variantplaner annotations -i annotations.vcf -o annotations.parquet vcf -r annot_id --info CLNDN --info AF_ESP
 ```
 
@@ -92,7 +93,7 @@ Option `-r|--rename-id` could be use to rename vcf id column name (default name 
 
 #### Csv format
 
-```
+```bash
 variantplaner annotations -i annotations.tsv -o annotations.parquet csv -c chr -p pos -r ref -a alt -s$'\t' --info CLNDN --info AF_ESP
 ```
 
@@ -102,13 +103,13 @@ It's work same as vcf sub command but you must specify chromosome (`-c`), positi
 
 #### Json format
 
-```
+```bash
 variantplaner metadata -i metadata.json -o metadata.parquet json -f sample -f link -f kindex
 ```
 
 #### Csv format
 
-```
+```bash
 variantplaner metadata -i metadata.csv -o metadata.parquet csv -c sample -c link -c kindex
 ```
 
@@ -116,13 +117,13 @@ variantplaner metadata -i metadata.csv -o metadata.parquet csv -c sample -c link
 
 #### Variants transmission
 
-If you studies germline variants it's useful to calculate the familial origin of variants.
+If you study germline variants it's useful to calculate the familial origin of variants.
 
-```
+```bash
 variantplaner generate transmission -i genotypes.parquet -I index_sample_name -m mother_sample_name -f father_sample_name -t transmission.parquet
 ```
 
-`genotypes.parquet` file with variant of all family this file must contains `gt` and `samples` columns.
+`genotypes.parquet` file with variants of all family this file must contains `gt` and `samples` columns.
 
 In `transmission.parquet` each line contains an index sample variants, index, mother, father genotypes sample information and also column origin.
 
@@ -135,12 +136,12 @@ Origin column contains a number with 3 digit:
 ```
 
 You can also use pedigree file:
-```
+
+```bash
 variantplaner generate transmission -i genotypes.parquet -p family.ped -t transmission.parquet
 ```
 
 **Warning**: this command could have important RAM usage (propotionaly to number of sample index variants)
-
 
 ## Contribution
 
