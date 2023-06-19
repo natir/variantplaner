@@ -105,7 +105,7 @@ def __hive_worker(path: pathlib.Path, output_prefix: pathlib.Path) -> pathlib.Pa
 
 
 def hive(paths: list[pathlib.Path], output_prefix: pathlib.Path, threads: int = 1) -> None:
-    """Read all genotypes parquet file and use information to generate a hive like struct, based on $id\\ \\%\\ 256$  with genotype informations.
+    r"""Read all genotypes parquet file and use information to generate a hive like struct, based on $id\ \%\ 256$  with genotype informations.
 
     Real number of threads use are equal to $min(threads, len(paths))$.
 

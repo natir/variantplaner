@@ -50,7 +50,6 @@ def chromosome2integer(lf: polars.LazyFrame) -> polars.LazyFrame:
 def add_variant_id(lf: polars.LazyFrame) -> polars.LazyFrame:
     """Add a column id of variants.
 
-
     This id is compute by 64 bit hash on chromosome, position, reference sequence and alternative sequence.
 
 

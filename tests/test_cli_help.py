@@ -28,12 +28,12 @@ Options:
   --help                       Show this message and exit.
 
 Commands:
-  annotations  Convert an annotation variation file in parquet.
-  generate     Subcommand generate thing.
-  metadata     Convert an metadata file in parquet.
-  parquet2vcf  Convert parquet in vcf.
-  struct       Struct operation on parquet file.
-  vcf2parquet  Convert a vcf in parquet.
+  annotations  Convert an annotation variation file in a compatible parquet.
+  generate     Generate information.
+  metadata     Convert metadata file in parquet file.
+  parquet2vcf  Convert some parquet file in vcf.
+  struct       Subcommand to made struct operation on parquet file.
+  vcf2parquet  Convert a vcf in multiple parquet file.
 """
     )
 
@@ -48,7 +48,7 @@ def test_show_help_annotations() -> None:
         result.stdout
         == """Usage: variantplaner annotations [OPTIONS] COMMAND [ARGS]...
 
-  Convert an annotation variation file in parquet.
+  Convert an annotation variation file in a compatible parquet.
 
 Options:
   -i, --input-path FILE   Path to input file  [required]
@@ -57,8 +57,8 @@ Options:
   --help                  Show this message and exit.
 
 Commands:
-  csv  Convert an annotated csv in parquet.
-  vcf  Convert an annotated vcf in parquet.
+  csv  Convert annotations store in csv file to compatible parquet file.
+  vcf  Convert a vcf file with INFO field in compatible parquet file.
 """
     )
 
@@ -73,14 +73,14 @@ def test_show_help_struct() -> None:
         result.stdout
         == """Usage: variantplaner struct [OPTIONS] COMMAND [ARGS]...
 
-  Struct operation on parquet file.
+  Subcommand to made struct operation on parquet file.
 
 Options:
   -i, --input-paths FILE  Paths of the variant files to be merged  [required]
   --help                  Show this message and exit.
 
 Commands:
-  genotypes  Convert set of genotype parquet in hive file.
+  genotypes  Convert set of genotype parquet in hive like files structures.
   variants   Merge multiple variants parquet file in one.
 """
     )
@@ -96,7 +96,7 @@ def test_show_help_metadata() -> None:
         result.stdout
         == """Usage: variantplaner metadata [OPTIONS] COMMAND [ARGS]...
 
-  Convert an metadata file in parquet.
+  Convert metadata file in parquet file.
 
 Options:
   -i, --input-path FILE   Path to input file  [required]
@@ -105,8 +105,8 @@ Options:
   --help                  Show this message and exit.
 
 Commands:
-  csv   Convert an metadata csv in parquet.
-  json  Convert an metadata json in parquet.
+  csv   Convert metadata csv file in parquet file.
+  json  Convert metadata json file in parquet file.
 """
     )
 
@@ -121,7 +121,7 @@ def test_show_help_vcf2parquet() -> None:
         result.stdout
         == """Usage: variantplaner vcf2parquet [OPTIONS]
 
-  Convert a vcf in parquet.
+  Convert a vcf in multiple parquet file.
 
 Options:
   -i, --input-path FILE     Path to vcf input file  [required]
@@ -147,7 +147,7 @@ def test_show_help_parquet2vcf() -> None:
         result.stdout
         == """Usage: variantplaner parquet2vcf [OPTIONS]
 
-  Convert parquet in vcf.
+  Convert some parquet file in vcf.
 
 Options:
   -i, --input-path FILE      Path to variants in parquet format  [required]
@@ -176,12 +176,12 @@ def test_show_help_generate() -> None:
         result.stdout
         == """Usage: variantplaner generate [OPTIONS] COMMAND [ARGS]...
 
-  Subcommand generate thing.
+  Generate information.
 
 Options:
   --help  Show this message and exit.
 
 Commands:
-  transmission  Generate transmission information.
+  transmission  Generate transmission file from genotypes and pedigree.
 """
     )

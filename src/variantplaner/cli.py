@@ -221,7 +221,7 @@ def parquet2vcf(
     filter_col: str | None = None,
     format_str: str | None = None,
 ) -> None:
-    """Convert a parquet file in vcf."""
+    """Convert some parquet file in vcf."""
     logger = logging.getLogger("parquet2vcf")
 
     logger.debug(f"parameter: {input_path=} {output=}")
@@ -522,7 +522,7 @@ def annotations_csv(
     required=True,
 )
 def metadata(ctx: click.Context, input_path: pathlib.Path, output_path: pathlib.Path) -> None:
-    """Convert metadata in parquet file."""
+    """Convert metadata file in parquet file."""
     logger = logging.getLogger("metadata")
 
     ctx.obj = {"input_path": input_path, "output_path": output_path}
@@ -599,7 +599,7 @@ def metadata_csv(ctx: click.Context, columns: list[str], separator: str = ",") -
 ############
 @main.group("generate")
 def generate_main() -> None:
-    """Generate subcommand."""
+    """Generate information."""
     logger = logging.getLogger("generate")
 
     logger.debug("parameter: ")
@@ -651,7 +651,7 @@ def generate_transmission(
     father: str | None,
     transmission_path: pathlib.Path,
 ) -> None:
-    """Generate transmission file from genotypes and pedigree information."""
+    """Generate transmission file from genotypes and pedigree."""
     logger = logging.getLogger("generate-origin")
 
     logger.debug(f"parameter: {input_path=} {ped_path=} {index=} {mother=} {father=} {transmission_path=}")
