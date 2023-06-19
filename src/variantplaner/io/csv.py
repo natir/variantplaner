@@ -1,4 +1,4 @@
-"""Function to manage input and output of csv file."""
+"""Read and write csv file."""
 
 # std import
 from __future__ import annotations
@@ -19,7 +19,7 @@ if typing.TYPE_CHECKING:  # pragma: no cover
         from typing_extensions import Unpack
 
     class ScanCsv(typing.TypedDict, total=False):
-        """A struct to check type of parameter give to polars.scan_csv."""
+        """A struct to check type of parameter give to [polars.scan_csv][]."""
 
         has_header: bool
         separator: str

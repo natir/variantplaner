@@ -64,9 +64,12 @@ markdown_extensions:
 - pymdownx.tasklist
 - toc:
     permalink: true
+- pymdownx.arithmatex:
+    generic: true
 
 plugins:
 - search
+- autorefs
 - markdown-exec
 - gen-files:
     scripts:
@@ -93,3 +96,8 @@ extra:
   social:
   - icon: fontawesome/brands/github
     link: https://github.com/natir
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js

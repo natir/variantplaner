@@ -23,8 +23,8 @@ def transmission_ped(
     **Warning**: only the first sample with two parent are consider.
 
     Args:
-        genotypes_lf: Genotypes LazyFrame, `gt` column are required.
-        pedigree_lf: Pedigree LazyFrame.
+        genotypes_lf: Genotypes [polars.LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html), `gt` column are required.
+        pedigree_lf: Pedigree [polars.LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html).
 
     Returns:
          DataFrame with transmission information
@@ -48,13 +48,13 @@ def transmission(
     """Compute how each variant are transmite to index case.
 
     Args:
-        genotypes_lf: Genotypes polars.LazyFrame, `gt` column are required.
+        genotypes_lf: Genotypes [polars.LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html), `gt` column are required.
         index_name: Sample name of index case.
         mother_name: Sample name of mother.
         father_name: Sample name of father.
 
     Returns:
-         DataFrame with transmission information.
+         [polars.DataFrame](https://pola-rs.github.io/polars/py-polars/html/reference/dataframe/index.html) with transmission information.
          With genotyping information for index, mother and father.
          If any of them isn't present value are set to polars.Null (3 for gt)
          Columns transmission contains: index_gt * 100 + mother_gt * 10 + father_gt.

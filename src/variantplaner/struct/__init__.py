@@ -1,4 +1,4 @@
-"""Module manage data struct."""
+"""Generated data structures for easy integration."""
 
 from __future__ import annotations
 

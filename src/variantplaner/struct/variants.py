@@ -1,4 +1,4 @@
-"""Function relate to merge of vcf."""
+"""Function relate to vcf structuration."""
 
 # std import
 from __future__ import annotations
@@ -83,6 +83,8 @@ def __concat_uniq(paths: list[pathlib.Path], output: pathlib.Path) -> None:
 
 def merge(paths: list[pathlib.Path], output: pathlib.Path, memory_limit: int = 10_000_000_000) -> None:
     """Perform merge of multiple parquet variants file in one file.
+
+    These function generate temporary file, by default file are write in `/tmp` but you can control where these files are write by set TMPDIR, TEMP or TMP directory.
 
     Args:
         paths: List of file you want chunked.

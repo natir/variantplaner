@@ -1,4 +1,4 @@
-"""Function to manage input and output of vcf file."""
+"""Read and write vcf file."""
 
 # std import
 from __future__ import annotations
@@ -39,7 +39,10 @@ class IntoLazyFrameExtension(enum.Enum):
     """Enumration use to control behavior of IntoLazyFrame."""
 
     NOTHING = 0
+    """into_lazyframe not have any specific behavior"""
+
     MANAGE_SV = 1
+    """into_lazyframe try to avoid structural variant id colision, SVTYPE/SVLEN info value must be present."""
 
 
 def extract_header(input_path: pathlib.Path) -> list[str]:
@@ -73,7 +76,7 @@ def extract_header(input_path: pathlib.Path) -> list[str]:
 
 
 def info2expr(header: list[str], input_path: pathlib.Path, select_info: set[str] | None = None) -> list[polars.Expr]:
-    """Read vcf header to generate a list of polars.Expr to extract variants informations.
+    """Read vcf header to generate a list of [polars.Expr](https://pola-rs.github.io/polars/py-polars/html/reference/expressions/index.html) to extract variants informations.
 
     Args:
         header: Line of vcf header
@@ -81,11 +84,10 @@ def info2expr(header: list[str], input_path: pathlib.Path, select_info: set[str]
         select_info: List of target info field
 
     Returns:
-        List of polars expr to parse info columns.
+        List of [polars.Expr](https://pola-rs.github.io/polars/py-polars/html/reference/expressions/index.html) to parse info columns.
 
     Raises:
         NotAVCFError: If all line not start by '#CHR'
-        NotSupportType: If header line indicate a not support type
     """
     info_re = re.compile(
         r"ID=(?P<id>([A-Za-z_][0-9A-Za-z_.]*|1000G)),Number=(?P<number>[ARG0-9\.]+),Type=(?P<type>Integer|Float|String|Character)",
@@ -165,7 +167,7 @@ def format2expr(
     input_path: pathlib.Path,
     select_format: set[str] | None = None,
 ) -> dict[str, Callable[[polars.Expr, str], polars.Expr]]:
-    """Read vcf header to generate a list of polars.Expr to extract genotypes informations.
+    """Read vcf header to generate a list of [polars.Expr](https://pola-rs.github.io/polars/py-polars/html/reference/expressions/index.html) to extract genotypes informations.
 
     **Warning**: Float values can't be converted for the moment they are stored as String to keep information
 
@@ -278,13 +280,14 @@ def into_lazyframe(
     input_path: pathlib.Path,
     extension: IntoLazyFrameExtension = IntoLazyFrameExtension.NOTHING,
 ) -> polars.LazyFrame:
-    """Read a vcf file and convert it in lazyframe.
+    """Read a vcf file and convert it in [polars.LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html).
 
     Args:
         input_path: Path to vcf file.
+        extension: Control behavior of into_lazyframe.
 
     Returns:
-        A lazyframe that containt vcf information ('chr', 'pos', 'vid', 'ref', 'alt', 'qual', 'filter', 'info', ['format'], ['genotypes',…], 'id').
+        A [polars.LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html) that containt vcf information ('chr', 'pos', 'vid', 'ref', 'alt', 'qual', 'filter', 'info', ['format'], ['genotypes',…], 'id').
     """
     header = extract_header(input_path)
 
@@ -358,7 +361,7 @@ def build_rename_column(
     format_string: str | None = None,
     sample: dict[str, dict[str, str]] | None = None,
 ) -> RenameCol:
-    """An helper function to generate rename column dict for io.vcf.from_lazyframe function parameter.
+    """An helper function to generate rename column dict for [variantplaner.io.vcf.from_lazyframe][] function parameter.
 
     Returns:
         A rename column dictionary.
@@ -408,7 +411,7 @@ def from_lazyframe(
     output_path: pathlib.Path,
     renaming: RenameCol = DEFAULT_RENAME,
 ) -> None:
-    """Write polars.LazyFrame in vcf format.
+    """Write [polars.LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html) in vcf format.
 
     Chromosome name mapping table:
       - 23: X
@@ -417,7 +420,7 @@ def from_lazyframe(
 
     All other chromosome number isn't change.
 
-    Warning: This function perform LazyFrame.collect() before write csv, this can have a significant impact on memory usage.
+    Warning: This function perform [polars.LazyFrame.collect][] before write vcf, this can have a significant impact on memory usage.
 
     Args:
         lf: LazyFrame contains information.
@@ -488,12 +491,14 @@ def from_lazyframe(
 def add_info_column(lf: polars.LazyFrame, vcfinfo2parquet_name: list[tuple[str, str]]) -> polars.LazyFrame:
     """Construct an INFO column from multiple columns of lf.
 
+    Usefull when you want serialize [polars.LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html) in vcf file format.
+
     Args:
-        lf: A dataframe.
-        vcfinfo2parquet_name: List of vcf column name and lf column name.
+        lf: A [polars.LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html).
+        vcfinfo2parquet_name: List of vcf column name and [polars.LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html) column name.
 
     Returns:
-        LazyFrame with INFO column and remove lf column use.
+        [polars.LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html) with INFO column and remove lf column use.
     """
     lf = lf.with_columns(
         [

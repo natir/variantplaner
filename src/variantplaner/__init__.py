@@ -1,9 +1,8 @@
-"""VariantPlaner.
+"""VariantPlaner, a tool kit to manage many variant without many cpu and ram ressource.
 
-A tool kit to manage many variant without many cpu and ram ressource.
+Convert a vcf in parquet, convert annotations in parquet, convert parquet in vcf.
 
-Convert vcf in parquet, convert annotations in parquet, convert parquet in vcf.
-Build a file struct to get a fast variants database interogations time.
+But also build a files struct to get a fast variants database interogations time.
 """
 
 from __future__ import annotations

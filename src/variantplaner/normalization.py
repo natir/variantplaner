@@ -25,10 +25,10 @@ def chromosome2integer(lf: polars.LazyFrame) -> polars.LazyFrame:
     If chromosome value can't be convert in number row is remove.
 
     Args:
-        lf: LazyFrame contains chr column
+        lf: [polars.LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html) contains chr column
 
     Returns:
-        LazyFrame with chr column normalized
+        [polars.LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html) with chr column normalized
 
     """
     lf = lf.with_columns(
@@ -50,19 +50,23 @@ def chromosome2integer(lf: polars.LazyFrame) -> polars.LazyFrame:
 def add_variant_id(lf: polars.LazyFrame) -> polars.LazyFrame:
     """Add a column id of variants.
 
+
     This id is compute by 64 bit hash on chromosome, position, reference sequence and alternative sequence.
-    If lf.columns contains SVTYPE and SVLEN variant with regex group in alt <([^:]+):anything:weird> match SVTYPE are replace by concatenation of SVTYPE and SVLEN first value.
+
+
+    If lf.columns contains SVTYPE and SVLEN variant with regex group in alt <([^:]+).*> match SVTYPE are replace by concatenation of SVTYPE and SVLEN first value.
+
 
     Colision risk:
         - human genome size: 3,117,275,501 bp
-        - number of variant if each base have all sustitution 3,117,275,501 * 4 = 12,469,102,004
-        12,469,102,004 / 2^64 = 6.7595137e-10
+        - number of variant if each base have all sustitution $3,117,275,501 * 4 = 12,469,102,004$
+        - probablity of colision $12,469,102,004 / 2^{64} = 6.7595137 * 10^{-10}$
 
     Args:
-        lf: LazyFrame contains chr, pos, ref, alt columns
+        lf: [polars.LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html) contains chr, pos, ref, alt columns
 
     Returns:
-        LazyFrame with chr column normalized
+        [polars.LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html) with chr column normalized
     """
     if "SVTYPE" in lf.columns and "SVLEN" in lf.columns:
         lf = lf.with_columns(

@@ -4,7 +4,9 @@
 [![doc](https://img.shields.io/badge/docs-mkdocs%20material-blue.svg?style=flat)](https://natir.github.io/variantplaner/)
 [![pypi version](https://img.shields.io/pypi/v/variantplaner.svg)](https://pypi.org/project/variantplaner/)
 
-A tool kit to manage many variant without many cpu and ram ressource.
+A tool kit to manage many variant of many sample, with limited resources.
+
+`variantplaner` was initially built for a project concerning the human genome, but the project is evolving to be able to be used for any organism. This feature is planned for version 0.2.0.
 
 ## Installation
 
@@ -31,8 +33,8 @@ This section present basic usage for a more complete exemple check our [usage pa
 variantplaner vcf2parquet -i input.vcf -v variants.parquet -g genotypes.parquet -a annotations.parquet
 ```
 
-`-g` option isn't mandatory if you didn't set it you lose genotyping information.
-`-a` option isn't mandatory if you didn't set it you lose "INFO" fields information.
+- `-g` option isn't mandatory if you didn't set it you lose genotyping information, if `GT` is present in genotypes only heterozygote or homozygote variants are kept.
+- `-a` option isn't mandatory if you didn't set it you lose "INFO" fields information.
 
 
 Genotyping encoding:
@@ -43,6 +45,7 @@ Genotyping encoding:
 | 1  | heterozygote |
 | 2  | homozygote |
 | 3  | no information (only use in transmission file) |
+
 
 ### Convert parquet in vcf
 
@@ -113,7 +116,7 @@ variantplaner metadata -i metadata.csv -o metadata.parquet csv -c sample -c link
 
 #### Variants transmission
 
-It is sometimes useful to calculate the familial origin of variants.
+If you studies germline variants it's useful to calculate the familial origin of variants.
 
 ```
 variantplaner generate transmission -i genotypes.parquet -I index_sample_name -m mother_sample_name -f father_sample_name -t transmission.parquet

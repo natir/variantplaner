@@ -1,4 +1,4 @@
-"""Module that contains the command line application."""
+"""Module contains command line entry point function."""
 
 # Why does this file exist, and why not put this in `__main__`?
 #
@@ -92,7 +92,7 @@ def vcf2parquet(
     annotations: pathlib.Path | None,
     format_string: str = "GT:AD:DP:GQ",
 ) -> None:
-    """Convert a vcf in parquet."""
+    """Convert a vcf in multiple parquet file."""
     logger = logging.getLogger("vcf2parquet")
 
     logger.debug(f"parameter: {input_path=} {variants=} {genotypes=}")
@@ -221,7 +221,7 @@ def parquet2vcf(
     filter_col: str | None = None,
     format_str: str | None = None,
 ) -> None:
-    """Convert parquet in vcf."""
+    """Convert a parquet file in vcf."""
     logger = logging.getLogger("parquet2vcf")
 
     logger.debug(f"parameter: {input_path=} {output=}")
@@ -284,7 +284,7 @@ def parquet2vcf(
     required=True,
 )
 def struct_main(ctx: click.Context, input_paths: list[pathlib.Path]) -> None:
-    """Struct operation on parquet file."""
+    """Subcommand to made struct operation on parquet file."""
     logger = logging.getLogger("struct")
 
     ctx.obj = {"input_paths": input_paths}
@@ -292,7 +292,7 @@ def struct_main(ctx: click.Context, input_paths: list[pathlib.Path]) -> None:
     logger.debug(f"parameter: {input_paths=}")
 
 
-@struct_main.command()
+@struct_main.command("variants")
 @click.pass_context
 @click.option(
     "-o",
@@ -309,7 +309,7 @@ def struct_main(ctx: click.Context, input_paths: list[pathlib.Path]) -> None:
     show_default=True,
     default=10_000_000_000,
 )
-def variants(ctx: click.Context, output_path: pathlib.Path, bytes_memory_limit: int = 10_000_000_000) -> None:
+def struct_variants(ctx: click.Context, output_path: pathlib.Path, bytes_memory_limit: int = 10_000_000_000) -> None:
     """Merge multiple variants parquet file in one.
 
     If you set TMPDIR, TEMP or TMP environment variable you can control where temp file is create.
@@ -325,7 +325,7 @@ def variants(ctx: click.Context, output_path: pathlib.Path, bytes_memory_limit: 
     struct.variants.merge(input_paths, output_path, bytes_memory_limit)
 
 
-@struct_main.command()
+@struct_main.command("genotypes")
 @click.pass_context
 @click.option(
     "-p",
@@ -334,8 +334,8 @@ def variants(ctx: click.Context, output_path: pathlib.Path, bytes_memory_limit: 
     type=click.Path(file_okay=False, dir_okay=True, path_type=pathlib.Path),
     required=True,
 )
-def genotypes(ctx: click.Context, prefix_path: pathlib.Path) -> None:
-    """Convert set of genotype parquet in hive file."""
+def struct_genotypes(ctx: click.Context, prefix_path: pathlib.Path) -> None:
+    """Convert set of genotype parquet in hive like files structures."""
     logger = logging.getLogger("struct.genotypes")
 
     ctx.ensure_object(dict)
@@ -370,7 +370,7 @@ def genotypes(ctx: click.Context, prefix_path: pathlib.Path) -> None:
     required=True,
 )
 def annotations_main(ctx: click.Context, input_path: pathlib.Path, output_path: pathlib.Path) -> None:
-    """Convert an annotation variation file in parquet."""
+    """Convert an annotation variation file in a compatible parquet."""
     logger = logging.getLogger("annotations")
 
     ctx.obj = {"input_path": input_path, "output_path": output_path}
@@ -394,7 +394,7 @@ def annotations_main(ctx: click.Context, input_path: pathlib.Path, output_path: 
     type=str,
 )
 def annotations_vcf(ctx: click.Context, info: set[str] | None = None, rename_id: str | None = None) -> None:
-    """Convert an annotated vcf in parquet."""
+    """Convert a vcf file with INFO field in compatible parquet file."""
     logger = logging.getLogger("annotations-vcf")
 
     ctx.ensure_object(dict)
@@ -475,7 +475,7 @@ def annotations_csv(
     info: list[str],
     separator: str = ",",
 ) -> None:
-    """Convert an annotated csv in parquet."""
+    """Convert annotations store in csv file to compatible parquet file."""
     logger = logging.getLogger("annotations-vcf")
 
     ctx.ensure_object(dict)
@@ -522,7 +522,7 @@ def annotations_csv(
     required=True,
 )
 def metadata(ctx: click.Context, input_path: pathlib.Path, output_path: pathlib.Path) -> None:
-    """Convert an metadata file in parquet."""
+    """Convert metadata in parquet file."""
     logger = logging.getLogger("metadata")
 
     ctx.obj = {"input_path": input_path, "output_path": output_path}
@@ -540,7 +540,7 @@ def metadata(ctx: click.Context, input_path: pathlib.Path, output_path: pathlib.
     type=str,
 )
 def metadata_json(ctx: click.Context, fields: list[str]) -> None:
-    """Convert an metadata json in parquet."""
+    """Convert metadata json file in parquet file."""
     logger = logging.getLogger("metadata-json")
 
     ctx.ensure_object(dict)
@@ -576,7 +576,7 @@ def metadata_json(ctx: click.Context, fields: list[str]) -> None:
     show_default=True,
 )
 def metadata_csv(ctx: click.Context, columns: list[str], separator: str = ",") -> None:
-    """Convert an metadata csv in parquet."""
+    """Convert metadata csv file in parquet file."""
     logger = logging.getLogger("metadata-csv")
 
     ctx.ensure_object(dict)
@@ -599,7 +599,7 @@ def metadata_csv(ctx: click.Context, columns: list[str], separator: str = ",") -
 ############
 @main.group("generate")
 def generate_main() -> None:
-    """Subcommand generate thing."""
+    """Generate subcommand."""
     logger = logging.getLogger("generate")
 
     logger.debug("parameter: ")
@@ -643,7 +643,7 @@ def generate_main() -> None:
     help="Path transmission mode will be store",
     type=click.Path(dir_okay=False, writable=True, path_type=pathlib.Path),
 )
-def transmission(
+def generate_transmission(
     input_path: pathlib.Path,
     ped_path: pathlib.Path | None,
     index: str | None,
@@ -651,7 +651,7 @@ def transmission(
     father: str | None,
     transmission_path: pathlib.Path,
 ) -> None:
-    """Generate transmission information."""
+    """Generate transmission file from genotypes and pedigree information."""
     logger = logging.getLogger("generate-origin")
 
     logger.debug(f"parameter: {input_path=} {ped_path=} {index=} {mother=} {father=} {transmission_path=}")

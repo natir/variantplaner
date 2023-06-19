@@ -4,6 +4,15 @@ variantplaner is a set of tools that converts a large set of vcf's into an inter
 
 To show the capabilities of the variant planner we will use a small example.
 
+The purpose of this short tutorial is to present:
+
+- how to convert vcf into a more suitable format
+- how data can be restructured for querying
+- how to integrate variant annotation databases
+- how these different files can be used to obtain interesting biological information
+
+This tutorial suggests an organization of files, but you're under no obligation to follow it `variantplaner` is quite flexible in its organization.
+
 ## Setup
 
 This tutorial assume you are on unix like system, you have python setup and you [install variantplaner](https://github.com/natir/variantplaner#installation)
@@ -42,6 +51,7 @@ curl ${URI_ROOT}/ChineseTrio/HG007_NA24695_mother/latest/GRCh38/HG007_GRCh38_1_2
 ## Variant planner presentation
 
 variantplaner is a python module with command line tools, it is composed of several subcommands (they will be detailed later) but has two global options, one for parallelization and another for the level of verbosity you want.
+
 ```
 Usage: variantplaner [OPTIONS] COMMAND [ARGS]...
 
@@ -63,7 +73,7 @@ Commands:
 
 ## vcf2parquet
 
-First step is convert vcf data in [parquet](https://en.wikipedia.org/wiki/Apache_Parquet) it's a column oriented format with better performance.
+First step is convert vcf data in [parquet](https://en.wikipedia.org/wiki/Apache_Parquet) it's a column oriented format with better performance than indexed vcf.
 
 We split vcf in two part on for variant information and another for genotype information.
 
@@ -74,13 +84,15 @@ mkdir -p variants genotypes/samples/
 ```
 for vcf_path in $(ls vcf/*.vcf)
 do
-vcf_basename=$(basename ${vcf_path} .vcf)
-variantplaner -t 4 vcf2parquet -i ${vcf_path} \
--v variants/${vcf_basename}.parquet \
--g genotypes/samples/${vcf_basename}.parquet \
--f GT:PS:DP:ADALL:AD:GQ
+    sample_name=$(basename ${vcf_path} .vcf)
+    variantplaner -t 4 vcf2parquet -i ${vcf_path} \
+    -v variants/${sample_name}.parquet \
+    -g genotypes/samples/${sample_name}.parquet \
+    -f GT:PS:DP:ADALL:AD:GQ
 done
 ```
+
+We iterate over all vcf, variants are store in `variants/{sample_name}.parquet`, genotype information are store in `variants/{sample_name}.parquet`. Only genotypes with a format value equal to `-f` parameter value are retained.
 
 /// details | gnu-parallel method
 ```bash
@@ -92,7 +104,7 @@ parallel variantplaner -t 2 vcf2parquet -i vcf/{}.vcf -v variants/{}.parquet \
 
 Parquet variants file contains 5 column:
 
-- chr: Chromosome name, X -> 22, Y -> 23, MT -> 24
+- chr: Chromosome name, X -> 22, Y -> 23, MT -> 24 (**warning**: this behavior could change in next version)
 - pos: Position of variant
 - ref: Reference sequence
 - alt: Alternative sequence
@@ -102,7 +114,7 @@ Parquet variants file contains 5 column:
 /// details | variants parquet file content
 You can inspect content of parquet file generate with pqrs
 ```bash
-pqrs head variants/HG001.parquet
+pqrs head variants/samples/HG001.parquet
 {id: 17886044532216650390, chr: 1, pos: 783006, ref: "A", alt: "G"}
 {id: 7513336577790240873, chr: 1, pos: 783175, ref: "T", alt: "C"}
 {id: 17987040642944149052, chr: 1, pos: 784860, ref: "T", alt: "C"}
@@ -150,13 +162,15 @@ File `variants.parquet` containt all uniq variants present in dataset.
 
 ### By samples
 
-This structurations data is already down in vcf2parquet setp check content of `genotypes/samples`:
+This structurations data is already down in vcf2parquet step check content of `genotypes/samples`:
 ```bash
 ➜ ls genotypes/samples
 HG001.parquet  HG002.parquet  HG003.parquet  HG004.parquet  HG006.parquet  HG007.parquet
 ```
 
 ### By variants
+
+Here we'll organize the genotypes information by variants to make it easier to find samples where a variant is present or not.
 
 ```bash
 mkdir -p genotypes/variants/
@@ -165,6 +179,44 @@ variantplaner -t 8 struct $(echo $input) genotypes -p genotypes/variants/
 ```
 
 All genotypes information are split in [hive like structure](https://duckdb.org/docs/data/partitioning/hive_partitioning) to optimize request on data.
+
+### Compute transmission mode
+
+If you are working with families, `variantplaner` can calculate the modes of transmission of the variants.
+
+For these step we need concatenate all genotypes of a AshkenazimTrio in one parquet sample.
+
+```bash
+pqrs merge -i genotypes/samples/HG002.parquet genotypes/samples/HG003.parquet genotypes/samples/HG004.parquet -o genotypes/samples/AshkenazimTrio.parquet
+mkdir -p genotypes/transmissions/
+variantplaner generate transmission -i genotypes/samples/AshkenazimTrio.parquet -I HG002 -m HG003 -f HG004 -t genotypes/transmissions/AshkenazimTrio.parquet
+```
+
+`-I` parameter is use for index sample, `-m` parameter is use for mother sample, `-f` parameter is use for father sample only the index sample is mandatory if mother sample or father sample isn't present command work, you could also use a pedigree file with parameter `-p`.
+
+/// detail | transmission parquet file content
+```
+{id: 17618281883055118663, index_gt: 2, index_ps: null, index_dp: 890, index_adall: [0, 266], index_ad: [0, 415], index_gq: 421, mother_gt: 2, mother_ps: null, mother_dp: 806, mother_adall: [2, 255], mother_ad: [2, 418], mother_gq: 409, father_gt: 1, father_ps: null, father_dp: 885, father_adall: [142, 138], father_ad: [225, 214], father_gq: 547, origin: 221}
+{id: 16188392565314286737, index_gt: 1, index_ps: null, index_dp: 1101, index_adall: [175, 146], index_ad: [301, 260], index_gq: 658, mother_gt: 1, mother_ps: null, mother_dp: 944, mother_adall: [125, 138], mother_ad: [250, 260], mother_gq: 555, father_gt: 3, father_ps: null, father_dp: null, father_adall: null, father_ad: null, father_gq: null, origin: 113}
+{id: 16258731660316021801, index_gt: 2, index_ps: null, index_dp: 1259, index_adall: [1, 404], index_ad: [65, 637], index_gq: 563, mother_gt: 1, mother_ps: null, mother_dp: 946, mother_adall: [160, 157], mother_ad: [259, 258], mother_gq: 561, father_gt: 2, father_ps: null, father_dp: 1150, father_adall: [0, 353], father_ad: [68, 624], father_gq: 486, origin: 212}
+{id: 15289378089603723238, index_gt: 1, index_ps: null, index_dp: 1037, index_adall: [254, 211], index_ad: [36, 34], index_gq: 512, mother_gt: 2, mother_ps: null, mother_dp: 795, mother_adall: [82, 358], mother_ad: [0, 95], mother_gq: 461, father_gt: 1, father_ps: null, father_dp: 831, father_adall: [202, 194], father_ad: [36, 46], father_gq: 546, origin: 121}
+{id: 11858617203510458545, index_gt: 1, index_ps: null, index_dp: 1271, index_adall: [224, 187], index_ad: [349, 307], index_gq: 658, mother_gt: 1, mother_ps: null, mother_dp: 1121, mother_adall: [198, 163], mother_ad: [318, 279], mother_gq: 559, father_gt: 3, father_ps: null, father_dp: null, father_adall: null, father_ad: null, father_gq: null, origin: 113}
+```
+///
+
+Parquet transmissions file contains column all genotypes information with suffix `_index`, `_mother` and `_father` plus a `origin` column
+
+Origin column contains a number with 3 digit:
+
+```
+231
+││└ father genotype
+│└─ mother genotype
+└── index genotype
+```
+
+In this example case variants is homozygotes in index, mother information is missing, variants is heterozygotes in father.
+
 
 ## Add annotations
 
@@ -183,7 +235,8 @@ Next annotate this `variants.vcf` [with snpeff](https://pcingola.github.io/SnpEf
 
 To convert annotated vcf in parquet, keep 'ANN' info column and rename vcf id column in snpeff\_id you can run:
 ```bash
-variantplaner -t 8 annotations -i variants.snpeff.vcf -o snpeff.parquet vcf -i ANN -r snpeff_id
+mkdir -p annotations
+variantplaner -t 8 annotations -i variants.snpeff.vcf -o annotations/snpeff.parquet vcf -i ANN -r snpeff_id
 ```
 
 If you didn't set any value of option `-i` in vcf subsubcommand all info column are keep.
@@ -193,7 +246,7 @@ If you didn't set any value of option `-i` in vcf subsubcommand all info column 
 Download last clinvar version:
 
 ```bash
-mkdir annotations
+mkdir -p annotations
 curl https://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh38/clinvar.vcf.gz \
 | gunzip - > annotations/clinvar.vcf
 ```
@@ -251,7 +304,9 @@ Produce a `annotations/clinvar.parquet` with columns:
 
 ## Querying
 
-You could use [polars-cli](https://crates.io/crates/polars-cli) or [duckdb](https://duckdb.org/) to interogate your variants database.
+You can use any tool or software library supporting the parquet format to use the files generated by `variantplaner`.
+
+We show you how to use files with [polars-cli](https://crates.io/crates/polars-cli) and [duckdb](https://duckdb.org/).
 
 ### polars-cli
 

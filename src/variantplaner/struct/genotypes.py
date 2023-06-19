@@ -1,4 +1,4 @@
-"""Function relate to partition of genotype."""
+"""Function relate to genotype structuration."""
 
 # std import
 from __future__ import annotations
@@ -105,7 +105,11 @@ def __hive_worker(path: pathlib.Path, output_prefix: pathlib.Path) -> pathlib.Pa
 
 
 def hive(paths: list[pathlib.Path], output_prefix: pathlib.Path, threads: int = 1) -> None:
-    """Read all genotypes parquet file and use information to generate a hive like struct with genotype informations.
+    """Read all genotypes parquet file and use information to generate a hive like struct, based on $id\\ \\%\\ 256$  with genotype informations.
+
+    Real number of threads use are equal to $min(threads, len(paths))$.
+
+    Output format look like: `{output_prefix}/id_mod=[0..255]/[0..threads].parquet`.
 
     Args:
         paths: List of file you want reorganise

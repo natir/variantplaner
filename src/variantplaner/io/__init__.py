@@ -1,4 +1,4 @@
-"""Module manage input and output."""
+"""Module manage input parsing and output serializing."""
 
 from __future__ import annotations
 

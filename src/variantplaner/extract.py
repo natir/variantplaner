@@ -1,4 +1,4 @@
-"""Function to extract information of polars.LazyFrame produce by raw vcf file."""
+"""Extract information of [polars.LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html) produce from raw vcf file parsing."""
 
 # std import
 from __future__ import annotations
@@ -29,13 +29,13 @@ logger = logging.getLogger("manipulation")
 
 
 def variants(lf: polars.LazyFrame) -> polars.LazyFrame:
-    """Extract variants only information of lazyframe.
+    """Extract variants only information of polars.LazyFrame.
 
     Args:
-        lf: A lazyframe
+        lf: A [polars.LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html)
 
     Returns:
-        A lazyframe with just variant information (id, chr, pos, ref, alt)
+        A [polars.LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html) with just variant information (id, chr, pos, ref, alt)
     """
     return lf.select(
         [
@@ -53,20 +53,20 @@ def genotypes(
     col2expr: dict[str, Callable[[polars.Expr, str], polars.Expr]],
     format_str: str = "GT:AD:DP:GQ",
 ) -> polars.LazyFrame:
-    """Extract genotypes information of raw polars.LazyFrame.
+    """Extract genotypes information of raw [polars.LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html).
 
     Only line with format value match `format_str` are consider.
 
     Args:
-        lf: The target lazyframe
-        col2expr: A dict associate column name and function to apply to create polars.LazyFrame column (produce by io.vcf.format2expr)
+        lf: The target [polars.LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html)
+        col2expr: A dict associate column name and function to apply to create [polars.LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html) column (produce by io.vcf.format2expr)
         format_str: Only variants match with this string format are considere
 
     Returns:
-        A polars.LazyFrame with variant id, sample information and genotypes information
+        A [polars.LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html) with variant id, sample information and genotypes information
 
     Raises:
-        NoGenotypeError: If none of the lf columns is equal to FORMAT
+        NoGenotypeError: If none of the lf columns is equal to 'format'
     """
     if "format" not in lf.columns:
         raise NoGenotypeError
@@ -112,7 +112,7 @@ def merge_variants_genotypes(
     genotypes_lf: polars.LazyFrame,
     sample_name: list[str],
 ) -> polars.LazyFrame:
-    """Merge variants and genotypes lazyframe.
+    """Merge variants and genotypes [polars.LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html).
 
     Args:
        variants_lf: lazyframe with variants, column: (id, chr, pos, ref, alt).

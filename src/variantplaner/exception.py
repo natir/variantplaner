@@ -1,4 +1,4 @@
-"""All custom exception could be generate by VariantPlanner."""
+"""Exception could be generate by VariantPlanner."""
 
 # std import
 from __future__ import annotations
