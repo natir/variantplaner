@@ -3,17 +3,19 @@
 # std import
 from __future__ import annotations
 
+import os
 import pathlib
 import random
+import shutil
+import tempfile
 import typing
 
-import polars
-
 # 3rd party import
+import polars
 import pytest
 
 # project import
-from variantplaner import normalization
+from variantplaner import normalization, struct
 
 if typing.TYPE_CHECKING:  # pragma: no cover
     import pytest_benchmark
@@ -78,7 +80,91 @@ def __generate_variant_merge(
     return inner
 
 
+def __generate_variant_merge_on_disk(
+    threads: int,
+    nb_file: int,
+) -> typing.Callable[[pathlib.Path, pytest_benchmark.BenchmarkSession], None]:
+    @pytest.mark.benchmark(group="merge_variant_on_disk")
+    def inner(tmp_path: pathlib.Path, benchmark: pytest_benchmark.BenchmarkSession) -> None:
+        """Merge variant on disk."""
+        paths = []
+        for i in range(nb_file):
+            paths.append(tmp_path / f"{i}.parquet")
+            __generate_variant().sink_parquet(tmp_path / f"{i}.parquet")
+
+        os.environ["POLARS_MAX_THREADS"] = str(threads)
+        benchmark(lambda: struct.variants.merge(paths, tmp_path / "output.parquet", memory_limit=5_000_000))
+
+    return inner
+
+
+def __generate_variant_merge_on_disk_old(
+    threads: int,
+    nb_file: int,
+) -> typing.Callable[[pathlib.Path, pytest_benchmark.BenchmarkSession], None]:
+    @pytest.mark.benchmark(group="merge_variant_on_disk_old")
+    def inner(tmp_path: pathlib.Path, benchmark: pytest_benchmark.BenchmarkSession) -> None:
+        """Merge variant on disk."""
+        paths = []
+        for i in range(nb_file):
+            paths.append(tmp_path / f"{i}.parquet")
+            __generate_variant().sink_parquet(tmp_path / f"{i}.parquet")
+
+        os.environ["POLARS_MAX_THREADS"] = str(threads)
+        benchmark(lambda: old_merge(paths, tmp_path / "output.parquet", memory_limit=5_000_000))
+
+    return inner
+
+
+def old_merge(paths: list[pathlib.Path], output: pathlib.Path, memory_limit: int = 10_000_000_000) -> None:
+    """Perform merge of multiple parquet variants file in one file.
+
+    These function generate temporary file, by default file are write in `/tmp` but you can control where these files are write by set TMPDIR, TEMP or TMP directory.
+
+    Args:
+        paths: List of file you want chunked.
+        output: Path where variants is write.
+        memory_limit: Size of each chunk in bytes.
+
+    Returns:
+        None
+    """
+    inputs = paths
+    temp_directory = tempfile.TemporaryDirectory()
+    temp_prefix = pathlib.Path(temp_directory.name)
+
+    while len(inputs) != 1:
+        new_inputs = []
+
+        for input_chunk in struct.variants.__chunk_by_memory(inputs, bytes_limit=memory_limit):
+            if len(input_chunk) > 1:
+                # general case
+                temp_output = temp_prefix / struct.variants.__random_string()
+
+                new_inputs.append(temp_output)
+                struct.variants.__concat_uniq(input_chunk, temp_output)
+
+            elif len(input_chunk) == 1:
+                # if chunk containt only one file it's last file of inputs
+                # we add it to new_inputs list
+                new_inputs.append(input_chunk[0])
+
+            inputs = new_inputs
+
+    # When loop finish we have one file in inputs with all merge
+    # We just have to rename it
+    shutil.move(inputs[0], output)
+
+    # Call cleanup to remove all tempfile generate durring merging
+    temp_directory.cleanup()
+
+
 for i in range(15, 25):
     common = 2**i
     globals()[f"variant_merge_id_{common}"] = __generate_variant_merge(common, "id")
     globals()[f"variant_merge_variant_{common}"] = __generate_variant_merge(common, "variant")
+
+
+for i in range(20, 41, 2):
+    globals()[f"variant_merge_on_disk_{i}"] = __generate_variant_merge_on_disk(8, i)
+    globals()[f"variant_merge_on_disk_old_{i}"] = __generate_variant_merge_on_disk(8, i)

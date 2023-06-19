@@ -3,6 +3,7 @@
 # std import
 from __future__ import annotations
 
+import os
 import pathlib
 import random
 
@@ -126,6 +127,8 @@ def test_concat_uniq(tmp_path: pathlib.Path) -> None:
 def test_merge(tmp_path: pathlib.Path) -> None:
     """Check merge."""
     tmp_file = tmp_path / "merge_parquet.parquet"
+
+    os.environ["POLARS_MAX_THREADS"] = str(2)
 
     struct.variants.merge(
         [DATA_DIR / "no_genotypes.variants.parquet", DATA_DIR / "no_info.variants.parquet"],
