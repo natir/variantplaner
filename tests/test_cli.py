@@ -97,7 +97,8 @@ def test_vcf2parquet(tmp_path: pathlib.Path) -> None:
             polars.scan_parquet(DATA_DIR / "no_info.genotypes.parquet"),
             polars.scan_parquet(genotypes_path),
         )
-    except OverflowError:  # TODO remove this
+    except OverflowError:  # pragma: no cover
+        # TODO remove this
         truth = polars.scan_parquet(DATA_DIR / "no_info.genotypes.parquet")
         lf = polars.scan_parquet(genotypes_path)
         assert truth.columns == lf.columns

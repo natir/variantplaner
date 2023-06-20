@@ -67,14 +67,18 @@ def transmission(
     if "gt" not in genotypes_column:
         raise NoGTError("genotype polars.LazyFrame")
 
+    samples = sorted(genotypes_lf.select("sample").unique().collect().get_column("sample").to_list())
+
+    logger.debug(f"{samples=}")
+
     group_lf = genotypes_lf.groupby("id").all().collect()
+
     group_lf = group_lf.filter(polars.col("sample").list.contains(index_name))
 
-    logger.debug(f"{group_lf.row(0)}")
-
     # I assume sample order is all time the same but I'm not sure
-    sample2index = {sample: idx for idx, sample in enumerate(group_lf.row(0)[1], start=0)}
+    sample2index = {sample: idx for idx, sample in enumerate(samples, start=0)}
 
+    logger.debug(f"{index_name=} {mother_name=} {father_name=}")
     logger.debug(f"{sample2index}")
 
     transmission_lf = group_lf.with_columns(
@@ -84,6 +88,9 @@ def transmission(
     if mother_name in sample2index:
         transmission_lf = transmission_lf.with_columns(
             [polars.col(col).list.get(sample2index[mother_name]).alias(f"mother_{col}") for col in genotypes_column],
+        )
+        transmission_lf = transmission_lf.with_columns(
+            polars.col("mother_gt").fill_null(value=0),
         )
     else:
         transmission_lf = transmission_lf.with_columns(
@@ -96,6 +103,9 @@ def transmission(
     if father_name in sample2index:
         transmission_lf = transmission_lf.with_columns(
             [polars.col(col).list.get(sample2index[father_name]).alias(f"father_{col}") for col in genotypes_column],
+        )
+        transmission_lf = transmission_lf.with_columns(
+            polars.col("father_gt").fill_null(value=0),
         )
     else:
         transmission_lf = transmission_lf.with_columns(
