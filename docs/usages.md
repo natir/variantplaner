@@ -194,7 +194,7 @@ variantplaner generate transmission -i genotypes/samples/AshkenazimTrio.parquet 
 
 `-I` parameter is use for index sample, `-m` parameter is use for mother sample, `-f` parameter is use for father sample only the index sample is mandatory if mother sample or father sample isn't present command work, you could also use a pedigree file with parameter `-p`.
 
-/// detail | transmission parquet file content
+/// details | transmission parquet file content
 ```
 {id: 17618281883055118663, index_gt: 2, index_ps: null, index_dp: 890, index_adall: [0, 266], index_ad: [0, 415], index_gq: 421, mother_gt: 2, mother_ps: null, mother_dp: 806, mother_adall: [2, 255], mother_ad: [2, 418], mother_gq: 409, father_gt: 1, father_ps: null, father_dp: 885, father_adall: [142, 138], father_ad: [225, 214], father_gq: 547, origin: 221}
 {id: 16188392565314286737, index_gt: 1, index_ps: null, index_dp: 1101, index_adall: [175, 146], index_ad: [301, 260], index_gq: 658, mother_gt: 1, mother_ps: null, mother_dp: 944, mother_adall: [125, 138], mother_ad: [250, 260], mother_gq: 555, father_gt: 3, father_ps: null, father_dp: null, father_adall: null, father_ad: null, father_gq: null, origin: 113}
