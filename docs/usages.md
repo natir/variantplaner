@@ -22,10 +22,9 @@ Requirements list:
 
 - curl
 - gunzip
+- [pqrs](https://github.com/manojkarthick/pqrs) (only for transmission computation otherwise optional)
 
 Optional:
-
-- [pqrs](https://github.com/manojkarthick/pqrs)
 - gnu-parallel
 
 Quering dataset:
@@ -196,11 +195,11 @@ variantplaner generate transmission -i genotypes/samples/AshkenazimTrio.parquet 
 
 /// details | transmission parquet file content
 ```
-{id: 17618281883055118663, index_gt: 2, index_ps: null, index_dp: 890, index_adall: [0, 266], index_ad: [0, 415], index_gq: 421, mother_gt: 2, mother_ps: null, mother_dp: 806, mother_adall: [2, 255], mother_ad: [2, 418], mother_gq: 409, father_gt: 1, father_ps: null, father_dp: 885, father_adall: [142, 138], father_ad: [225, 214], father_gq: 547, origin: 221}
-{id: 16188392565314286737, index_gt: 1, index_ps: null, index_dp: 1101, index_adall: [175, 146], index_ad: [301, 260], index_gq: 658, mother_gt: 1, mother_ps: null, mother_dp: 944, mother_adall: [125, 138], mother_ad: [250, 260], mother_gq: 555, father_gt: 3, father_ps: null, father_dp: null, father_adall: null, father_ad: null, father_gq: null, origin: 113}
-{id: 16258731660316021801, index_gt: 2, index_ps: null, index_dp: 1259, index_adall: [1, 404], index_ad: [65, 637], index_gq: 563, mother_gt: 1, mother_ps: null, mother_dp: 946, mother_adall: [160, 157], mother_ad: [259, 258], mother_gq: 561, father_gt: 2, father_ps: null, father_dp: 1150, father_adall: [0, 353], father_ad: [68, 624], father_gq: 486, origin: 212}
-{id: 15289378089603723238, index_gt: 1, index_ps: null, index_dp: 1037, index_adall: [254, 211], index_ad: [36, 34], index_gq: 512, mother_gt: 2, mother_ps: null, mother_dp: 795, mother_adall: [82, 358], mother_ad: [0, 95], mother_gq: 461, father_gt: 1, father_ps: null, father_dp: 831, father_adall: [202, 194], father_ad: [36, 46], father_gq: 546, origin: 121}
-{id: 11858617203510458545, index_gt: 1, index_ps: null, index_dp: 1271, index_adall: [224, 187], index_ad: [349, 307], index_gq: 658, mother_gt: 1, mother_ps: null, mother_dp: 1121, mother_adall: [198, 163], mother_ad: [318, 279], mother_gq: 559, father_gt: 3, father_ps: null, father_dp: null, father_adall: null, father_ad: null, father_gq: null, origin: 113}
+{id: 8808396193990831731, index_gt: 1, index_ps: null, index_dp: 1143, index_adall: [155, 162], index_ad: [301, 333], index_gq: 492, mother_gt: 2, mother_ps: null, mother_dp: 1014, mother_adall: [0, 366], mother_ad: [86, 529], mother_gq: 484, father_gt: 0, father_ps: null, father_dp: null, father_adall: null, father_ad: null, father_gq: null, origin: 120}
+{id: 16292939689019815231, index_gt: 1, index_ps: null, index_dp: 1011, index_adall: [168, 121], index_ad: [268, 233], index_gq: 561, mother_gt: 1, mother_ps: null, mother_dp: 1028, mother_adall: [151, 154], mother_ad: [269, 253], mother_gq: 606, father_gt: 1, father_ps: null, father_dp: 986, father_adall: [166, 155], father_ad: [257, 244], father_gq: 474, origin: 111}
+{id: 5620091056827412267, index_gt: 1, index_ps: null, index_dp: 1095, index_adall: [145, 150], index_ad: [314, 283], index_gq: 622, mother_gt: 1, mother_ps: null, mother_dp: 1047, mother_adall: [171, 175], mother_ad: [247, 232], mother_gq: 546, father_gt: 0, father_ps: null, father_dp: null, father_adall: null, father_ad: null, father_gq: null, origin: 110}
+{id: 12724509537759826392, index_gt: 1, index_ps: null, index_dp: 1052, index_adall: [158, 150], index_ad: [235, 217], index_gq: 714, mother_gt: 1, mother_ps: null, mother_dp: 993, mother_adall: [154, 161], mother_ad: [253, 285], mother_gq: 543, father_gt: 0, father_ps: null, father_dp: null, father_adall: null, father_ad: null, father_gq: null, origin: 110}
+{id: 10535646079926954450, index_gt: 2, index_ps: null, index_dp: 1081, index_adall: [1, 382], index_ad: [0, 531], index_gq: 517, mother_gt: 2, mother_ps: null, mother_dp: 962, mother_adall: [0, 330], mother_ad: [0, 487], mother_gq: 500, father_gt: 1, father_ps: null, father_dp: 1095, father_adall: [191, 206], father_ad: [248, 291], father_gq: 460, origin: 221}
 ```
 ///
 
