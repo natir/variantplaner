@@ -121,6 +121,4 @@ def transmission(
         .alias("origin"),
     )
 
-    transmission_lf = transmission_lf.drop(["sample", *genotypes_column])
-
-    return transmission_lf
+    return transmission_lf.drop(["sample", *genotypes_column])

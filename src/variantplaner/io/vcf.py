@@ -534,9 +534,7 @@ def add_info_column(lf: polars.LazyFrame, vcfinfo2parquet_name: list[tuple[str, 
         ],
     )
 
-    lf = lf.drop([p for (v, p) in vcfinfo2parquet_name])
-
-    return lf
+    return lf.drop([p for (v, p) in vcfinfo2parquet_name])
 
 
 def __generate_header(

@@ -92,6 +92,4 @@ def into_lazyframe(
 
     lf = normalization.chromosome2integer(lf)
 
-    lf = normalization.add_variant_id(lf)
-
-    return lf
+    return normalization.add_variant_id(lf)
