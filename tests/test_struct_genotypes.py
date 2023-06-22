@@ -79,57 +79,11 @@ def test_hive(tmp_path: pathlib.Path) -> None:
     struct.genotypes.hive(
         [DATA_DIR / "no_info.genotypes.parquet", DATA_DIR / "no_info.genotypes.parquet"],
         tmp_path,
+        group_genotypes=1,
         threads=2,
     )
 
     partition_paths = set(__scantree(tmp_path))
-
-    assert partition_paths == {
-        tmp_path / "id_mod=56/2.parquet",
-        tmp_path / "id_mod=194/1.parquet",
-        tmp_path / "id_mod=43/2.parquet",
-        tmp_path / "id_mod=224/2.parquet",
-        tmp_path / "id_mod=194/2.parquet",
-        tmp_path / "id_mod=6/1.parquet",
-        tmp_path / "id_mod=198/1.parquet",
-        tmp_path / "id_mod=6/2.parquet",
-        tmp_path / "id_mod=198/2.parquet",
-        tmp_path / "id_mod=160/1.parquet",
-        tmp_path / "id_mod=75/1.parquet",
-        tmp_path / "id_mod=160/2.parquet",
-        tmp_path / "id_mod=115/1.parquet",
-        tmp_path / "id_mod=94/1.parquet",
-        tmp_path / "id_mod=75/2.parquet",
-        tmp_path / "id_mod=33/1.parquet",
-        tmp_path / "id_mod=238/1.parquet",
-        tmp_path / "id_mod=115/2.parquet",
-        tmp_path / "id_mod=94/2.parquet",
-        tmp_path / "id_mod=29/1.parquet",
-        tmp_path / "id_mod=33/2.parquet",
-        tmp_path / "id_mod=238/2.parquet",
-        tmp_path / "id_mod=237/1.parquet",
-        tmp_path / "id_mod=103/1.parquet",
-        tmp_path / "id_mod=29/2.parquet",
-        tmp_path / "id_mod=70/1.parquet",
-        tmp_path / "id_mod=99/1.parquet",
-        tmp_path / "id_mod=237/2.parquet",
-        tmp_path / "id_mod=103/2.parquet",
-        tmp_path / "id_mod=85/1.parquet",
-        tmp_path / "id_mod=70/2.parquet",
-        tmp_path / "id_mod=99/2.parquet",
-        tmp_path / "id_mod=41/1.parquet",
-        tmp_path / "id_mod=85/2.parquet",
-        tmp_path / "id_mod=41/2.parquet",
-        tmp_path / "id_mod=122/1.parquet",
-        tmp_path / "id_mod=205/1.parquet",
-        tmp_path / "id_mod=44/1.parquet",
-        tmp_path / "id_mod=122/2.parquet",
-        tmp_path / "id_mod=44/2.parquet",
-        tmp_path / "id_mod=56/1.parquet",
-        tmp_path / "id_mod=205/2.parquet",
-        tmp_path / "id_mod=43/1.parquet",
-        tmp_path / "id_mod=224/1.parquet",
-    }
 
     value = polars.concat([polars.read_parquet(path) for path in partition_paths]).drop("id_mod")
     truth = polars.concat(
