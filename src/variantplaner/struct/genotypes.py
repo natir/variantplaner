@@ -83,9 +83,7 @@ def __hive_worker(lfs: tuple[polars.LazyFrame], output_prefix: pathlib.Path) -> 
     """
     basename = multiprocessing.current_process().name.split("-")[-1]
 
-    logger.info(f"{lfs=} in {basename=}")
-
-    polars.concat(lfs).with_columns(
+    polars.concat(lf for lf in lfs if lf is not None).with_columns(
         [
             polars.col("id").mod(256).alias("id_mod"),
         ],
@@ -103,7 +101,7 @@ def __hive_worker(lfs: tuple[polars.LazyFrame], output_prefix: pathlib.Path) -> 
     ).collect()
 
 
-def hive(paths: list[pathlib.Path], output_prefix: pathlib.Path, group_genotypes: int = 5, threads: int = 1) -> None:
+def hive(paths: list[pathlib.Path], output_prefix: pathlib.Path, group_genotypes: int = 15, threads: int = 10) -> None:
     r"""Read all genotypes parquet file and use information to generate a hive like struct, based on $id\ \%\ 256$  with genotype informations.
 
     Real number of threads use are equal to $min(threads, len(paths))$.
@@ -122,13 +120,11 @@ def hive(paths: list[pathlib.Path], output_prefix: pathlib.Path, group_genotypes
 
     threads = min(threads, len(paths))
 
-    fill_value = polars.LazyFrame(schema=polars.scan_parquet(paths[0]).schema)
-
     lfs = (polars.scan_parquet(path) for path in paths)
 
     lf_groups = itertools.zip_longest(
         *[iter(lfs)] * group_genotypes,
-        fillvalue=fill_value,
+        fillvalue=None,
     )
 
     with multiprocessing.get_context("spawn").Pool(threads) as pool:

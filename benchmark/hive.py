@@ -7,9 +7,8 @@ import pathlib
 import random
 import typing
 
-import polars
-
 # 3rd party import
+import polars
 import pytest
 
 # project import
@@ -31,9 +30,17 @@ def __generate_genotypes(number: int = 10_000) -> polars.LazyFrame:
             "id": random.choices(range(2**32), k=number),
             "sample": random.choices(samples, k=number),
             "gt": random.choices([1, 2], k=number),
-            "ad": [[random.choices(range(256)), random.choices(range(256))] for _ in range(number)],
+            "ad": [[random.choice(range(256)), random.choice(range(256))] for _ in range(number)],
             "dp": random.choices(range(256), k=number),
             "gq": random.choices(range(100), k=number),
+        },
+        schema={
+            "id": polars.UInt64,
+            "sample": polars.Utf8,
+            "gt": polars.UInt8,
+            "ad": polars.List(polars.UInt16),
+            "dp": polars.UInt16,
+            "gq": polars.UInt16,
         },
     )
 
@@ -57,12 +64,19 @@ def __generate_hive(
             file_path.parent.mkdir(parents=True, exist_ok=True)
             __generate_genotypes(genotype_number).sink_parquet(file_path)
 
-        benchmark(lambda: struct.genotypes.hive(paths, tmp_path / f"hive_{group_size}", threads=4))
+        benchmark(
+            lambda: struct.genotypes.hive(
+                paths,
+                tmp_path / f"hive_{group_size}",
+                threads=8,
+                group_genotypes=group_size,
+            ),
+        )
 
-    inner.__doc__ = """Perform hive partitioning on 40 genotypes file"""
+    inner.__doc__ = """Perform hive partitioning on some genotypes file"""
 
     return inner
 
 
-for i in [1, *list(range(10, 401, 20))]:
-    globals()[f"hive_partitioning_group_size_{i}"] = __generate_hive(1_000, i, 2000)
+for i in range(1, 21, 2):
+    globals()[f"hive_partitioning_group_size_{i}"] = __generate_hive(100, i, 200)
