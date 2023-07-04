@@ -535,6 +535,32 @@ def test_metadata_json(tmp_path: pathlib.Path) -> None:
     )
 
 
+def test_metadata_jsonl(tmp_path: pathlib.Path) -> None:
+    """Run metadata json."""
+    metadata_path = tmp_path / "metadata.parquet"
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli.main,
+        [
+            "metadata",
+            "-i",
+            str(DATA_DIR / "metadata.jsonl"),
+            "-o",
+            str(metadata_path),
+            "json",
+            "-l",
+        ],
+    )
+
+    assert result.exit_code == 0
+
+    polars.testing.assert_frame_equal(
+        polars.scan_parquet(metadata_path),
+        polars.scan_parquet(DATA_DIR / "metadata.parquet"),
+    )
+
+
 def test_metadata_json_select(tmp_path: pathlib.Path) -> None:
     """Run metadata json."""
     metadata_path = tmp_path / "metadata.parquet"
