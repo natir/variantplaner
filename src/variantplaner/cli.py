@@ -539,7 +539,14 @@ def metadata(ctx: click.Context, input_path: pathlib.Path, output_path: pathlib.
     help="List of fields that are kept if this list is empty all fields are kept",
     type=str,
 )
-def metadata_json(ctx: click.Context, fields: list[str]) -> None:
+@click.option(
+    "-l",
+    "--json-line",
+    help="Input are in json lines format",
+    type=bool,
+    is_flag=True,
+)
+def metadata_json(ctx: click.Context, fields: list[str], json_line: bool) -> None: # noqa: FBT001 it's a cli function with flag input
     """Convert metadata json file in parquet file."""
     logger = logging.getLogger("metadata-json")
 
@@ -550,7 +557,7 @@ def metadata_json(ctx: click.Context, fields: list[str]) -> None:
 
     logger.debug(f"parameter: {input_path=} {output_path=} {fields=}")
 
-    lf = polars.read_json(input_path)
+    lf = polars.read_ndjson(input_path) if json_line else polars.read_json(input_path)
 
     if fields:
         lf = lf.select(fields)
