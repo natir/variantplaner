@@ -85,6 +85,14 @@ def merge_variant_func(data: pandas.DataFrame, _name: str) -> tuple[pandas.DataF
     return data, "Merging time by variant in number of variant"
 
 
+def hive_partitioning_func(data: pandas.DataFrame, _name: str) -> tuple[pandas.DataFrame, str]:
+    """Hive partitioning."""
+    data["method"] = data["method"].apply(lambda x: int(x.split("_")[4]))
+    data = data.sort_values(by=["method"])
+
+    return data, "Spliting time by number of concatenate file"
+
+
 def create_plot(
     data: pandas.DataFrame,
     name: str,

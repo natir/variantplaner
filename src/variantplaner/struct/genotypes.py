@@ -3,6 +3,7 @@
 # std import
 from __future__ import annotations
 
+import itertools
 import logging
 import multiprocessing
 import typing
@@ -70,7 +71,7 @@ def __write_or_add(new_lf: polars.DataFrame, partition_path: pathlib.Path) -> No
         new_lf.write_parquet(partition_path)
 
 
-def __hive_worker(path: pathlib.Path, output_prefix: pathlib.Path) -> pathlib.Path:
+def __hive_worker(lfs: tuple[polars.LazyFrame], output_prefix: pathlib.Path) -> None:
     """Subprocess of hive function run in parallel.
 
     Args:
@@ -82,9 +83,7 @@ def __hive_worker(path: pathlib.Path, output_prefix: pathlib.Path) -> pathlib.Pa
     """
     basename = multiprocessing.current_process().name.split("-")[-1]
 
-    logger.info(f"{path=} in {basename=}")
-
-    polars.scan_parquet(path).with_columns(
+    polars.concat(lf for lf in lfs if lf is not None).with_columns(
         [
             polars.col("id").mod(256).alias("id_mod"),
         ],
@@ -101,10 +100,8 @@ def __hive_worker(path: pathlib.Path, output_prefix: pathlib.Path) -> pathlib.Pa
         schema={},
     ).collect()
 
-    return path
 
-
-def hive(paths: list[pathlib.Path], output_prefix: pathlib.Path, threads: int = 1) -> None:
+def hive(paths: list[pathlib.Path], output_prefix: pathlib.Path, threads: int, file_per_thread: int) -> None:
     r"""Read all genotypes parquet file and use information to generate a hive like struct, based on $id\ \%\ 256$  with genotype informations.
 
     Real number of threads use are equal to $min(threads, len(paths))$.
@@ -112,13 +109,26 @@ def hive(paths: list[pathlib.Path], output_prefix: pathlib.Path, threads: int = 
     Output format look like: `{output_prefix}/id_mod=[0..255]/[0..threads].parquet`.
 
     Args:
-        paths: List of file you want reorganise
+        paths: list of file you want reorganise
         output_prefix: prefix of hive
+        threads: number of multiprocessing threads run
+        file_per_threads: number of file manage per multiprocessing threads
 
     Returns:
         None
     """
-    threads = min(threads, len(paths))
+    if len(paths) == 0:
+        return
+
+    lfs = (polars.scan_parquet(path) for path in paths)
+
+    lf_groups = itertools.zip_longest(
+        *[iter(lfs)] * file_per_thread,
+        fillvalue=None,
+    )
 
     with multiprocessing.get_context("spawn").Pool(threads) as pool:
-        pool.starmap(__hive_worker, [(path, output_prefix) for path in paths])
+        pool.starmap(
+            __hive_worker,
+            [(lf_group, output_prefix) for lf_group in lf_groups],
+        )

@@ -334,7 +334,14 @@ def struct_variants(ctx: click.Context, output_path: pathlib.Path, bytes_memory_
     type=click.Path(file_okay=False, dir_okay=True, path_type=pathlib.Path),
     required=True,
 )
-def struct_genotypes(ctx: click.Context, prefix_path: pathlib.Path) -> None:
+@click.option(
+    "-f",
+    "--file-per-thread",
+    help="Number of file manage by one threads",
+    type=click.IntRange(1),
+    default=15,
+)
+def struct_genotypes(ctx: click.Context, prefix_path: pathlib.Path, file_per_thread: int) -> None:
     """Convert set of genotype parquet in hive like files structures."""
     logger = logging.getLogger("struct.genotypes")
 
@@ -343,11 +350,15 @@ def struct_genotypes(ctx: click.Context, prefix_path: pathlib.Path) -> None:
     input_paths = ctx.obj["input_paths"]
 
     threads = int(os.environ["POLARS_MAX_THREADS"])
-    os.environ["POLARS_MAX_THREADS"] = "1"
+    if threads == 1:
+        os.environ["POLARS_MAX_THREADS"] = "1"
+    else:
+        threads //= 2
+        os.environ["POLARS_MAX_THREADS"] = "2"
 
     logger.debug(f"parameter: {prefix_path=}")
 
-    struct.genotypes.hive(input_paths, prefix_path, threads)
+    struct.genotypes.hive(input_paths, prefix_path, threads=threads, file_per_thread=file_per_thread)
 
 
 ###############
@@ -546,7 +557,11 @@ def metadata(ctx: click.Context, input_path: pathlib.Path, output_path: pathlib.
     type=bool,
     is_flag=True,
 )
-def metadata_json(ctx: click.Context, fields: list[str], json_line: bool) -> None: # noqa: FBT001 it's a cli function with flag input
+def metadata_json(
+    ctx: click.Context,
+    fields: list[str],
+    json_line: bool,  # noqa: FBT001 it's a cli function with flag input
+) -> None:
     """Convert metadata json file in parquet file."""
     logger = logging.getLogger("metadata-json")
 
