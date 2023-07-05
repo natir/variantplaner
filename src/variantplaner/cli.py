@@ -342,8 +342,8 @@ def struct_genotypes(ctx: click.Context, prefix_path: pathlib.Path) -> None:
 
     input_paths = ctx.obj["input_paths"]
 
-    threads = int(os.environ["POLARS_MAX_THREADS"])
-    os.environ["POLARS_MAX_THREADS"] = "1"
+    threads = int(os.environ["POLARS_MAX_THREADS"]) // 2
+    os.environ["POLARS_MAX_THREADS"] = "2"
 
     logger.debug(f"parameter: {prefix_path=}")
 
@@ -546,7 +546,11 @@ def metadata(ctx: click.Context, input_path: pathlib.Path, output_path: pathlib.
     type=bool,
     is_flag=True,
 )
-def metadata_json(ctx: click.Context, fields: list[str], json_line: bool) -> None: # noqa: FBT001 it's a cli function with flag input
+def metadata_json(
+    ctx: click.Context,
+    fields: list[str],
+    json_line: bool,  # noqa: FBT001 it's a cli function with flag input
+) -> None:
     """Convert metadata json file in parquet file."""
     logger = logging.getLogger("metadata-json")
 
