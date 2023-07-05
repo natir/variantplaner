@@ -79,8 +79,8 @@ def test_hive(tmp_path: pathlib.Path) -> None:
     struct.genotypes.hive(
         [DATA_DIR / "no_info.genotypes.parquet", DATA_DIR / "no_info.genotypes.parquet"],
         tmp_path,
-        group_genotypes=1,
         threads=2,
+        file_per_thread=1,
     )
 
     partition_paths = set(__scantree(tmp_path))

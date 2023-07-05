@@ -69,7 +69,7 @@ def __generate_hive(
                 paths,
                 tmp_path / f"hive_{group_size}",
                 threads=8,
-                group_genotypes=group_size,
+                file_per_thread=group_size,
             ),
         )
 
