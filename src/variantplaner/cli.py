@@ -309,7 +309,20 @@ def struct_main(ctx: click.Context, input_paths: list[pathlib.Path]) -> None:
     show_default=True,
     default=10_000_000_000,
 )
-def struct_variants(ctx: click.Context, output_path: pathlib.Path, bytes_memory_limit: int = 10_000_000_000) -> None:
+@click.option(
+    "-p",
+    "--polars-threads",
+    help="Number of threads use to merge one block of file",
+    type=click.IntRange(1),
+    show_default=True,
+    default=4,
+)
+def struct_variants(
+    ctx: click.Context,
+    output_path: pathlib.Path,
+    bytes_memory_limit: int = 10_000_000_000,
+    polars_threads: int = 4,
+) -> None:
     """Merge multiple variants parquet file in one.
 
     If you set TMPDIR, TEMP or TMP environment variable you can control where temp file is create.
@@ -322,7 +335,7 @@ def struct_variants(ctx: click.Context, output_path: pathlib.Path, bytes_memory_
 
     logger.debug(f"parameter: {output_path=} {bytes_memory_limit}")
 
-    struct.variants.merge(input_paths, output_path, bytes_memory_limit)
+    struct.variants.merge(input_paths, output_path, bytes_memory_limit, polars_threads)
 
 
 @struct_main.command("genotypes")

@@ -4,6 +4,8 @@
 from __future__ import annotations
 
 import logging
+import multiprocessing
+import os
 import pathlib
 import random
 import shutil
@@ -81,7 +83,12 @@ def __concat_uniq(paths: list[pathlib.Path], output: pathlib.Path) -> None:
     lf.sink_parquet(output)
 
 
-def merge(paths: list[pathlib.Path], output: pathlib.Path, memory_limit: int = 10_000_000_000) -> None:
+def merge(
+    paths: list[pathlib.Path],
+    output: pathlib.Path,
+    memory_limit: int = 10_000_000_000,
+    polars_threads: int = 4,
+) -> None:
     """Perform merge of multiple parquet variants file in one file.
 
     These function generate temporary file, by default file are write in `/tmp` but you can control where these files are write by set TMPDIR, TEMP or TMP directory.
@@ -94,6 +101,10 @@ def merge(paths: list[pathlib.Path], output: pathlib.Path, memory_limit: int = 1
     Returns:
         None
     """
+    all_threads = int(os.environ["POLARS_MAX_THREADS"])
+    multi_threads = max(all_threads // polars_threads, 1)
+    os.environ["POLARS_MAX_THREADS"] = str(polars_threads)
+
     inputs = paths
     temp_directory = tempfile.TemporaryDirectory()
     temp_prefix = pathlib.Path(temp_directory.name)
@@ -102,6 +113,7 @@ def merge(paths: list[pathlib.Path], output: pathlib.Path, memory_limit: int = 1
     while len(inputs) != 1:
         new_inputs = []
 
+        inputs_outputs = []
         for input_chunk in __chunk_by_memory(inputs, bytes_limit=memory_limit):
             logger.debug(f"{len(input_chunk)=}")
             if len(input_chunk) > 1:
@@ -109,7 +121,7 @@ def merge(paths: list[pathlib.Path], output: pathlib.Path, memory_limit: int = 1
                 temp_output = temp_prefix / __random_string()
 
                 new_inputs.append(temp_output)
-                __concat_uniq(input_chunk, temp_output)
+                inputs_outputs.append((input_chunk, temp_output))
 
             elif len(input_chunk) == 1:
                 # if chunk containt only one file it's last file of inputs
@@ -118,6 +130,9 @@ def merge(paths: list[pathlib.Path], output: pathlib.Path, memory_limit: int = 1
 
             logger.debug(f"{new_inputs=}")
             inputs = new_inputs
+
+        with multiprocessing.get_context("spawn").Pool(multi_threads) as pool:
+            pool.starmap(__concat_uniq, inputs_outputs)
 
     # When loop finish we have one file in inputs with all merge
     # We just have to rename it

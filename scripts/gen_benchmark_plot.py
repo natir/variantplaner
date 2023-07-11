@@ -85,6 +85,22 @@ def merge_variant_func(data: pandas.DataFrame, _name: str) -> tuple[pandas.DataF
     return data, "Merging time by variant in number of variant"
 
 
+def merge_variant_on_disk_func(data: pandas.DataFrame, _name: str) -> tuple[pandas.DataFrame, str]:
+    """Update variant merge by variant."""
+    data["method"] = data["method"].apply(lambda x: int(x.split("_")[4]))
+    data = data.sort_values(by=["method"])
+
+    return data, "Running time compare to number of file"
+
+
+def merge_variant_on_disk_old_func(data: pandas.DataFrame, _name: str) -> tuple[pandas.DataFrame, str]:
+    """Update variant merge by variant."""
+    data["method"] = data["method"].apply(lambda x: int(x.split("_")[5]))
+    data = data.sort_values(by=["method"])
+
+    return data, "Running time compare to number of file old"
+
+
 def hive_partitioning_func(data: pandas.DataFrame, _name: str) -> tuple[pandas.DataFrame, str]:
     """Hive partitioning."""
     data["method"] = data["method"].apply(lambda x: int(x.split("_")[4]))
@@ -160,6 +176,9 @@ def render_plot() -> str:
         name: globals()[f"{name}_func"] if f"{name}_func" in globals() else nothing
         for name in df.get_column("benchmark").unique().to_list()
     }
+
+    for name, func in name2func.items():
+        print(name, func)
 
     bench2plot = {}
     for name, data in df.groupby("benchmark"):
