@@ -112,7 +112,7 @@ def hive(paths: list[pathlib.Path], output_prefix: pathlib.Path, threads: int, f
         paths: list of file you want reorganise
         output_prefix: prefix of hive
         threads: number of multiprocessing threads run
-        file_per_threads: number of file manage per multiprocessing threads
+        file_per_thread: number of file manage per multiprocessing threads
 
     Returns:
         None
