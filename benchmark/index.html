@@ -1,0 +1,2219 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A tool kit to manage many variant on desktop computer">
+      
+      
+      
+        <link rel="canonical" href="https://natir.github.io/variantplaner/benchmark/">
+      
+      
+        <link rel="prev" href="../coverage/">
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.18">
+    
+    
+      
+        <title>Benchmark - VariantPlaner</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.26e3688c.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ecc896b0.min.css">
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_markdown_exec_ansi.css">
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../css/material.css">
+    
+      <link rel="stylesheet" href="../css/mkdocstrings.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="lime">
+  
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="VariantPlaner" class="md-header__button md-logo" aria-label="VariantPlaner" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            VariantPlaner
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Benchmark
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+          
+            
+            
+            
+            <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="lime"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+            
+              <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_2" hidden>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3 3.19.09m3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95 2.06.05m-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31Z"/></svg>
+              </label>
+            
+          
+            
+            
+            
+            <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="purple"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_2">
+            
+              <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5c-.84 0-1.65.15-2.39.42L12 2M3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29L3.34 7m.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14L3.36 17M20.65 7l-1.77 3.79a7.023 7.023 0 0 0-2.38-4.15l4.15.36m-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29L20.64 17M12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44L12 22Z"/></svg>
+              </label>
+            
+          
+        </form>
+      
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/natir/variantplaner" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    natir/variantplaner
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        Home
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../usages/" class="md-tabs__link">
+      Usages
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../reference/variantplaner/" class="md-tabs__link">
+        Code Reference
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../contributing/" class="md-tabs__link md-tabs__link--active">
+        Development
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+                
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="VariantPlaner" class="md-nav__button md-logo" aria-label="VariantPlaner" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    VariantPlaner
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/natir/variantplaner" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    natir/variantplaner
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+      
+      
+      
+        <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
+          Home
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_1">
+          <span class="md-nav__icon md-icon"></span>
+          Home
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        Overview
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../changelog/" class="md-nav__link">
+        Changelog
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../credits/" class="md-nav__link">
+        Credits
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../license/" class="md-nav__link">
+        License
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../usages/" class="md-nav__link">
+        Usages
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+          Code Reference
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Code Reference
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1" >
+      
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../reference/variantplaner/">variantplaner</a>
+          
+            <label for="__nav_3_1">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_3_1">
+          <span class="md-nav__icon md-icon"></span>
+          variantplaner
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/variantplaner/cli/" class="md-nav__link">
+        cli
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/variantplaner/exception/" class="md-nav__link">
+        exception
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/variantplaner/extract/" class="md-nav__link">
+        extract
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/variantplaner/generate/" class="md-nav__link">
+        generate
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1_5" >
+      
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../reference/variantplaner/io/">io</a>
+          
+            <label for="__nav_3_1_5">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_1_5_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_3_1_5">
+          <span class="md-nav__icon md-icon"></span>
+          io
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/variantplaner/io/csv/" class="md-nav__link">
+        csv
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/variantplaner/io/ped/" class="md-nav__link">
+        ped
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/variantplaner/io/vcf/" class="md-nav__link">
+        vcf
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/variantplaner/normalization/" class="md-nav__link">
+        normalization
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1_7" >
+      
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../reference/variantplaner/struct/">struct</a>
+          
+            <label for="__nav_3_1_7">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_1_7_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_3_1_7">
+          <span class="md-nav__icon md-icon"></span>
+          struct
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/variantplaner/struct/genotypes/" class="md-nav__link">
+        genotypes
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/variantplaner/struct/variants/" class="md-nav__link">
+        variants
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+      
+      
+      
+        <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+          Development
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+        <label class="md-nav__title" for="__nav_4">
+          <span class="md-nav__icon md-icon"></span>
+          Development
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        Contributing
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code_of_conduct/" class="md-nav__link">
+        Code of Conduct
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../coverage/" class="md-nav__link">
+        Coverage report
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Benchmark
+      </a>
+      
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+                
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" hidden>
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+  <h1>Benchmark</h1>
+
+<p>Figure showing the performance of some variantplaner functions to check their complexity or compare certain features.</p>
+<script src="https://cdn.jsdelivr.net/npm/vega@5.25.0"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-lite@5.9.1"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-embed@6.22.1"></script>
+
+<div id="vis"></div>
+
+<div id="annotations_extractions"></div>
+<script>
+vegaEmbed(
+  "#annotations_extractions",
+  {
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.8.0.json",
+  "config": {
+    "view": {
+      "continuousHeight": 300,
+      "continuousWidth": 300
+    }
+  },
+  "data": {
+    "name": "data-d28057f87b0b88123cc5d61ad0a26f5c"
+  },
+  "datasets": {
+    "data-d28057f87b0b88123cc5d61ad0a26f5c": [
+      {
+        "benchmark": "annotations_extractions",
+        "median": 0.0077085490001991275,
+        "method": 1,
+        "q1": 0.007633473000055346,
+        "q3": 0.00780032325008051,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "annotations_extractions",
+        "median": 0.00792249549999724,
+        "method": 2,
+        "q1": 0.007840445000056206,
+        "q3": 0.008009745999970619,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "annotations_extractions",
+        "median": 0.008222952000323858,
+        "method": 3,
+        "q1": 0.008105426750034894,
+        "q3": 0.008334053000112362,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "annotations_extractions",
+        "median": 0.008815059999960795,
+        "method": 4,
+        "q1": 0.008680734000108714,
+        "q3": 0.008899035750118856,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "annotations_extractions",
+        "median": 0.009633004999841432,
+        "method": 5,
+        "q1": 0.009487254999839934,
+        "q3": 0.009716054999898915,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "annotations_extractions",
+        "median": 0.009695154999917577,
+        "method": 6,
+        "q1": 0.009587529999862454,
+        "q3": 0.009838206249924042,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "annotations_extractions",
+        "median": 0.010281365000082587,
+        "method": 7,
+        "q1": 0.010184663000245564,
+        "q3": 0.010386240000002545,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "annotations_extractions",
+        "median": 0.010888162000128432,
+        "method": 8,
+        "q1": 0.010751660999858359,
+        "q3": 0.011044162999951368,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "annotations_extractions",
+        "median": 0.011219698000104472,
+        "method": 9,
+        "q1": 0.011075675500023863,
+        "q3": 0.011297500500177193,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "annotations_extractions",
+        "median": 0.011870475000250735,
+        "method": 10,
+        "q1": 0.011759423999706087,
+        "q3": 0.01197222500013595,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "annotations_extractions",
+        "median": 0.01229848299999503,
+        "method": 11,
+        "q1": 0.012209282250182696,
+        "q3": 0.012421359000200027,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "annotations_extractions",
+        "median": 0.012919781000164221,
+        "method": 12,
+        "q1": 0.012802004999798555,
+        "q3": 0.013049106999915239,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "annotations_extractions",
+        "median": 0.013393376999829343,
+        "method": 13,
+        "q1": 0.013289276749901546,
+        "q3": 0.013480227750051199,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "annotations_extractions",
+        "median": 0.013821897000070749,
+        "method": 14,
+        "q1": 0.013683170999797767,
+        "q3": 0.013912498000081541,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "annotations_extractions",
+        "median": 0.014410081999812974,
+        "method": 15,
+        "q1": 0.014285981500052003,
+        "q3": 0.01456858349979484,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "annotations_extractions",
+        "median": 0.014826901000105863,
+        "method": 16,
+        "q1": 0.014676524000151403,
+        "q3": 0.014955451750097382,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "annotations_extractions",
+        "median": 0.01523238699974172,
+        "method": 17,
+        "q1": 0.015168587000061962,
+        "q3": 0.015358162999859815,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "annotations_extractions",
+        "median": 0.015777209000134462,
+        "method": 18,
+        "q1": 0.015679432999831988,
+        "q3": 0.01597020999997767,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "annotations_extractions",
+        "median": 0.016292494000026636,
+        "method": 19,
+        "q1": 0.016212867999911396,
+        "q3": 0.016389393999816093,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "annotations_extractions",
+        "median": 0.016768796000178554,
+        "method": 20,
+        "q1": 0.01666164525011027,
+        "q3": 0.016874296249966392,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "annotations_extractions",
+        "median": 0.01747761000024184,
+        "method": 21,
+        "q1": 0.017379334000111157,
+        "q3": 0.01758751000011216,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "annotations_extractions",
+        "median": 0.017856513999959134,
+        "method": 22,
+        "q1": 0.017737012999759827,
+        "q3": 0.01797053899997536,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "annotations_extractions",
+        "median": 0.01822572550008772,
+        "method": 23,
+        "q1": 0.018128174999901603,
+        "q3": 0.018352576500092255,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "annotations_extractions",
+        "median": 0.018647928499831323,
+        "method": 24,
+        "q1": 0.018480177500123318,
+        "q3": 0.018741929500038168,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "annotations_extractions",
+        "median": 0.019192334999843297,
+        "method": 25,
+        "q1": 0.019068734000029508,
+        "q3": 0.019301034999898548,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "annotations_extractions",
+        "median": 0.01973243900010857,
+        "method": 26,
+        "q1": 0.019596838000097705,
+        "q3": 0.019797239000126865,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "annotations_extractions",
+        "median": 0.019932627000343928,
+        "method": 27,
+        "q1": 0.01984857624995584,
+        "q3": 0.02000717699991128,
+        "version": "3.9"
+      }
+    ]
+  },
+  "layer": [
+    {
+      "encoding": {
+        "color": {
+          "field": "version",
+          "type": "nominal"
+        },
+        "x": {
+          "field": "method",
+          "sort": null,
+          "type": "quantitative"
+        },
+        "y": {
+          "field": "q1",
+          "scale": {
+            "zero": false
+          },
+          "title": "Times in (s)",
+          "type": "quantitative"
+        },
+        "y2": {
+          "field": "q3"
+        }
+      },
+      "mark": {
+        "type": "errorband"
+      },
+      "title": "Effect of number of columns use in annotations conversion"
+    },
+    {
+      "encoding": {
+        "color": {
+          "field": "version",
+          "type": "nominal"
+        },
+        "x": {
+          "field": "method",
+          "sort": null,
+          "type": "quantitative"
+        },
+        "y": {
+          "field": "median",
+          "sort": null,
+          "type": "quantitative"
+        }
+      },
+      "mark": {
+        "point": true,
+        "type": "line"
+      }
+    }
+  ]
+},
+)
+</script>
+<p><br></p>
+<div id="hive_partitioning"></div>
+<script>
+vegaEmbed(
+  "#hive_partitioning",
+  {
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.8.0.json",
+  "config": {
+    "view": {
+      "continuousHeight": 300,
+      "continuousWidth": 300
+    }
+  },
+  "data": {
+    "name": "data-a49e75204b1b722c8b26d1090a810fae"
+  },
+  "datasets": {
+    "data-a49e75204b1b722c8b26d1090a810fae": [
+      {
+        "benchmark": "hive_partitioning",
+        "median": 21.373358130000042,
+        "method": 1,
+        "q1": 21.231748612000047,
+        "q3": 21.538947514000256,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "hive_partitioning",
+        "median": 15.472741544500082,
+        "method": 3,
+        "q1": 15.421358572999907,
+        "q3": 15.586007043000109,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "hive_partitioning",
+        "median": 11.579751462000047,
+        "method": 5,
+        "q1": 11.521700494000015,
+        "q3": 11.59357478700008,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "hive_partitioning",
+        "median": 9.126024123499974,
+        "method": 7,
+        "q1": 9.079834449000145,
+        "q3": 9.163600105000114,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "hive_partitioning",
+        "median": 7.650170504999892,
+        "method": 9,
+        "q1": 7.53180188500005,
+        "q3": 7.716086904000122,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "hive_partitioning",
+        "median": 6.23478786199999,
+        "method": 11,
+        "q1": 6.227088261000006,
+        "q3": 6.257091602999992,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "hive_partitioning",
+        "median": 5.525635897999962,
+        "method": 13,
+        "q1": 5.506390742999997,
+        "q3": 5.542198865000046,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "hive_partitioning",
+        "median": 4.806158499999981,
+        "method": 15,
+        "q1": 4.774219714999958,
+        "q3": 4.845478326000034,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "hive_partitioning",
+        "median": 4.228574737000031,
+        "method": 17,
+        "q1": 4.18309524,
+        "q3": 4.257328038000026,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "hive_partitioning",
+        "median": 3.8375026614999967,
+        "method": 19,
+        "q1": 3.8141400379999766,
+        "q3": 3.8557432430000063,
+        "version": "3.9"
+      }
+    ]
+  },
+  "layer": [
+    {
+      "encoding": {
+        "color": {
+          "field": "version",
+          "type": "nominal"
+        },
+        "x": {
+          "field": "method",
+          "sort": null,
+          "type": "quantitative"
+        },
+        "y": {
+          "field": "q1",
+          "scale": {
+            "zero": false
+          },
+          "title": "Times in (s)",
+          "type": "quantitative"
+        },
+        "y2": {
+          "field": "q3"
+        }
+      },
+      "mark": {
+        "type": "errorband"
+      },
+      "title": "Spliting time by number of concatenate file"
+    },
+    {
+      "encoding": {
+        "color": {
+          "field": "version",
+          "type": "nominal"
+        },
+        "x": {
+          "field": "method",
+          "sort": null,
+          "type": "quantitative"
+        },
+        "y": {
+          "field": "median",
+          "sort": null,
+          "type": "quantitative"
+        }
+      },
+      "mark": {
+        "point": true,
+        "type": "line"
+      }
+    }
+  ]
+},
+)
+</script>
+<p><br></p>
+<div id="merge_id"></div>
+<script>
+vegaEmbed(
+  "#merge_id",
+  {
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.8.0.json",
+  "config": {
+    "view": {
+      "continuousHeight": 300,
+      "continuousWidth": 300
+    }
+  },
+  "data": {
+    "name": "data-a91d0e37a9d03c9aa726d6dec97d2f61"
+  },
+  "datasets": {
+    "data-a91d0e37a9d03c9aa726d6dec97d2f61": [
+      {
+        "benchmark": "merge_id",
+        "median": 6.60000000607397e-05,
+        "method": 32768,
+        "q1": 5.210000017541461e-05,
+        "q3": 6.67000003886642e-05,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "merge_id",
+        "median": 6.620000021939632e-05,
+        "method": 65536,
+        "q1": 5.220000002736924e-05,
+        "q3": 6.680099977529608e-05,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "merge_id",
+        "median": 6.605049998142931e-05,
+        "method": 131072,
+        "q1": 5.2101000164839206e-05,
+        "q3": 6.670099992334144e-05,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "merge_id",
+        "median": 6.609999991269433e-05,
+        "method": 262144,
+        "q1": 5.220000002736924e-05,
+        "q3": 6.680099977529608e-05,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "merge_id",
+        "median": 6.60010000501643e-05,
+        "method": 524288,
+        "q1": 5.2099999720667256e-05,
+        "q3": 6.670099992334144e-05,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "merge_id",
+        "median": 6.620000021939632e-05,
+        "method": 1048576,
+        "q1": 5.2101000164839206e-05,
+        "q3": 6.679999978587148e-05,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "merge_id",
+        "median": 6.60010000501643e-05,
+        "method": 2097152,
+        "q1": 5.2101000164839206e-05,
+        "q3": 6.670099992334144e-05,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "merge_id",
+        "median": 6.609999991269433e-05,
+        "method": 4194304,
+        "q1": 5.220000002736924e-05,
+        "q3": 6.670099992334144e-05,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "merge_id",
+        "median": 6.609999991269433e-05,
+        "method": 8388608,
+        "q1": 5.220000002736924e-05,
+        "q3": 6.679999978587148e-05,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "merge_id",
+        "median": 5.019999980504508e-05,
+        "method": 16777216,
+        "q1": 1.0000000202126103e-05,
+        "q3": 5.0801000270439545e-05,
+        "version": "3.9"
+      }
+    ]
+  },
+  "layer": [
+    {
+      "encoding": {
+        "color": {
+          "field": "version",
+          "type": "nominal"
+        },
+        "x": {
+          "field": "method",
+          "sort": null,
+          "type": "quantitative"
+        },
+        "y": {
+          "field": "q1",
+          "scale": {
+            "zero": false
+          },
+          "title": "Times in (s)",
+          "type": "quantitative"
+        },
+        "y2": {
+          "field": "q3"
+        }
+      },
+      "mark": {
+        "type": "errorband"
+      },
+      "title": "Merging time by id in number of variant"
+    },
+    {
+      "encoding": {
+        "color": {
+          "field": "version",
+          "type": "nominal"
+        },
+        "x": {
+          "field": "method",
+          "sort": null,
+          "type": "quantitative"
+        },
+        "y": {
+          "field": "median",
+          "sort": null,
+          "type": "quantitative"
+        }
+      },
+      "mark": {
+        "point": true,
+        "type": "line"
+      }
+    }
+  ]
+},
+)
+</script>
+<p><br></p>
+<div id="merge_variant"></div>
+<script>
+vegaEmbed(
+  "#merge_variant",
+  {
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.8.0.json",
+  "config": {
+    "view": {
+      "continuousHeight": 300,
+      "continuousWidth": 300
+    }
+  },
+  "data": {
+    "name": "data-fc2e2f836c97f2f7cb365031442d5046"
+  },
+  "datasets": {
+    "data-fc2e2f836c97f2f7cb365031442d5046": [
+      {
+        "benchmark": "merge_variant",
+        "median": 6.62999996166036e-05,
+        "method": 32768,
+        "q1": 5.239999973127851e-05,
+        "q3": 6.69999999445281e-05,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "merge_variant",
+        "median": 9.100000170292333e-06,
+        "method": 65536,
+        "q1": 9.000000318337698e-06,
+        "q3": 9.200000022246968e-06,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "merge_variant",
+        "median": 6.630000007135095e-05,
+        "method": 131072,
+        "q1": 5.230100032349583e-05,
+        "q3": 6.69999999445281e-05,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "merge_variant",
+        "median": 6.630000007135095e-05,
+        "method": 262144,
+        "q1": 5.239999973127851e-05,
+        "q3": 6.70009999339527e-05,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "merge_variant",
+        "median": 6.630000007135095e-05,
+        "method": 524288,
+        "q1": 5.2400000186025864e-05,
+        "q3": 6.69999999445281e-05,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "merge_variant",
+        "median": 9.000000318337698e-06,
+        "method": 1048576,
+        "q1": 8.999999863590347e-06,
+        "q3": 9.100000170292333e-06,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "merge_variant",
+        "median": 6.630000007135095e-05,
+        "method": 2097152,
+        "q1": 5.230000033407123e-05,
+        "q3": 6.69999999445281e-05,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "merge_variant",
+        "median": 6.640000015067926e-05,
+        "method": 4194304,
+        "q1": 5.25000000379805e-05,
+        "q3": 6.710099978590733e-05,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "merge_variant",
+        "median": 6.62999996166036e-05,
+        "method": 8388608,
+        "q1": 5.239999973127851e-05,
+        "q3": 6.709999979648273e-05,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "merge_variant",
+        "median": 4.0549999994254904e-05,
+        "method": 16777216,
+        "q1": 1.0300000212737359e-05,
+        "q3": 5.0999999984924216e-05,
+        "version": "3.9"
+      }
+    ]
+  },
+  "layer": [
+    {
+      "encoding": {
+        "color": {
+          "field": "version",
+          "type": "nominal"
+        },
+        "x": {
+          "field": "method",
+          "sort": null,
+          "type": "quantitative"
+        },
+        "y": {
+          "field": "q1",
+          "scale": {
+            "zero": false
+          },
+          "title": "Times in (s)",
+          "type": "quantitative"
+        },
+        "y2": {
+          "field": "q3"
+        }
+      },
+      "mark": {
+        "type": "errorband"
+      },
+      "title": "Merging time by variant in number of variant"
+    },
+    {
+      "encoding": {
+        "color": {
+          "field": "version",
+          "type": "nominal"
+        },
+        "x": {
+          "field": "method",
+          "sort": null,
+          "type": "quantitative"
+        },
+        "y": {
+          "field": "median",
+          "sort": null,
+          "type": "quantitative"
+        }
+      },
+      "mark": {
+        "point": true,
+        "type": "line"
+      }
+    }
+  ]
+},
+)
+</script>
+<p><br></p>
+<div id="parquet2vcf"></div>
+<script>
+vegaEmbed(
+  "#parquet2vcf",
+  {
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.8.0.json",
+  "config": {
+    "view": {
+      "continuousHeight": 300,
+      "continuousWidth": 300
+    }
+  },
+  "data": {
+    "name": "data-2817a90cc1356d06163997d96587c985"
+  },
+  "datasets": {
+    "data-2817a90cc1356d06163997d96587c985": [
+      {
+        "benchmark": "parquet2vcf",
+        "median": 0.040408678999938275,
+        "method": "add_genotype",
+        "q1": 0.040178227000069455,
+        "q3": 0.04052202900038537,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "parquet2vcf",
+        "median": 0.004401724999752332,
+        "method": "basic",
+        "q1": 0.004368350000049759,
+        "q3": 0.004441300000166848,
+        "version": "3.9"
+      }
+    ]
+  },
+  "layer": [
+    {
+      "encoding": {
+        "color": {
+          "field": "version",
+          "type": "nominal"
+        },
+        "x": {
+          "field": "method",
+          "sort": null,
+          "type": "nominal"
+        },
+        "y": {
+          "field": "q1",
+          "scale": {
+            "zero": false
+          },
+          "title": "Times in (s)",
+          "type": "quantitative"
+        },
+        "y2": {
+          "field": "q3"
+        }
+      },
+      "mark": {
+        "type": "errorband"
+      },
+      "title": "parquet2vcf"
+    },
+    {
+      "encoding": {
+        "color": {
+          "field": "version",
+          "type": "nominal"
+        },
+        "x": {
+          "field": "method",
+          "sort": null,
+          "type": "nominal"
+        },
+        "y": {
+          "field": "median",
+          "sort": null,
+          "type": "quantitative"
+        }
+      },
+      "mark": {
+        "point": true,
+        "type": "line"
+      }
+    }
+  ]
+},
+)
+</script>
+<p><br></p>
+<div id="struct_genotypes"></div>
+<script>
+vegaEmbed(
+  "#struct_genotypes",
+  {
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.8.0.json",
+  "config": {
+    "view": {
+      "continuousHeight": 300,
+      "continuousWidth": 300
+    }
+  },
+  "data": {
+    "name": "data-12b33415f1b5c4200a2f9b60b704ae0c"
+  },
+  "datasets": {
+    "data-12b33415f1b5c4200a2f9b60b704ae0c": [
+      {
+        "benchmark": "struct_genotypes",
+        "median": 0.20440827050015287,
+        "method": "struct_genotypes",
+        "q1": 0.20359326500010866,
+        "q3": 0.20499817299969436,
+        "version": "3.9"
+      }
+    ]
+  },
+  "layer": [
+    {
+      "encoding": {
+        "color": {
+          "field": "version",
+          "type": "nominal"
+        },
+        "x": {
+          "field": "method",
+          "sort": null,
+          "type": "nominal"
+        },
+        "y": {
+          "field": "q1",
+          "scale": {
+            "zero": false
+          },
+          "title": "Times in (s)",
+          "type": "quantitative"
+        },
+        "y2": {
+          "field": "q3"
+        }
+      },
+      "mark": {
+        "type": "errorband"
+      },
+      "title": "struct_genotypes"
+    },
+    {
+      "encoding": {
+        "color": {
+          "field": "version",
+          "type": "nominal"
+        },
+        "x": {
+          "field": "method",
+          "sort": null,
+          "type": "nominal"
+        },
+        "y": {
+          "field": "median",
+          "sort": null,
+          "type": "quantitative"
+        }
+      },
+      "mark": {
+        "point": true,
+        "type": "line"
+      }
+    }
+  ]
+},
+)
+</script>
+<p><br></p>
+<div id="struct_variants"></div>
+<script>
+vegaEmbed(
+  "#struct_variants",
+  {
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.8.0.json",
+  "config": {
+    "view": {
+      "continuousHeight": 300,
+      "continuousWidth": 300
+    }
+  },
+  "data": {
+    "name": "data-eff06b8fd30d8cb1d76a05e214d1d4af"
+  },
+  "datasets": {
+    "data-eff06b8fd30d8cb1d76a05e214d1d4af": [
+      {
+        "benchmark": "struct_variants",
+        "median": 0.004439525000179856,
+        "method": "struct_variants",
+        "q1": 0.004372224999883656,
+        "q3": 0.00451215075008804,
+        "version": "3.9"
+      }
+    ]
+  },
+  "layer": [
+    {
+      "encoding": {
+        "color": {
+          "field": "version",
+          "type": "nominal"
+        },
+        "x": {
+          "field": "method",
+          "sort": null,
+          "type": "nominal"
+        },
+        "y": {
+          "field": "q1",
+          "scale": {
+            "zero": false
+          },
+          "title": "Times in (s)",
+          "type": "quantitative"
+        },
+        "y2": {
+          "field": "q3"
+        }
+      },
+      "mark": {
+        "type": "errorband"
+      },
+      "title": "struct_variants"
+    },
+    {
+      "encoding": {
+        "color": {
+          "field": "version",
+          "type": "nominal"
+        },
+        "x": {
+          "field": "method",
+          "sort": null,
+          "type": "nominal"
+        },
+        "y": {
+          "field": "median",
+          "sort": null,
+          "type": "quantitative"
+        }
+      },
+      "mark": {
+        "point": true,
+        "type": "line"
+      }
+    }
+  ]
+},
+)
+</script>
+<p><br></p>
+<div id="vcf2parquet"></div>
+<script>
+vegaEmbed(
+  "#vcf2parquet",
+  {
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.8.0.json",
+  "config": {
+    "view": {
+      "continuousHeight": 300,
+      "continuousWidth": 300
+    }
+  },
+  "data": {
+    "name": "data-d18513fb4d6ba785fcb6951887042c61"
+  },
+  "datasets": {
+    "data-d18513fb4d6ba785fcb6951887042c61": [
+      {
+        "benchmark": "vcf2parquet",
+        "median": 0.012024469000152749,
+        "method": "variants",
+        "q1": 0.011909917999787467,
+        "q3": 0.012197993999848222,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "vcf2parquet",
+        "median": 0.09465573900024538,
+        "method": "variants_genotypes",
+        "q1": 0.09362408325011984,
+        "q3": 0.09584064550017501,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "vcf2parquet",
+        "median": 0.06381505950002975,
+        "method": "variants_annotations",
+        "q1": 0.06364630850021058,
+        "q3": 0.0639212604999102,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "vcf2parquet",
+        "median": 0.14536927699987245,
+        "method": "variants_genotypes_annotations",
+        "q1": 0.14507072600008541,
+        "q3": 0.14627233300006992,
+        "version": "3.9"
+      }
+    ]
+  },
+  "layer": [
+    {
+      "encoding": {
+        "color": {
+          "field": "version",
+          "type": "nominal"
+        },
+        "x": {
+          "field": "method",
+          "sort": null,
+          "type": "nominal"
+        },
+        "y": {
+          "field": "q1",
+          "scale": {
+            "zero": false
+          },
+          "title": "Times in (s)",
+          "type": "quantitative"
+        },
+        "y2": {
+          "field": "q3"
+        }
+      },
+      "mark": {
+        "type": "errorband"
+      },
+      "title": "Vcf2Parquet mode evaluation"
+    },
+    {
+      "encoding": {
+        "color": {
+          "field": "version",
+          "type": "nominal"
+        },
+        "x": {
+          "field": "method",
+          "sort": null,
+          "type": "nominal"
+        },
+        "y": {
+          "field": "median",
+          "sort": null,
+          "type": "quantitative"
+        }
+      },
+      "mark": {
+        "point": true,
+        "type": "line"
+      }
+    }
+  ]
+},
+)
+</script>
+<p><br></p>
+<div id="vcf_parsing"></div>
+<script>
+vegaEmbed(
+  "#vcf_parsing",
+  {
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.8.0.json",
+  "config": {
+    "view": {
+      "continuousHeight": 300,
+      "continuousWidth": 300
+    }
+  },
+  "data": {
+    "name": "data-a410e113c62449bca2f1ec6b033ae384"
+  },
+  "datasets": {
+    "data-a410e113c62449bca2f1ec6b033ae384": [
+      {
+        "benchmark": "vcf_parsing",
+        "median": 0.0014282090000108383,
+        "method": 32,
+        "q1": 0.0014153080000056661,
+        "q3": 0.001442558500016844,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "vcf_parsing",
+        "median": 0.0020174109999970824,
+        "method": 64,
+        "q1": 0.002003286249987468,
+        "q3": 0.0020324117500010175,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "vcf_parsing",
+        "median": 0.003002867000006404,
+        "method": 128,
+        "q1": 0.0029806169999915255,
+        "q3": 0.0030343180000045322,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "vcf_parsing",
+        "median": 0.003222917999991637,
+        "method": 256,
+        "q1": 0.0032066189999966355,
+        "q3": 0.003246418999992784,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "vcf_parsing",
+        "median": 0.0037413219999962166,
+        "method": 512,
+        "q1": 0.0037100210000104994,
+        "q3": 0.003787772000002576,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "vcf_parsing",
+        "median": 0.0047731774999988374,
+        "method": 1024,
+        "q1": 0.0047237269999982345,
+        "q3": 0.004819728000001078,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "vcf_parsing",
+        "median": 0.006517935999994506,
+        "method": 2048,
+        "q1": 0.0064399359999924854,
+        "q3": 0.006621736999989025,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "vcf_parsing",
+        "median": 0.011721718000003989,
+        "method": 4096,
+        "q1": 0.01151231699998334,
+        "q3": 0.011836168500011013,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "vcf_parsing",
+        "median": 0.026513851999993676,
+        "method": 8192,
+        "q1": 0.026211625749986922,
+        "q3": 0.02661432724998747,
+        "version": "3.9"
+      },
+      {
+        "benchmark": "vcf_parsing",
+        "median": 0.055425108999997974,
+        "method": 16384,
+        "q1": 0.055129060500007654,
+        "q3": 0.055761036000006925,
+        "version": "3.9"
+      }
+    ]
+  },
+  "layer": [
+    {
+      "encoding": {
+        "color": {
+          "field": "version",
+          "type": "nominal"
+        },
+        "x": {
+          "field": "method",
+          "sort": null,
+          "type": "quantitative"
+        },
+        "y": {
+          "field": "q1",
+          "scale": {
+            "zero": false
+          },
+          "title": "Times in (s)",
+          "type": "quantitative"
+        },
+        "y2": {
+          "field": "q3"
+        }
+      },
+      "mark": {
+        "type": "errorband"
+      },
+      "title": "Vcf parsing scaling"
+    },
+    {
+      "encoding": {
+        "color": {
+          "field": "version",
+          "type": "nominal"
+        },
+        "x": {
+          "field": "method",
+          "sort": null,
+          "type": "quantitative"
+        },
+        "y": {
+          "field": "median",
+          "sort": null,
+          "type": "quantitative"
+        }
+      },
+      "mark": {
+        "point": true,
+        "type": "line"
+      }
+    }
+  ]
+},
+)
+</script>
+<p><br></p>
+
+
+
+  
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+            Back to top
+          </button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/natir" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.top", "search.highlight", "search.suggest"], "search": "../assets/javascripts/workers/search.74e28a9f.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.220ee61c.min.js"></script>
+      
+        
+          <script src="../javascripts/mathjax.js"></script>
+        
+      
+        
+          <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+        
+      
+        
+          <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        
+      
+    
+  </body>
+</html>
