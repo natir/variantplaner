@@ -93,14 +93,6 @@ def merge_variant_on_disk_func(data: pandas.DataFrame, _name: str) -> tuple[pand
     return data, "Running time compare to number of file"
 
 
-def merge_variant_on_disk_old_func(data: pandas.DataFrame, _name: str) -> tuple[pandas.DataFrame, str]:
-    """Update variant merge by variant."""
-    data["method"] = data["method"].apply(lambda x: int(x.split("_")[5]))
-    data = data.sort_values(by=["method"])
-
-    return data, "Running time compare to number of file old"
-
-
 def hive_partitioning_func(data: pandas.DataFrame, _name: str) -> tuple[pandas.DataFrame, str]:
     """Hive partitioning."""
     data["method"] = data["method"].apply(lambda x: int(x.split("_")[4]))
