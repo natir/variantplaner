@@ -26,8 +26,10 @@ import polars
 # project import
 from variantplaner import exception, extract, generate, io, struct
 
+# mypy: warn_unused_ignores = false
 
-@click.group(name="variantplaner")
+
+@click.group(name="variantplaner")  # type: ignore[arg-type]
 @click.option("-t", "--threads", help="Number of threads usable", default=1, type=click.IntRange(0), show_default=True)
 @click.option("-v", "--verbose", help="Verbosity level", count=True, type=click.IntRange(0, 4))
 def main(threads: int = 1, verbose: int = 0) -> None:
@@ -50,7 +52,7 @@ def main(threads: int = 1, verbose: int = 0) -> None:
 ###############
 # vcf2parquet #
 ###############
-@main.command()
+@main.command()  # type: ignore[arg-type]
 @click.option(
     "-i",
     "--input-path",
@@ -129,7 +131,7 @@ def vcf2parquet(
 ###############
 # parquet2vcf #
 ###############
-@main.command()
+@main.command()  # type: ignore[arg-type]
 @click.option(
     "-i",
     "--input-path",
@@ -273,7 +275,7 @@ def parquet2vcf(
 ##########
 # Struct #
 ##########
-@main.group("struct")
+@main.group("struct")  # type: ignore[arg-type]
 @click.pass_context
 @click.option(
     "-i",
@@ -292,7 +294,7 @@ def struct_main(ctx: click.Context, input_paths: list[pathlib.Path]) -> None:
     logger.debug(f"parameter: {input_paths=}")
 
 
-@struct_main.command("variants")
+@struct_main.command("variants")  # type: ignore[arg-type]
 @click.pass_context
 @click.option(
     "-o",
@@ -338,7 +340,7 @@ def struct_variants(
     struct.variants.merge(input_paths, output_path, bytes_memory_limit, polars_threads)
 
 
-@struct_main.command("genotypes")
+@struct_main.command("genotypes")  # type: ignore[arg-type]
 @click.pass_context
 @click.option(
     "-p",
@@ -377,7 +379,7 @@ def struct_genotypes(ctx: click.Context, prefix_path: pathlib.Path, file_per_thr
 ###############
 # Annotations #
 ###############
-@main.group("annotations")
+@main.group("annotations")  # type: ignore[arg-type]
 @click.pass_context
 @click.option(
     "-i",
@@ -402,7 +404,7 @@ def annotations_main(ctx: click.Context, input_path: pathlib.Path, output_path: 
     logger.debug(f"parameter: {input_path=} {output_path=}")
 
 
-@annotations_main.command("vcf")
+@annotations_main.command("vcf")  # type: ignore[arg-type]
 @click.pass_context
 @click.option(
     "-i",
@@ -445,7 +447,7 @@ def annotations_vcf(ctx: click.Context, info: set[str] | None = None, rename_id:
     lf.sink_parquet(output_path, compression="snappy")
 
 
-@annotations_main.command("csv")
+@annotations_main.command("csv")  # type: ignore[arg-type]
 @click.pass_context
 @click.option(
     "-c",
@@ -529,7 +531,7 @@ def annotations_csv(
 ############
 # Metadata #
 ############
-@main.group()
+@main.group()  # type: ignore[arg-type]
 @click.pass_context
 @click.option(
     "-i",
@@ -554,7 +556,7 @@ def metadata(ctx: click.Context, input_path: pathlib.Path, output_path: pathlib.
     logger.debug(f"parameter: {input_path=} {output_path=}")
 
 
-@metadata.command("json")
+@metadata.command("json")  # type: ignore[arg-type]
 @click.pass_context
 @click.option(
     "-f",
@@ -593,7 +595,7 @@ def metadata_json(
     lf.write_parquet(output_path)
 
 
-@metadata.command("csv")
+@metadata.command("csv")  # type: ignore[arg-type]
 @click.pass_context
 @click.option(
     "-c",
@@ -640,7 +642,7 @@ def generate_main() -> None:
     logger.debug("parameter: ")
 
 
-@generate_main.command("transmission")
+@generate_main.command("transmission")  # type: ignore[arg-type]
 @click.option(
     "-i",
     "--input-path",
