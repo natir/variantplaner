@@ -75,7 +75,7 @@ def __hive_worker(lfs: tuple[polars.LazyFrame], output_prefix: pathlib.Path) -> 
     """Subprocess of hive function run in parallel.
 
     Args:
-        path: List of file you want reorganise
+        lfs: List of [polars.LazyFrame] you want reorganise
         output_prefix: prefix of hive
 
     Returns:

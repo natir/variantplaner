@@ -20,6 +20,7 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Topic :: Documentation",
     "Topic :: Software Development",
     "Topic :: Utilities",
@@ -43,6 +44,9 @@ variantplaner = "variantplaner.cli:main"
 
 [tool.pdm]
 version = {source = "scm"}
+plugins = [
+    "pdm-multirun",
+]
 
 [tool.pdm.build]
 package-dir = "src"
@@ -50,18 +54,22 @@ editable-backend = "editables"
 
 [tool.pdm.dev-dependencies]
 duty = ["duty>=0.10"]
+#ci-quality = ["variantplaner[duty,docs,quality,typing,security]"]
+#ci-tests = ["variantplaner[duty,tests]"]
 docs = [
     "altair>=5",
     "black>=23",
-    "mkdocs>=1",
-    "mkdocs-coverage>=0.2",
-    "mkdocs-gen-files>=0.5",
-    "mkdocs-literate-nav>=0.6",
-    "mkdocs-material>=9",
-    "mkdocs-section-index>=0.3",
-    "mkdocstrings[python]>=0.22",
     "markdown-callouts>=0.3",
     "markdown-exec>=1.6",
+    "mkdocs-coverage>=0.2",
+    "mkdocs-gen-files>=0.5",
+    "mkdocs-git-committers-plugin-2>=1",
+    "mkdocs-literate-nav>=0.6",
+    "mkdocs-material>=9",
+    "mkdocs-minify-plugin>=0.6",
+    "mkdocs-section-index>=0.3",
+    "mkdocs>=1",
+    "mkdocstrings[python]>=0.22",
     "toml>=0.10",
 ]
 maintain = [
@@ -73,15 +81,18 @@ quality = [
     "ruff>=0.0.276",
 ]
 tests = [
-    "pytest>=7",
+    "pytest-benchmark[histogram]>=4",
     "pytest-cov>=4",
     "pytest-randomly>=3",
     "pytest-xdist>=3",
-    "pytest-benchmark[histogram]>=4",
+    "pytest>=7",
 ]
 typing = [
     "mypy>=1",
     "types-markdown>=3",
+    "types-pyyaml>=6",
     "types-toml>=0.10",
 ]
-security = ["safety>=2"]
+security = [
+    "safety>=2",
+]

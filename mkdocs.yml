@@ -1,10 +1,17 @@
-site_name: "VariantPlaner"
-site_description: "A tool kit to manage many variant on desktop computer"
-site_url: "https://natir.github.io/variantplaner"
-repo_url: "https://github.com/natir/variantplaner"
-repo_name: "natir/variantplaner"
-site_dir: "site"
-watch: [README.md, CONTRIBUTING.md, CHANGELOG.md, src/variantplaner, scripts]
+---
+site_name: VariantPlaner
+site_description: A tool kit to manage many variant on desktop computer
+site_url: https://natir.github.io/variantplaner
+repo_url: https://github.com/natir/variantplaner
+repo_name: natir/variantplaner
+site_dir: site
+watch:
+  - mkdocs.yml
+  - README.md
+  - CONTRIBUTING.md
+  - CHANGELOG.md
+  - src/variantplaner
+copyright: Copyright &copy; 2023 Pierre Marijon
 
 nav:
 - Home:
@@ -12,9 +19,9 @@ nav:
   - Changelog: changelog.md
   - Credits: credits.md
   - License: license.md
-- Usages: usages.md
 # defer to gen-files + literate-nav
-- Code Reference: reference/
+- API reference:
+  - variantplaner: reference/
 - Development:
   - Contributing: contributing.md
   - Code of Conduct: code_of_conduct.md
@@ -24,52 +31,69 @@ nav:
 theme:
   name: material
   features:
-  - navigation.tabs
-  - navigation.tabs.sticky
-  - navigation.top
-  - search.highlight
-  - search.suggest
+    - announce.dismiss
+    - content.action.edit
+    - content.action.view
+    - content.code.annotate
+    - content.code.copy
+    - content.tooltips
+    - navigation.footer
+    - navigation.indexes
+    - navigation.sections
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.top
+    - search.highlight
+    - search.suggest
+    - toc.follow
   palette:
-  - media: "(prefers-color-scheme: dark)"
-    scheme: slate
-    primary: black
-    accent: lime
-    toggle:
-      icon: material/weather-night
-      name: Switch to light mode
-  - media: "(prefers-color-scheme: light)"
-    scheme: default
-    primary: teal
-    accent: purple
-    toggle:
-      icon: material/weather-sunny
-      name: Switch to dark mode
-
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: lime
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: teal
+      accent: purple
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
 
 extra_css:
-- css/material.css
-- css/mkdocstrings.css
+  - css/material.css
+  - css/mkdocstrings.css
 
 markdown_extensions:
-- admonition
-- callouts
-- pymdownx.emoji
-- pymdownx.blocks.details
-- pymdownx.magiclink
-- pymdownx.snippets:
-    check_paths: true
-- pymdownx.superfences
-- pymdownx.tabbed:
-    alternate_style: true
-- pymdownx.tasklist
-- toc:
-    permalink: true
-- pymdownx.arithmatex:
-    generic: true
+  - attr_list
+  - admonition
+  - callouts
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.blocks.details
+  - footnotes
+  - pymdownx.magiclink
+  - pymdownx.snippets:
+      check_paths: true
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+      slugify:
+        kwds:
+          case: lower
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true
 
 plugins:
-- search
 - autorefs
+- search
 - markdown-exec
 - gen-files:
     scripts:
@@ -77,7 +101,6 @@ plugins:
 - literate-nav:
     nav_file: SUMMARY.txt
 - coverage
-- section-index
 - mkdocstrings:
     handlers:
       python:
@@ -86,16 +109,33 @@ plugins:
         - https://pola-rs.github.io/polars/py-polars/html/objects.inv
         - https://click.palletsprojects.com/en/8.1.x/objects.inv
         options:
-          separate_signature: true
-          merge_init_into_class: true
           docstring_options:
             ignore_init_summary: true
-          filters: ["!^_"]
+          docstring_section_style: list
+          heading_level: 1
+          merge_init_into_class: true
+          separate_signature: true
+          show_root_heading: true
+          show_root_full_path: false
+          show_signature_annotations: true
+          show_symbol_type_heading: true
+          show_symbol_type_toc: true
+          signature_crossrefs: true
+- git-committers:
+    enabled: !ENV [DEPLOY, false]
+    repository: natir/variantplaner
+
+- minify:
+    minify_html: !ENV [DEPLOY, false]
 
 extra:
   social:
-  - icon: fontawesome/brands/github
-    link: https://github.com/natir
+    - icon: fontawesome/brands/github
+      link: https://github.com/natir
+    - icon: fontawesome/brands/gitter
+      link: https://gitter.im/variantplaner/community
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/variantplaner/
 
 extra_javascript:
   - javascripts/mathjax.js

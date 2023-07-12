@@ -1,7 +1,7 @@
 .DEFAULT_GOAL := help
 SHELL := bash
-
-DUTY = $(shell [ -n "${VIRTUAL_ENV}" ] || echo pdm run) duty
+DUTY := $(if $(VIRTUAL_ENV),,pdm run) duty
+export PDM_MULTIRUN_VERSIONS ?= 3.9 3.10 3.11
 
 args = $(foreach a,$($(subst -,_,$1)_args),$(if $(value $a),$a="$($a)"))
 check_quality_args = files
@@ -33,7 +33,7 @@ help:
 
 .PHONY: lock
 lock:
-	@pdm lock
+	@pdm lock -G:all
 
 .PHONY: setup
 setup:
@@ -41,7 +41,7 @@ setup:
 
 .PHONY: check
 check:
-	@PDM_MULTIRUN_VERSIONS="3.9 3.10 3.11" pdm multirun duty check-quality check-types check-docs
+	@pdm multirun duty check-quality check-types check-docs
 	@$(DUTY) check-dependencies check-api
 
 .PHONY: $(BASIC_DUTIES)
@@ -50,4 +50,4 @@ $(BASIC_DUTIES):
 
 .PHONY: $(QUALITY_DUTIES)
 $(QUALITY_DUTIES):
-	@PDM_MULTIRUN_VERSIONS="3.9 3.10 3.11" pdm multirun duty $@ $(call args,$@)
+	@pdm multirun duty $@ $(call args,$@)
