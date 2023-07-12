@@ -111,12 +111,12 @@ def __generate_variant_merge_on_disk_old(
             __generate_variant().sink_parquet(tmp_path / f"{i}.parquet")
 
         os.environ["POLARS_MAX_THREADS"] = str(threads)
-        benchmark(lambda: old_merge(paths, tmp_path / "output.parquet", memory_limit=5_000_000))
+        benchmark(lambda: __old_merge(paths, tmp_path / "output.parquet", memory_limit=5_000_000))
 
     return inner
 
 
-def old_merge(paths: list[pathlib.Path], output: pathlib.Path, memory_limit: int = 10_000_000_000) -> None:
+def __old_merge(paths: list[pathlib.Path], output: pathlib.Path, memory_limit: int = 10_000_000_000) -> None:
     """Perform merge of multiple parquet variants file in one file.
 
     These function generate temporary file, by default file are write in `/tmp` but you can control where these files are write by set TMPDIR, TEMP or TMP directory.
