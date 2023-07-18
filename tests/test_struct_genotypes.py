@@ -67,11 +67,11 @@ def test_write_or_add(tmp_path: pathlib.Path) -> None:
 
     struct.genotypes.__write_or_add(df, path)
 
-    truth = polars.concat([df, df])
+    truth = polars.concat([df, df]).sort("id", "sample")
 
-    reality = polars.read_parquet(path)
+    reality = polars.read_parquet(path).sort("id", "sample")
 
-    polars.testing.assert_frame_equal(truth, reality)
+    polars.testing.assert_frame_equal(truth, reality, check_row_order=True)
 
 
 def test_hive(tmp_path: pathlib.Path) -> None:

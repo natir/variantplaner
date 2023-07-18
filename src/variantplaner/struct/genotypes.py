@@ -6,6 +6,8 @@ from __future__ import annotations
 import itertools
 import logging
 import multiprocessing
+import shutil
+import tempfile
 import typing
 
 if typing.TYPE_CHECKING:  # pragma: no cover
@@ -64,8 +66,12 @@ def __write_or_add(new_lf: polars.DataFrame, partition_path: pathlib.Path) -> No
         None
     """
     if partition_path.exists():
-        old_lf = polars.read_parquet(partition_path)
-        polars.concat([old_lf, new_lf]).write_parquet(partition_path)
+        tmp_file = tempfile.NamedTemporaryFile().name
+
+        old_lf = polars.scan_parquet(partition_path)
+        polars.concat([old_lf, new_lf.lazy()]).sink_parquet(tmp_file)
+
+        shutil.move(tmp_file, partition_path)
     else:
         partition_path.parent.mkdir(parents=True, exist_ok=True)
         new_lf.write_parquet(partition_path)
