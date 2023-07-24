@@ -148,7 +148,7 @@ def vcf2parquet(
 @click.option(
     "-o",
     "--output",
-    help="Path where the vcf is write",
+    help="Path where the vcf is written",
     type=click.Path(dir_okay=False, writable=True, path_type=pathlib.Path),
     required=True,
 )
@@ -327,7 +327,7 @@ def struct_variants(
 ) -> None:
     """Merge multiple variants parquet file in one.
 
-    If you set TMPDIR, TEMP or TMP environment variable you can control where temp file is create.
+    If you set TMPDIR, TEMP or TMP environment variable you can control where temp file is created.
     """
     logger = logging.getLogger("struct.variants")
 

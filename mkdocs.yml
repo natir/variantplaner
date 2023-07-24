@@ -12,10 +12,12 @@ watch:
   - CHANGELOG.md
   - src/variantplaner
 copyright: Copyright &copy; 2023 Pierre Marijon
+edit_uri: edit/main/docs/
 
 nav:
 - Home:
   - Overview: index.md
+  - Usages: usages.md
   - Changelog: changelog.md
   - Credits: credits.md
   - License: license.md

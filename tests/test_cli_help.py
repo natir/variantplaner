@@ -152,7 +152,7 @@ def test_show_help_parquet2vcf() -> None:
 Options:
   -i, --input-path FILE      Path to variants in parquet format  [required]
   -g, --genotypes-path FILE  Path to genotypes in parquet format
-  -o, --output FILE          Path where the vcf is write  [required]
+  -o, --output FILE          Path where the vcf is written  [required]
   -c, --chromosome TEXT      Name of chromosome column  [default: chr]
   -p, --position TEXT        Name of position column  [default: pos]
   -I, --identifier TEXT      Name of identity column  [default: id]
