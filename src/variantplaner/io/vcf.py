@@ -112,7 +112,7 @@ def info2expr(header: list[str], input_path: pathlib.Path, select_info: set[str]
                     local_expr = local_expr.cast(polars.Int64)
                 elif search["type"] == "Float":
                     local_expr = local_expr.cast(polars.Float64)
-                elif search["type"] == "String" or search["type"] == "Character":
+                elif search["type"] in {"String", "Character"}:
                     pass  # Not do anything on string or character
                 else:
                     pass  # Not reachable
@@ -123,7 +123,7 @@ def info2expr(header: list[str], input_path: pathlib.Path, select_info: set[str]
                     local_expr = local_expr.cast(polars.List(polars.Int64))
                 elif search["type"] == "Float":
                     local_expr = local_expr.cast(polars.List(polars.Float64))
-                elif search["type"] == "String" or search["type"] == "Character":
+                elif search["type"] in {"String", "Character"}:
                     pass  # Not do anything on string or character
                 else:
                     pass  # Not reachable
@@ -207,19 +207,19 @@ def format2expr(
             if number == "1":
                 if format_type == "Integer":
                     expressions[name] = __format_one_int
-                elif format_type == "Float":  # noqa: SIM114 Float isn't already support but in future
+                elif format_type == "Float":  # Float isn't already support but in future
                     expressions[name] = __format_one_str
-                elif format_type == "String" or format_type == "Character":
+                elif format_type in {"String", "Character"}:
                     expressions[name] = __format_one_str
                 else:
                     pass  # Not reachable
 
-            else:
-                if format_type == "Integer":  # noqa: PLR5501 All other number are consider as list
+            else:  # noqa: PLR5501 All other number are consider as list
+                if format_type == "Integer":
                     expressions[name] = __format_list_int
-                elif format_type == "Float":  # noqa: SIM114 Float isn't already support but in future
+                elif format_type == "Float":  # Float isn't already support but in future
                     expressions[name] = __format_list_str
-                elif format_type == "String" or format_type == "Character":
+                elif format_type in {"String", "Character"}:
                     expressions[name] = __format_list_str
                 else:
                     pass  # Not reachable
