@@ -108,14 +108,14 @@ def __hive_worker(lfs: tuple[polars.LazyFrame], output_prefix: pathlib.Path) -> 
 
 
 def hive(paths: list[pathlib.Path], output_prefix: pathlib.Path, threads: int, file_per_thread: int) -> None:
-    r"""Read all genotypes parquet file and use information to generate a hive like struct, based on $id\ \%\ 256$  with genotype informations.
+    r"""Read all genotypes parquet file and use information to generate a hive like struct, based on $id\ \%\ 256$  with genotype information.
 
     Real number of threads use are equal to $min(threads, len(paths))$.
 
     Output format look like: `{output_prefix}/id_mod=[0..255]/[0..threads].parquet`.
 
     Args:
-        paths: list of file you want reorganise
+        paths: list of file you want reorganize
         output_prefix: prefix of hive
         threads: number of multiprocessing threads run
         file_per_thread: number of file manage per multiprocessing threads

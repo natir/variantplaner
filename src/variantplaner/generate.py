@@ -20,7 +20,7 @@ def transmission_ped(
 ) -> polars.DataFrame:
     """Compute transmission of each variants.
 
-    **Warning**: only the first sample with two parent are consider.
+    **Warning**: only the first sample with two parent are considered.
 
     Args:
         genotypes_lf: Genotypes [polars.LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html), `gt` column are required.
@@ -30,7 +30,7 @@ def transmission_ped(
          DataFrame with transmission information
 
     Raises:
-        NoGTError: if genotypes_lf not containts gt column.
+        NoGTError: If genotypes_lf not contains gt column.
     """
     pedigree_lf = pedigree_lf.filter(polars.col("father_id") != "unknow").filter(polars.col("mother_id") != "unknow")
 

@@ -70,7 +70,7 @@ def into_lazyframe(
         scan_csv_args: polars.scan_csv parameter.
 
     Returns:
-        A lazyframe that containt csv information
+        A lazyframe that contain csv information
 
     """
     lf = polars.scan_csv(

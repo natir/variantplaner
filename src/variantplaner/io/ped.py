@@ -15,13 +15,13 @@ import polars
 
 
 def into_lazyframe(input_path: pathlib.Path) -> polars.LazyFrame:
-    """Read a pedigre file in [polars.LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html).
+    """Read a pedigree file in [polars.LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html).
 
     Args:
-        input_path: Path to pedigre file.
+        input_path: Path to pedigree file.
 
     Returns:
-        A [polars.LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html) that containt ped information ('family_id', 'personal_id', 'father_id', 'mother_id', 'sex', 'affected')
+        A [polars.LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html) that contains ped information ('family_id', 'personal_id', 'father_id', 'mother_id', 'sex', 'affected')
     """
     return polars.scan_csv(
         input_path,
@@ -41,13 +41,13 @@ def into_lazyframe(input_path: pathlib.Path) -> polars.LazyFrame:
 
 
 def from_lazyframe(lf: polars.LazyFrame, output_path: pathlib.Path) -> None:
-    """Write pedigre [polars.LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html) in ped format.
+    """Write pedigree [polars.LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html) in ped format.
 
-    Warning: This function perform [polars.LazyFrame.collect][] before write csv, this can have a significant impact on memory usage
+    Warning: This function performs [polars.LazyFrame.collect][] before write csv, this can have a significant impact on memory usage
 
     Args:
-        lf: LazyFrame contains pedigre information.
-        output_path: Path where write pedigre information.
+        lf: LazyFrame contains pedigree information.
+        output_path: Path where write pedigree information.
 
     Returns:
         None

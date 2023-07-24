@@ -1,8 +1,8 @@
 # VariantPlaner
 
-variantplaner is a set of tools that converts a large set of vcf's into an interoperable data structure in an efficient way.
+variantplaner is a set of tools that converts a large set of vcf's into an interoperable data structure efficiently.
 
-To show the capabilities of the variant planner we will use a small example.
+To show the capabilities of the `variantplaner`, we will use a small example.
 
 The purpose of this short tutorial is to present:
 
@@ -22,7 +22,7 @@ Requirements list:
 
 - curl
 - gunzip
-- [pqrs](https://github.com/manojkarthick/pqrs) (only for transmission computation otherwise optional)
+- [pqrs](https://github.com/manojkarthick/pqrs) (only for transmission computation, otherwise optional)
 
 Optional:
 - gnu-parallel
@@ -72,7 +72,7 @@ Commands:
 
 ## vcf2parquet
 
-First step is convert vcf data in [parquet](https://en.wikipedia.org/wiki/Apache_Parquet) it's a column oriented format with better performance than indexed vcf.
+First step is to convert vcf data in [parquet](https://en.wikipedia.org/wiki/Apache_Parquet), it's a column oriented format with better performance than indexed vcf.
 
 We split vcf in two part on for variant information and another for genotype information.
 
@@ -91,7 +91,7 @@ do
 done
 ```
 
-We iterate over all vcf, variants are store in `variants/{sample_name}.parquet`, genotype information are store in `variants/{sample_name}.parquet`. Only genotypes with a format value equal to `-f` parameter value are retained.
+We iterate over all vcf, variants are store in `variants/{sample_name}.parquet`, genotype information are store in `variants/{sample_name}.parquet`. Only genotypes with a format value equal to the `-f` parameter value are retained.
 
 /// details | gnu-parallel method
 ```bash
@@ -107,7 +107,7 @@ Parquet variants file contains 5 column:
 - pos: Position of variant
 - ref: Reference sequence
 - alt: Alternative sequence
-- id: An hash of other value colision isn't check but highly improbable [check api documentation](/variantplaner/reference/variantplaner/normalization/#variantplaner.normalization.add_variant_id)
+- id: An hash of other value collision isn't check but highly improbable [check api documentation](/variantplaner/reference/variantplaner/normalization/#variantplaner.normalization.add_variant_id)
 
 
 /// details | variants parquet file content
@@ -148,14 +148,14 @@ pqrs head genotypes/HG001.parquet
 
 ### Merge all variant
 
-We can now aggregate all variant present in our dataset to perform this operation we use divide to conquer merge methode by generate temporary file. By default file are write in `/tmp` but you can control where these files are write by set `TMPDIR`, `TEMP` or `TMP` directory.
+We can now aggregate all variant present in our dataset to perform this operation we use divide to conquer merge method by generate temporary file. By default, file are written in `/tmp` but you can control where these files are written by set `TMPDIR`, `TEMP` or `TMP` directory.
 
 ```bash
 input=$(ls variants/ | xargs -I {} -x echo "-i variants/"{} | tr '\n' ' ')
 variantplaner -t 8 struct $(echo $input) variants -o variants.parquet
 ```
 
-File `variants.parquet` containt all uniq variants present in dataset.
+File `variants.parquet` contains all unique variants present in dataset.
 
 ### Genotypes structuration
 
@@ -169,7 +169,7 @@ HG001.parquet  HG002.parquet  HG003.parquet  HG004.parquet  HG006.parquet  HG007
 
 ### By variants
 
-Here we'll organize the genotypes information by variants to make it easier to find samples where a variant is present or not.
+Here, we'll organize the genotypes information by variants to make it easier to find samples where a variant is present or not.
 
 ```bash
 mkdir -p genotypes/variants/
@@ -183,7 +183,7 @@ All genotypes information are split in [hive like structure](https://duckdb.org/
 
 If you are working with families, `variantplaner` can calculate the modes of transmission of the variants.
 
-For these step we need concatenate all genotypes of a AshkenazimTrio in one parquet sample.
+For these step, we need to concatenate all genotypes of a AshkenazimTrio in one parquet sample.
 
 ```bash
 pqrs merge -i genotypes/samples/HG002.parquet genotypes/samples/HG003.parquet genotypes/samples/HG004.parquet -o genotypes/samples/AshkenazimTrio.parquet
@@ -205,7 +205,7 @@ variantplaner generate transmission -i genotypes/samples/AshkenazimTrio.parquet 
 
 Parquet transmissions file contains column all genotypes information with suffix `_index`, `_mother` and `_father` plus a `origin` column
 
-Origin column contains a number with 3 digit:
+Origin column contains a number with 3 digits:
 
 ```
 231
@@ -214,12 +214,12 @@ Origin column contains a number with 3 digit:
 └── index genotype
 ```
 
-In this example case variants is homozygotes in index, mother information is missing, variants is heterozygotes in father.
+In this example case, variants is homozygotes in index, mother information is missing, variants is heterozygotes in father.
 
 
 ## Add annotations
 
-To work on your variant you probably need and annotations.
+To work on your variant, you probably need and annotations.
 
 ### Snpeff annotations
 
@@ -228,7 +228,7 @@ First convert your unique variants in parquet format (`variants.parquet`) in vcf
 variantplaner -t 8 parquet2vcf -i variants.parquet -o variants.vcf
 ```
 
-`parquet2vcf` subcommand have many more option but we didn't need it now.
+`parquet2vcf` subcommand have many more options but we didn't need it now.
 
 Next annotate this `variants.vcf` [with snpeff](https://pcingola.github.io/SnpEff/), we assume you generate a file call `variants.snpeff.vcf`.
 
@@ -258,7 +258,7 @@ variantplaner annotations -i annotations/clinvar.vcf -o annotations/clinvar.parq
 
 Parquet file produce contains many columns:
 
-- clinvar_id: content of vcf id column if option `-r` is not set column name is `vid`
+- clinvar_id: content of vcf id column if option `-r` is not set, column name is `vid`
 - id: variantplaner id
 - All INFO filed
 
@@ -275,7 +275,7 @@ pqrs head annotations/clinvar.parquet
 ```
 ///
 
-With option of subcommand vcf `-i` you can select which column are include in parquet file
+With option of subcommand vcf `-i` you can select which column are included in parquet file
 For example command:
 ```bash
 variantplaner annotations -i annotations/clinvar.vcf -o annotations/clinvar.parquet vcf -r clinvar_id -i ALLELEID -i CLNDN -i AF_ESP -i GENEINFO

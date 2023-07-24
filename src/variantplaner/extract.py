@@ -55,12 +55,12 @@ def genotypes(
 ) -> polars.LazyFrame:
     """Extract genotypes information of raw [polars.LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html).
 
-    Only line with format value match `format_str` are consider.
+    Only line with format value match `format_str` are considered.
 
     Args:
         lf: The target [polars.LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html)
         col2expr: A dict associate column name and function to apply to create [polars.LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html) column (produce by io.vcf.format2expr)
-        format_str: Only variants match with this string format are considere
+        format_str: Only variants match with this string format are considered
 
     Returns:
         A [polars.LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html) with variant id, sample information and genotypes information

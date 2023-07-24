@@ -36,13 +36,13 @@ logger = logging.getLogger("io.vcf")
 
 
 class IntoLazyFrameExtension(enum.Enum):
-    """Enumration use to control behavior of IntoLazyFrame."""
+    """Enumeration use to control behavior of IntoLazyFrame."""
 
     NOTHING = 0
     """into_lazyframe not have any specific behavior"""
 
     MANAGE_SV = 1
-    """into_lazyframe try to avoid structural variant id colision, SVTYPE/SVLEN info value must be present."""
+    """into_lazyframe try to avoid structural variant id collision, SVTYPE/SVLEN info value must be present."""
 
 
 def extract_header(input_path: pathlib.Path) -> list[str]:
@@ -76,7 +76,7 @@ def extract_header(input_path: pathlib.Path) -> list[str]:
 
 
 def info2expr(header: list[str], input_path: pathlib.Path, select_info: set[str] | None = None) -> list[polars.Expr]:
-    """Read vcf header to generate a list of [polars.Expr](https://pola-rs.github.io/polars/py-polars/html/reference/expressions/index.html) to extract variants informations.
+    """Read vcf header to generate a list of [polars.Expr](https://pola-rs.github.io/polars/py-polars/html/reference/expressions/index.html) to extract variants information.
 
     Args:
         header: Line of vcf header
@@ -167,7 +167,7 @@ def format2expr(
     input_path: pathlib.Path,
     select_format: set[str] | None = None,
 ) -> dict[str, Callable[[polars.Expr, str], polars.Expr]]:
-    """Read vcf header to generate a list of [polars.Expr](https://pola-rs.github.io/polars/py-polars/html/reference/expressions/index.html) to extract genotypes informations.
+    """Read vcf header to generate a list of [polars.Expr](https://pola-rs.github.io/polars/py-polars/html/reference/expressions/index.html) to extract genotypes information.
 
     **Warning**: Float values can't be converted for the moment they are stored as String to keep information
 
@@ -287,7 +287,7 @@ def into_lazyframe(
         extension: Control behavior of into_lazyframe.
 
     Returns:
-        A [polars.LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html) that containt vcf information ('chr', 'pos', 'vid', 'ref', 'alt', 'qual', 'filter', 'info', ['format'], ['genotypes',…], 'id').
+        A [polars.LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html) that contains vcf information ('chr', 'pos', 'vid', 'ref', 'alt', 'qual', 'filter', 'info', ['format'], ['genotypes',…], 'id').
     """
     header = extract_header(input_path)
 
@@ -361,7 +361,7 @@ def build_rename_column(
     format_string: str | None = None,
     sample: dict[str, dict[str, str]] | None = None,
 ) -> RenameCol:
-    """An helper function to generate rename column dict for [variantplaner.io.vcf.from_lazyframe][] function parameter.
+    """A helper function to generate rename column dict for [variantplaner.io.vcf.from_lazyframe][] function parameter.
 
     Returns:
         A rename column dictionary.
@@ -418,9 +418,9 @@ def from_lazyframe(
       - 24: Y
       - 25: MT
 
-    All other chromosome number isn't change.
+    All other chromosome number isn't changed.
 
-    Warning: This function perform [polars.LazyFrame.collect][] before write vcf, this can have a significant impact on memory usage.
+    Warning: This function performs [polars.LazyFrame.collect][] before write vcf, this can have a significant impact on memory usage.
 
     Args:
         lf: LazyFrame contains information.
@@ -491,7 +491,7 @@ def from_lazyframe(
 def add_info_column(lf: polars.LazyFrame, vcfinfo2parquet_name: list[tuple[str, str]]) -> polars.LazyFrame:
     """Construct an INFO column from multiple columns of lf.
 
-    Usefull when you want serialize [polars.LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html) in vcf file format.
+    Useful when you want serialise [polars.LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html) in vcf file format.
 
     Args:
         lf: A [polars.LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html).

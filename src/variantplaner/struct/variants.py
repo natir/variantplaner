@@ -91,11 +91,11 @@ def merge(
 ) -> None:
     """Perform merge of multiple parquet variants file in one file.
 
-    These function generate temporary file, by default file are write in `/tmp` but you can control where these files are write by set TMPDIR, TEMP or TMP directory.
+    These function generate temporary file, by default file are written in `/tmp` but you can control where these files are written by set TMPDIR, TEMP or TMP directory.
 
     Args:
         paths: List of file you want chunked.
-        output: Path where variants is write.
+        output: Path where variants is written.
         memory_limit: Size of each chunk in bytes.
 
     Returns:
