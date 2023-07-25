@@ -226,8 +226,6 @@ def docs_deploy(ctx: Context) -> None:
     """
     os.environ["DEPLOY"] = "true"
     config_file = mkdocs_config()
-    if config_file == "mkdocs.yml":
-        ctx.run(lambda: False, title="Not deploying docs without Material for MkDocs Insiders!")
     ctx.run(mkdocs.gh_deploy(config_file=config_file), title="Deploying documentation")
 
 
@@ -307,4 +305,5 @@ def bench(ctx: Context, match: str = "") -> None:
     ctx.run(
         pytest.run("benchmark", config_file="config/benchmark.ini", select=match),
         title=pyprefix("Running benchmark"),
+        command=f"pytest -c config/benchmark -n auto -k{match!r} --color=yes benchmark",
     )

@@ -124,9 +124,7 @@ plugins:
           show_symbol_type_toc: true
           signature_crossrefs: true
           filters: ["!^_"]
-- git-committers:
-    enabled: !ENV [DEPLOY, false]
-    repository: natir/variantplaner
+
 
 - minify:
     minify_html: !ENV [DEPLOY, false]

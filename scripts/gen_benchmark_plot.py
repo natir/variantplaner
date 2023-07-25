@@ -169,9 +169,6 @@ def render_plot() -> str:
         for name in df.get_column("benchmark").unique().to_list()
     }
 
-    for name, func in name2func.items():
-        print(name, func)
-
     bench2plot = {}
     for name, data in df.groupby("benchmark"):
         bench2plot[name] = create_plot(data, str(name), name2func)

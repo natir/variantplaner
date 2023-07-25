@@ -78,5 +78,5 @@ def __generate_hive(
     return inner
 
 
-for i in range(1, 21, 2):
-    globals()[f"hive_partitioning_group_size_{i}"] = __generate_hive(100, i, 200)
+for i in range(2, 21, 2):
+    globals()[f"hive_partitioning_group_size_{i}"] = __generate_hive(100, i, 40)
