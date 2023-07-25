@@ -226,7 +226,7 @@ def docs_deploy(ctx: Context) -> None:
     """
     os.environ["DEPLOY"] = "true"
     config_file = mkdocs_config()
-    ctx.run(mkdocs.gh_deploy(config_file=config_file), title="Deploying documentation")
+    ctx.run(mkdocs.gh_deploy(config_file=config_file, no_history=True), title="Deploying documentation")
 
 
 @duty
@@ -262,7 +262,6 @@ def release(ctx: Context, version: str) -> None:
     ctx.run("git push", title="Pushing commits", pty=False)
     ctx.run("git push --tags", title="Pushing tags", pty=False)
     ctx.run("pdm build", title="Building dist/wheel", pty=PTY)
-    ctx.run("twine upload --skip-existing dist/*", title="Publishing version", pty=PTY)
 
 
 @duty(silent=True, aliases=["coverage"])
