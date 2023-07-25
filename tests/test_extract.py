@@ -20,18 +20,18 @@ def test_extract_variants() -> None:
     """Check extract variants."""
     truth = polars.scan_parquet(DATA_DIR / "no_info.variants.parquet")
 
-    df = io.vcf.into_lazyframe(DATA_DIR / "no_info.vcf")
+    df = io.vcf.into_lazyframe(DATA_DIR / "no_info.vcf", DATA_DIR / "grch38.92.csv")
 
     lf = extract.variants(df.lazy())
 
-    polars.testing.assert_frame_equal(truth, lf)
+    polars.testing.assert_frame_equal(truth, lf, check_row_order=False, check_column_order=False)
 
 
 def test_extract_genotypes() -> None:
     """Check extract genotypes."""
     truth = polars.scan_parquet(DATA_DIR / "no_info.genotypes.parquet")
 
-    df = io.vcf.into_lazyframe(DATA_DIR / "no_info.vcf")
+    df = io.vcf.into_lazyframe(DATA_DIR / "no_info.vcf", DATA_DIR / "grch38.92.csv")
 
     vcf_header = io.vcf.extract_header(DATA_DIR / "no_info.vcf")
     lf = extract.genotypes(df, io.vcf.format2expr(vcf_header, DATA_DIR / "no_info.vcf"))
@@ -50,7 +50,7 @@ def test_extract_genotypes_no_gt() -> None:
 
     input_path = DATA_DIR / "no_info_no_gt.vcf"
 
-    lf = io.vcf.into_lazyframe(input_path)
+    lf = io.vcf.into_lazyframe(input_path, DATA_DIR / "grch38.92.csv")
 
     vcf_header = io.vcf.extract_header(input_path)
 
@@ -63,7 +63,7 @@ def test_extract_genotypes_no_gt() -> None:
 
 def test_extract_genotypes_without_genotypes() -> None:
     """Check extract genotypes failled if vcf not containts genotypes."""
-    df = io.vcf.into_lazyframe(DATA_DIR / "no_genotypes.vcf")
+    df = io.vcf.into_lazyframe(DATA_DIR / "no_genotypes.vcf", DATA_DIR / "grch38.92.csv")
     vcf_header = io.vcf.extract_header(DATA_DIR / "no_info.vcf")
 
     with pytest.raises(exception.NoGenotypeError):
@@ -72,7 +72,7 @@ def test_extract_genotypes_without_genotypes() -> None:
 
 def test_extract_merge_variant_genotypes() -> None:
     """Check merge_variants_genotypes."""
-    vcf = io.vcf.into_lazyframe(DATA_DIR / "no_info.vcf")
+    vcf = io.vcf.into_lazyframe(DATA_DIR / "no_info.vcf", DATA_DIR / "grch38.92.csv")
     vcf_header = io.vcf.extract_header(DATA_DIR / "no_info.vcf")
     sample_name = io.vcf.sample_index(vcf_header, DATA_DIR / "no_info.vcf")
     if sample_name is None:
@@ -107,7 +107,7 @@ def test_extract_merge_variant_genotypes() -> None:
 
     assert merge.dtypes == [
         polars.UInt64,
-        polars.UInt8,
+        polars.Utf8,
         polars.UInt64,
         polars.Utf8,
         polars.Utf8,

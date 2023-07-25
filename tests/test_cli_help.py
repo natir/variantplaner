@@ -51,10 +51,12 @@ def test_show_help_annotations() -> None:
   Convert an annotation variation file in a compatible parquet.
 
 Options:
-  -i, --input-path FILE   Path to input file  [required]
-  -o, --output-path PATH  Path where variants annotations will be written in
-                          parquet  [required]
-  --help                  Show this message and exit.
+  -i, --input-path FILE         Path to input file  [required]
+  -o, --output-path PATH        Path where variants annotations will be written
+                                in parquet  [required]
+  -c, --chrom2length-path FILE  CSV file that associates a chromosome name with
+                                its size  [required]
+  --help                        Show this message and exit.
 
 Commands:
   csv  Convert annotations store in csv file to compatible parquet file.
@@ -124,15 +126,18 @@ def test_show_help_vcf2parquet() -> None:
   Convert a vcf in multiple parquet file.
 
 Options:
-  -i, --input-path FILE     Path to vcf input file  [required]
-  -v, --variants FILE       Path where the variants will be written in parquet
-                            [required]
-  -g, --genotypes FILE      Path where the genotypes will be written in parquet
-  -a, --annotations FILE    Path where the annotations will be written in
-                            parquet (if no info file is empty)
-  -f, --format-string TEXT  Value of FORMAT column, line not match with this are
-                            ignored  [default: GT:AD:DP:GQ]
-  --help                    Show this message and exit.
+  -i, --input-path FILE         Path to vcf input file  [required]
+  -c, --chrom2length-path FILE  CSV file that associates a chromosome name with
+                                its size  [required]
+  -v, --variants FILE           Path where the variants will be written in
+                                parquet  [required]
+  -g, --genotypes FILE          Path where the genotypes will be written in
+                                parquet
+  -a, --annotations FILE        Path where the annotations will be written in
+                                parquet (if no info file is empty)
+  -f, --format-string TEXT      Value of FORMAT column, line not match with this
+                                are ignored  [default: GT:AD:DP:GQ]
+  --help                        Show this message and exit.
 """
     )
 

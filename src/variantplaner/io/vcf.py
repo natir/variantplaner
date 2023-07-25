@@ -28,8 +28,9 @@ if typing.TYPE_CHECKING:  # pragma: no cover
 import polars
 
 # project import
-from variantplaner import normalization
+from variantplaner import io, normalization
 from variantplaner.exception import NotAVCFError
+from variantplaner_rs import VariantId  # noqa: F401 extend polars with new expression
 
 MINIMAL_COL_NUMBER: int = 8
 SAMPLE_COL_BEGIN: int = 9
@@ -137,7 +138,7 @@ def info2expr(header: list[str], input_path: pathlib.Path, select_info: set[str]
 
 def __format_gt(expr: polars.Expr, /, name: str) -> polars.Expr:
     """Manage gt field."""
-    return expr.str.count_match("1").cast(polars.UInt8).alias(name.lower())
+    return expr.str.count_matches("1").cast(polars.UInt8).alias(name.lower())
 
 
 def __format_one_int(expr: polars.Expr, /, name: str) -> polars.Expr:
@@ -209,7 +210,7 @@ def format2expr(
             if number == "1":
                 if format_type == "Integer":
                     expressions[name] = __format_one_int
-                elif format_type == "Float":  # noqa: SIM114 Float isn't already support but in future
+                elif format_type == "Float":  # Float isn't already support but in future
                     expressions[name] = __format_one_str
                 elif format_type in {"String", "Character"}:
                     expressions[name] = __format_one_str
@@ -219,7 +220,7 @@ def format2expr(
             else:
                 if format_type == "Integer":
                     expressions[name] = __format_list_int
-                elif format_type == "Float":  # noqa: SIM114 Float isn't already support but in future
+                elif format_type == "Float":  # Float isn't already support but in future
                     expressions[name] = __format_list_str
                 elif format_type in {"String", "Character"}:
                     expressions[name] = __format_list_str
@@ -280,12 +281,14 @@ def __column_name(header: list[str], input_path: pathlib.Path) -> list[str]:
 
 def into_lazyframe(
     input_path: pathlib.Path,
+    chr2len_path: pathlib.Path,
     extension: IntoLazyFrameExtension = IntoLazyFrameExtension.NOTHING,
 ) -> polars.LazyFrame:
     """Read a vcf file and convert it in [polars.LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html).
 
     Args:
         input_path: Path to vcf file.
+        chr2len_path: Path to chr2length csv.
         extension: Control behavior of into_lazyframe.
 
     Returns:
@@ -300,18 +303,18 @@ def into_lazyframe(
         separator="\t",
         comment_char="#",
         has_header=False,
-        dtypes={"column_1": polars.Utf8},
+        dtypes={"column_1": polars.Utf8, "column_2": polars.UInt64},
         ignore_errors=True,
     )
+
+    chr2len = io.csv.chr2length_into_lazyframe(chr2len_path)
 
     lf = lf.rename(col_name)
 
     if extension == IntoLazyFrameExtension.MANAGE_SV:
         lf = lf.with_columns(info2expr(header, input_path, {"SVTYPE", "SVLEN"}))
 
-    lf = normalization.chromosome2integer(lf)
-
-    lf = normalization.add_variant_id(lf)
+    lf = normalization.add_variant_id(lf, chr2len)
 
     if extension == IntoLazyFrameExtension.MANAGE_SV:
         drop_column = {"SVTYPE", "SVLEN"}

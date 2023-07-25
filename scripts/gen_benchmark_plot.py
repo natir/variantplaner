@@ -93,6 +93,30 @@ def merge_variant_on_disk_func(data: pandas.DataFrame, _name: str) -> tuple[pand
     return data, "Running time compare to number of file"
 
 
+def add_id_hash_func(data: pandas.DataFrame, _name: str) -> tuple[pandas.DataFrame, str]:
+    """Update variant id by hash."""
+    data["method"] = data["method"].apply(lambda x: int(x.split("_")[3]))
+    data = data.sort_values(by=["method"])
+
+    return data, "Running time compare to number of variant"
+
+
+def add_id_rust_func(data: pandas.DataFrame, _name: str) -> tuple[pandas.DataFrame, str]:
+    """Update variant id by rust."""
+    data["method"] = data["method"].apply(lambda x: int(x.split("_")[3]))
+    data = data.sort_values(by=["method"])
+
+    return data, "Running time compare to number of variant"
+
+
+def add_id_default_func(data: pandas.DataFrame, _name: str) -> tuple[pandas.DataFrame, str]:
+    """Update variant id use by default."""
+    data["method"] = data["method"].apply(lambda x: int(x.split("_")[3]))
+    data = data.sort_values(by=["method"])
+
+    return data, "Running time compare to number of variant"
+
+
 def hive_partitioning_func(data: pandas.DataFrame, _name: str) -> tuple[pandas.DataFrame, str]:
     """Hive partitioning."""
     data["method"] = data["method"].apply(lambda x: int(x.split("_")[4]))

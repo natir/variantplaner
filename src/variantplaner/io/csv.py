@@ -51,6 +51,7 @@ from variantplaner import normalization
 
 def into_lazyframe(
     input_path: pathlib.Path,
+    chr2len_path: pathlib.Path,
     chromosome_col: str,
     position_col: str,
     reference_col: str,
@@ -63,6 +64,7 @@ def into_lazyframe(
 
     Args:
         input_path: Path to csv.
+        chr2len_path: Path to chr2length csv.
         chromosome_col: Name of the column that holds the chromosomes.
         position_col: Name of the column that holds the positions.
         reference_col: Name of the column that holds the reference sequence.
@@ -77,6 +79,7 @@ def into_lazyframe(
         input_path,
         **scan_csv_args,
     )
+    chr2len = chr2length_into_lazyframe(chr2len_path)
 
     lf = lf.rename(
         {
@@ -90,6 +93,19 @@ def into_lazyframe(
     if info_cols:
         lf = lf.select(["chr", "pos", "ref", "alt", *info_cols])
 
-    lf = normalization.chromosome2integer(lf)
+    return normalization.add_variant_id(lf, chr2len)
 
-    return normalization.add_variant_id(lf)
+
+def chr2length_into_lazyframe(input_path: pathlib.Path) -> polars.LazyFrame:
+    """Read a csv file with two column chr and length and perform some percomputation.
+
+    Args:
+        input_path: Path to csv.
+
+    Returns:
+        A lazyframe with chromosome name associate to length, offset information
+    """
+    lf = polars.scan_csv(input_path, schema={"chr": polars.Utf8, "length": polars.UInt64})
+    return lf.with_columns(
+        offset=polars.col("length").cumsum() - polars.col("length"),
+    )
