@@ -20,6 +20,15 @@ a.autorefs-external::after {
   background-color: var(--md-typeset-a-color);
 }
 
+.md-typeset__table {
+  min-width: 100%;
+}
+
+.md-typeset table:not([class]) {
+  display: table;
+}
+
+
 a.external:hover::after,
 a.autorefs-external:hover::after {
   background-color: var(--md-accent-fg-color);
