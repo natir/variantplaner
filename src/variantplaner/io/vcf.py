@@ -1,5 +1,7 @@
 """Read and write vcf file."""
 
+# ruff: noqa: PLR5501
+
 # std import
 from __future__ import annotations
 
@@ -207,17 +209,17 @@ def format2expr(
             if number == "1":
                 if format_type == "Integer":
                     expressions[name] = __format_one_int
-                elif format_type == "Float":  # Float isn't already support but in future
+                elif format_type == "Float":  # noqa: SIM114 Float isn't already support but in future
                     expressions[name] = __format_one_str
                 elif format_type in {"String", "Character"}:
                     expressions[name] = __format_one_str
                 else:
                     pass  # Not reachable
 
-            else:  # noqa: PLR5501 All other number are consider as list
+            else:
                 if format_type == "Integer":
                     expressions[name] = __format_list_int
-                elif format_type == "Float":  # Float isn't already support but in future
+                elif format_type == "Float":  # noqa: SIM114 Float isn't already support but in future
                     expressions[name] = __format_list_str
                 elif format_type in {"String", "Character"}:
                     expressions[name] = __format_list_str
