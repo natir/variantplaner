@@ -96,6 +96,7 @@ variantplaner annotations -i $INPUT_FILE -o $OUTPUT_PARQUET $INPUT_TYPE [OPTIONS
 ```
 
 Where:
+
 - `-i|--input-path` is the input file (required)
 - `-o|--output-path` is the output parquet file (required)
 - `$INPUT_TYPE` is whether VCF or CSV (see below for the different value types)
@@ -114,6 +115,7 @@ variantplaner annotations -i annotations.vcf -o clinvar.parquet vcf -r annot_id 
 If not set, all the info columns will end up in the output file.
 
 Options:
+
 - `-r|--rename-id`: Can be used to rename vcf id column name (default is `vid`).
 - `-i|--info`: Lets you select the info fields you wish to output. If not set, this will export them all.
 - `vcf`: If the input file type is VCF
@@ -131,13 +133,13 @@ Unlike the VCF format, `variantplaner` has no way to tell which columns in the C
 This is why you need to specify the column names in the options (requires a header).
 
 Options:
+
 - `-c|--chromosome`: Name of chromosome column
 - `-p|--position`: Name of position column
 - `-r|--reference`: Name of reference column
 - `-a|--alternative`: Name of alternative column
 - `-i|--info`: Lets you select the info fields you'd like to output. If not set, this will export them all.
 - `-s|--separator`: A single byte character to use as a delimiter in the input file (defaults to `,`)
-
 
 ### Metadata
 
@@ -181,7 +183,8 @@ You can also use pedigree file:
 variantplaner generate transmission -i genotypes.parquet -p family.ped -t transmission.parquet
 ```
 
-**Warning**: this command could have important RAM usage (propotionaly to number of sample index variants)
+???+ danger
+	This command could have important RAM usage (propotionaly to number of sample index variants)
 
 ## Contribution
 
