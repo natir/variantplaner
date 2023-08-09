@@ -316,6 +316,29 @@ def test_struct_genotypes(tmp_path: pathlib.Path) -> None:
     assert result.exit_code == 0
 
 
+def test_struct_genotypes_threads(tmp_path: pathlib.Path) -> None:
+    """Basic struct genotypes run."""
+    prefix_path = tmp_path / "hive"
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli.main,
+        [
+            "-vvvv",
+            "-t",
+            "4",
+            "struct",
+            "-i",
+            str(DATA_DIR / "no_info.genotypes.parquet"),
+            "genotypes",
+            "-p",
+            str(prefix_path),
+        ],
+    )
+
+    assert result.exit_code == 0
+
+
 def test_annotations_vcf(tmp_path: pathlib.Path) -> None:
     """Basic annotations vcf run."""
     annotations_path = tmp_path / "annotations.parquet"
