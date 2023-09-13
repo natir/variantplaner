@@ -46,6 +46,7 @@ def main(threads: int = 1, verbose: int = 0) -> None:
 
     logger.debug(f"parameter: {threads=} {verbose=}")
 
+    polars.set_random_seed(42)
     os.environ["POLARS_MAX_THREADS"] = str(threads)
 
 

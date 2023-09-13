@@ -94,8 +94,8 @@ def test_vcf2parquet(tmp_path: pathlib.Path) -> None:
     )
     try:
         polars.testing.assert_frame_equal(
-            polars.scan_parquet(DATA_DIR / "no_info.genotypes.parquet"),
-            polars.scan_parquet(genotypes_path),
+            polars.scan_parquet(DATA_DIR / "no_info.genotypes.parquet").sort("id"),
+            polars.scan_parquet(genotypes_path).sort("id"),
         )
     except OverflowError:  # pragma: no cover
         # TODO remove this

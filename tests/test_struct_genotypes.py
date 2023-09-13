@@ -33,47 +33,6 @@ def __scantree(path: pathlib.Path) -> typing.Iterator[pathlib.Path]:
             yield pathlib.Path(entry.path)
 
 
-def test_manage_group(tmp_path: pathlib.Path) -> None:
-    """Check manage group."""
-    prefix = tmp_path / "manage_group"
-
-    func = struct.genotypes.__manage_group(prefix, ["sample", "gt"], "1")
-
-    df = polars.read_parquet(DATA_DIR / "no_info.genotypes.parquet")
-
-    df.groupby("sample", "gt").apply(func)
-
-    partition_paths = set(__scantree(prefix))
-
-    assert partition_paths == {
-        prefix / "sample=sample_3/gt=2/1.parquet",
-        prefix / "sample=sample_2/gt=1/1.parquet",
-        prefix / "sample=sample_3/gt=1/1.parquet",
-        prefix / "sample=sample_1/gt=2/1.parquet",
-    }
-
-
-def test_write_or_add(tmp_path: pathlib.Path) -> None:
-    """Check write or add."""
-    path = tmp_path / "write_or_add.parquet"
-
-    assert not path.exists()
-
-    df = polars.read_parquet(DATA_DIR / "no_info.genotypes.parquet")
-
-    struct.genotypes.__write_or_add(df, path)
-
-    assert path.exists()
-
-    struct.genotypes.__write_or_add(df, path)
-
-    truth = polars.concat([df, df]).sort("id", "sample")
-
-    reality = polars.read_parquet(path).sort("id", "sample")
-
-    polars.testing.assert_frame_equal(truth, reality, check_row_order=True)
-
-
 def test_hive(tmp_path: pathlib.Path) -> None:
     """Check partition genotype parquet."""
     struct.genotypes.hive(

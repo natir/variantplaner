@@ -71,7 +71,7 @@ def transmission(
 
     logger.debug(f"{samples=}")
 
-    group_lf = genotypes_lf.groupby("id").all().collect()
+    group_lf = genotypes_lf.group_by("id").all().collect()
 
     group_lf = group_lf.filter(polars.col("sample").list.contains(index_name))
 
