@@ -14,6 +14,11 @@ watch:
 copyright: Copyright &copy; 2023 Pierre Marijon
 edit_uri: edit/main/docs/
 
+validation:
+  omitted_files: warn
+  absolute_links: warn
+  unrecognized_links: warn
+
 nav:
   - Home:
       - Overview: index.md
@@ -111,11 +116,13 @@ plugins:
             - https://docs.python.org/3/objects.inv
             - https://pola-rs.github.io/polars/py-polars/html/objects.inv
             - https://click.palletsprojects.com/en/8.1.x/objects.inv
+          paths: [src]
           options:
             docstring_options:
               ignore_init_summary: true
             docstring_section_style: list
             heading_level: 1
+            inherited_members: true
             merge_init_into_class: true
             separate_signature: true
             show_root_heading: true
@@ -125,7 +132,7 @@ plugins:
             show_symbol_type_toc: true
             signature_crossrefs: true
             filters: ["!^_"]
-
+            summary: true
   - minify:
       minify_html: !ENV [DEPLOY, false]
 

@@ -170,7 +170,7 @@ def render_plot() -> str:
     }
 
     bench2plot = {}
-    for name, data in df.groupby("benchmark"):
+    for name, data in df.group_by("benchmark"):
         bench2plot[name] = create_plot(data, str(name), name2func)
 
     template_data = {"bench2plot": bench2plot}

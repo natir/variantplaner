@@ -107,7 +107,7 @@ Parquet variants file contains 5 column:
 - pos: Position of variant
 - ref: Reference sequence
 - alt: Alternative sequence
-- id: An hash of other value collision isn't check but highly improbable [check api documentation](/variantplaner/reference/variantplaner/normalization/#variantplaner.normalization.add_variant_id)
+- id: An hash of other value collision isn't check but highly improbable [check api documentation](reference/variantplaner/normalization.md#variantplaner.normalization.add_variant_i)
 
 
 /// details | variants parquet file content
