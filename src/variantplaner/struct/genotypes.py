@@ -8,6 +8,8 @@ import logging
 import multiprocessing
 import typing
 
+import multiprocessing_logging
+
 if typing.TYPE_CHECKING:  # pragma: no cover
     import pathlib
 
@@ -18,9 +20,12 @@ import polars
 
 logger = logging.getLogger("struct.genotypes")
 
+"""Value use to split variant by id modulo of this value."""
+PARTITION_MOD = 256
+
 
 def __hive_worker(lfs: tuple[polars.LazyFrame], basename: str, output_prefix: pathlib.Path) -> None:
-    """Concatenate multiple parquet file and group it by id % 256.
+    """Concatenate multiple parquet file and group it by id % PARTITION_MOD.
 
     Args:
         lfs: List of [polars.LazyFrame] you want reorganise
@@ -30,16 +35,16 @@ def __hive_worker(lfs: tuple[polars.LazyFrame], basename: str, output_prefix: pa
     Returns:
         None
     """
+    logging.info(f"Call hive worker {lfs=}, {basename=}, {output_prefix=}")
+
     lf = polars.concat(lf for lf in lfs if lf is not None).with_columns(
         [
-            polars.col("id").mod(256).alias("id_mod"),
+            polars.col("id").mod(PARTITION_MOD).alias("id_mod"),
         ],
     )
 
-    for id_mod in range(256):
-        path = output_prefix / f"{id_mod}" / f"{basename}.parquet"
-        path.parent.mkdir(parents=True, exist_ok=True)
-        lf.filter(polars.col("id_mod") == id_mod).sink_parquet(path)
+    for name, df in lf.collect().group_by(polars.col("id_mod")):
+        df.write_parquet(output_prefix / f"id_mod={name}" / f"{basename}.parquet")
 
 
 def __merge_file(prefix: pathlib.Path, basenames: list[str]) -> None:
@@ -52,21 +57,26 @@ def __merge_file(prefix: pathlib.Path, basenames: list[str]) -> None:
     Returns:
         None
     """
-    lfs = [
-        polars.scan_parquet(prefix / f"{basename}.parquet")
-        for basename in basenames
-        if (prefix / f"{basename}.parquet").is_file()
-    ]
+    logging.info(f"Call merge file {prefix=}, {basenames=}")
 
+    paths = [prefix / f"{basename}.parquet" for basename in basenames]
+
+    logging.info(f"{paths=}")
+
+    lfs = [polars.scan_parquet(path) for path in paths if path.is_file()]
+
+    logging.info(f"{lfs=}")
     if lfs:
+        logging.info(f"Merge multiple file in {prefix / '0.parquet'}")
         polars.concat(lfs).sink_parquet(prefix / "0.parquet")
 
-    for basename in basenames:
-        (prefix / f"{basename}.parquet").unlink(missing_ok=True)
+    for path in paths:
+        logging.info(f"Remove file {path}.parquet")
+        path.unlink(missing_ok=True)
 
 
 def hive(paths: list[pathlib.Path], output_prefix: pathlib.Path, threads: int, file_per_thread: int) -> None:
-    r"""Read all genotypes parquet file and use information to generate a hive like struct, based on $id\ \%\ 256$  with genotype information.
+    r"""Read all genotypes parquet file and use information to generate a hive like struct, based on $id\ \%\ PARTITION_MOD$  with genotype information.
 
     Real number of threads use are equal to $min(threads, len(paths))$.
 
@@ -81,16 +91,29 @@ def hive(paths: list[pathlib.Path], output_prefix: pathlib.Path, threads: int, f
     Returns:
         None
     """
+    logger.info(f"{paths=} {output_prefix=}, {threads=}, {file_per_thread=}")
+
     if len(paths) == 0:
         return
 
-    path_groups: typing.Iterable[typing.Iterable[pathlib.Path]] = (
-        [[path] for path in paths] if file_per_thread <= 1 else itertools.zip_longest(*[iter(paths)] * file_per_thread)
+    for i in range(PARTITION_MOD):
+        (output_prefix / f"id_mod={i}").mkdir(parents=True, exist_ok=True)
+
+    path_groups: typing.Iterable[typing.Iterable[pathlib.Path]] = list(
+        [[path] for path in paths]
+        if file_per_thread < 2  # noqa: PLR2004 if number of file is lower than 2 file grouping isn't required
+        else itertools.zip_longest(
+            *[iter(paths)] * file_per_thread,
+        ),
     )
 
     basenames = ["_".join(p.stem for p in g_paths if p is not None) for g_paths in path_groups]
 
-    lf_groups = [[polars.scan_parquet(p) for p in g_paths] for g_paths in path_groups]
+    lf_groups = [[polars.scan_parquet(p) for p in g_paths if p is not None] for g_paths in path_groups]
+
+    logger.info(f"{path_groups=}, {basenames=}")
+
+    multiprocessing_logging.install_mp_handler()
 
     with multiprocessing.get_context("spawn").Pool(threads) as pool:
         pool.starmap(
@@ -99,5 +122,5 @@ def hive(paths: list[pathlib.Path], output_prefix: pathlib.Path, threads: int, f
         )
         pool.starmap(
             __merge_file,
-            [(output_prefix / str(id_mod), basenames) for id_mod in range(256)],
+            [(output_prefix / f"id_mod={id_mod}", basenames) for id_mod in range(PARTITION_MOD)],
         )
