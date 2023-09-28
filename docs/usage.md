@@ -195,26 +195,28 @@ variantplaner generate transmission -i genotypes/samples/AshkenazimTrio.parquet 
 
 /// details | transmission parquet file content
 ```
-{id: 8808396193990831731, index_gt: 1, index_ps: null, index_dp: 1143, index_adall: [155, 162], index_ad: [301, 333], index_gq: 492, mother_gt: 2, mother_ps: null, mother_dp: 1014, mother_adall: [0, 366], mother_ad: [86, 529], mother_gq: 484, father_gt: 0, father_ps: null, father_dp: null, father_adall: null, father_ad: null, father_gq: null, origin: 120}
-{id: 16292939689019815231, index_gt: 1, index_ps: null, index_dp: 1011, index_adall: [168, 121], index_ad: [268, 233], index_gq: 561, mother_gt: 1, mother_ps: null, mother_dp: 1028, mother_adall: [151, 154], mother_ad: [269, 253], mother_gq: 606, father_gt: 1, father_ps: null, father_dp: 986, father_adall: [166, 155], father_ad: [257, 244], father_gq: 474, origin: 111}
-{id: 5620091056827412267, index_gt: 1, index_ps: null, index_dp: 1095, index_adall: [145, 150], index_ad: [314, 283], index_gq: 622, mother_gt: 1, mother_ps: null, mother_dp: 1047, mother_adall: [171, 175], mother_ad: [247, 232], mother_gq: 546, father_gt: 0, father_ps: null, father_dp: null, father_adall: null, father_ad: null, father_gq: null, origin: 110}
-{id: 12724509537759826392, index_gt: 1, index_ps: null, index_dp: 1052, index_adall: [158, 150], index_ad: [235, 217], index_gq: 714, mother_gt: 1, mother_ps: null, mother_dp: 993, mother_adall: [154, 161], mother_ad: [253, 285], mother_gq: 543, father_gt: 0, father_ps: null, father_dp: null, father_adall: null, father_ad: null, father_gq: null, origin: 110}
-{id: 10535646079926954450, index_gt: 2, index_ps: null, index_dp: 1081, index_adall: [1, 382], index_ad: [0, 531], index_gq: 517, mother_gt: 2, mother_ps: null, mother_dp: 962, mother_adall: [0, 330], mother_ad: [0, 487], mother_gq: 500, father_gt: 1, father_ps: null, father_dp: 1095, father_adall: [191, 206], father_ad: [248, 291], father_gq: 460, origin: 221}
+{id: 10201716324449815219, index_gt: 2, index_ps: null, index_dp: 1066, index_adall: [0, 284], index_ad: [118, 586], index_gq: 598, mother_gt: null, mother_ps: null, mother_dp: null, mother_adall: null, mother_ad: null, mother_gq: null, father_gt: null, father_ps: null, father_dp: null, father_adall: null, father_ad: null, father_gq: null, origin: "#~~"}
+{id: 8292180701257594706, index_gt: 1, index_ps: null, index_dp: 1122, index_adall: [177, 165], index_ad: [310, 283], index_gq: 556, mother_gt: null, mother_ps: null, mother_dp: null, mother_adall: null, mother_ad: null, mother_gq: null, father_gt: null, father_ps: null, father_dp: null, father_adall: null, father_ad: null, father_gq: null, origin: ""~~"}
+{id: 1728452411043401356, index_gt: 1, index_ps: null, index_dp: 1365, index_adall: [225, 222], index_ad: [348, 380], index_gq: 658, mother_gt: null, mother_ps: null, mother_dp: null, mother_adall: null, mother_ad: null, mother_gq: null, father_gt: null, father_ps: null, father_dp: null, father_adall: null, father_ad: null, father_gq: null, origin: ""~~"}
+{id: 4237549706021671868, index_gt: 1, index_ps: null, index_dp: 1019, index_adall: [154, 153], index_ad: [277, 282], index_gq: 517, mother_gt: null, mother_ps: null, mother_dp: null, mother_adall: null, mother_ad: null, mother_gq: null, father_gt: null, father_ps: null, father_dp: null, father_adall: null, father_ad: null, father_gq: null, origin: ""~~"}
+{id: 1361753917441299167, index_gt: 1, index_ps: null, index_dp: 1033, index_adall: [159, 170], index_ad: [265, 273], index_gq: 552, mother_gt: null, mother_ps: null, mother_dp: null, mother_adall: null, mother_ad: null, mother_gq: null, father_gt: null, father_ps: null, father_dp: null, father_adall: null, father_ad: null, father_gq: null, origin: ""~~"}
 ```
 ///
 
 Parquet transmissions file contains column all genotypes information with suffix `_index`, `_mother` and `_father` plus a `origin` column
 
-Origin column contains a number with 3 digits:
+Origin column contains a string with 3 character:
 
 ```
-231
-││└ father genotype
-│└─ mother genotype
-└── index genotype
+#~"
+││└ ASCII_value_of(father genotype + 33)
+│└─ ASCII_value_of(mother genotype + 33)
+└── ASCII_value_of(index genotype  + 33)
 ```
 
 In this example case, variants is homozygotes in index, mother information is missing, variants is heterozygotes in father.
+
+Maximal genotype value is 92, which corresponds to the character `}`, `~` match with value 93, this value also mean unknow genotype.
 
 
 ## Add annotations

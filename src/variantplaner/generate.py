@@ -56,11 +56,7 @@ def transmission(
         father_name: Sample name of father.
 
     Returns:
-         [polars.DataFrame](https://pola-rs.github.io/polars/py-polars/html/reference/dataframe/index.html) with transmission information.
-         With genotyping information for index, mother and father.
-         If any of them isn't present value are set to polars.Null (3 for gt)
-         Columns transmission contains: index_gt * 100 + mother_gt * 10 + father_gt.
-         Transmission: 230 mean homozygote variant not present in father but with no information about mother
+         [polars.DataFrame](https://pola-rs.github.io/polars/py-polars/html/reference/dataframe/index.html) with transmission information. With genotyping information for index, mother and father. If any of them isn't present value are set to polars.Null. Columns transmission contains a string: concat(chr(index_gt + 33), chr(mother_gt + 33), chr(father_gt + 33)), transmission: `#~!` mean homozygote diploide variant not present in father but with no information about mother.
 
     Raises:
         NoGTError: if genotypes_lf not containts gt column.
