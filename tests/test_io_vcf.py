@@ -21,6 +21,7 @@ if typing.TYPE_CHECKING:  # pragma: no cover
 import pathlib
 
 import polars
+import polars.testing
 import pytest
 
 # project import
@@ -183,13 +184,13 @@ def test_into_lazyframe() -> None:
     """Check into lazyframe."""
     truth = polars.scan_parquet(DATA_DIR / "no_info.parquet")
 
-    lf = io.vcf.into_lazyframe(DATA_DIR / "no_info.vcf")
+    lf = io.vcf.into_lazyframe(DATA_DIR / "no_info.vcf", DATA_DIR / "grch38.92.csv")
 
     polars.testing.assert_frame_equal(truth, lf)
 
     truth = polars.scan_parquet(DATA_DIR / "no_genotypes.parquet")
 
-    lf = io.vcf.into_lazyframe(DATA_DIR / "no_genotypes.vcf")
+    lf = io.vcf.into_lazyframe(DATA_DIR / "no_genotypes.vcf", DATA_DIR / "grch38.92.csv")
 
     polars.testing.assert_frame_equal(truth, lf)
 
@@ -198,7 +199,11 @@ def test_into_lazyframe_sv() -> None:
     """Check into lazyframe work on structural variant."""
     input_path = DATA_DIR / "sv.vcf"
 
-    lf = io.vcf.into_lazyframe(input_path, extension=io.vcf.IntoLazyFrameExtension.MANAGE_SV)
+    lf = io.vcf.into_lazyframe(
+        input_path,
+        DATA_DIR / "grch38.92.csv",
+        extension=io.vcf.IntoLazyFrameExtension.MANAGE_SV,
+    )
 
     lf.sink_parquet(DATA_DIR / "sv.parquet")
     polars.testing.assert_frame_equal(lf, polars.scan_parquet(DATA_DIR / "sv.parquet"))
@@ -207,10 +212,10 @@ def test_into_lazyframe_sv() -> None:
 def test_into_lazyframe_exception() -> None:
     """Check into_lazyframe exception."""
     with pytest.raises(exception.NotAVCFError):
-        io.vcf.into_lazyframe(DATA_DIR / "no_info.tsv")
+        io.vcf.into_lazyframe(DATA_DIR / "no_info.tsv", DATA_DIR / "grch38.92.csv")
 
     with pytest.raises(exception.NotAVCFError):
-        io.vcf.into_lazyframe(DATA_DIR / "only_header.vcf")
+        io.vcf.into_lazyframe(DATA_DIR / "only_header.vcf", DATA_DIR / "grch38.92.csv")
 
 
 def test_build_rename_column() -> None:
@@ -305,7 +310,7 @@ def test_from_lazyframe_qual_filter_info(tmp_path: pathlib.Path) -> None:
 
     vcf_header = io.vcf.extract_header(input_path)
     info_parser = io.vcf.info2expr(vcf_header, input_path)
-    lf = io.vcf.into_lazyframe(DATA_DIR / "no_genotypes.vcf").with_columns(info_parser)
+    lf = io.vcf.into_lazyframe(DATA_DIR / "no_genotypes.vcf", DATA_DIR / "grch38.92.csv").with_columns(info_parser)
 
     io.vcf.from_lazyframe(
         lf,
@@ -331,7 +336,7 @@ def test_from_lazyframe_qual_filter_format(tmp_path: pathlib.Path) -> None:
     input_path = DATA_DIR / "no_info.vcf"
 
     format_string = "GT:AD:DP:GQ"
-    vcf = io.vcf.into_lazyframe(input_path)
+    vcf = io.vcf.into_lazyframe(input_path, DATA_DIR / "grch38.92.csv")
     vcf_header = io.vcf.extract_header(input_path)
     sample_name = io.vcf.sample_index(vcf_header, input_path)
     if sample_name is None:
@@ -373,7 +378,7 @@ def test_add_info_column() -> None:
     """Check add_info_column."""
     vcf_header = io.vcf.extract_header(DATA_DIR / "no_genotypes.vcf")
     info_parser = io.vcf.info2expr(vcf_header, DATA_DIR / "no_genotypes.vcf")
-    lf = io.vcf.into_lazyframe(DATA_DIR / "no_genotypes.vcf").with_columns(info_parser)
+    lf = io.vcf.into_lazyframe(DATA_DIR / "no_genotypes.vcf", DATA_DIR / "grch38.92.csv").with_columns(info_parser)
 
     info = io.vcf.add_info_column(lf, [(col_name, col_name) for col_name in lf.columns if col_name.isupper()])
 
@@ -410,7 +415,7 @@ def test_generate_header() -> None:
     """Check generate header."""
     vcf_header = io.vcf.extract_header(DATA_DIR / "no_genotypes.vcf")
     info_parser = io.vcf.info2expr(vcf_header, DATA_DIR / "no_genotypes.vcf")
-    lf = io.vcf.into_lazyframe(DATA_DIR / "no_genotypes.vcf").with_columns(info_parser)
+    lf = io.vcf.into_lazyframe(DATA_DIR / "no_genotypes.vcf", DATA_DIR / "grch38.92.csv").with_columns(info_parser)
 
     assert (
         io.vcf.__generate_header(lf)

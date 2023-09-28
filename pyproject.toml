@@ -20,7 +20,6 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
     "Topic :: Documentation",
     "Topic :: Software Development",
     "Topic :: Utilities",
@@ -31,6 +30,7 @@ dependencies = [
     "click>=8.1.3",
     "typing-extensions>=4.5.0",
     "multiprocessing-logging>=0.3.4",
+    "variantplaner-rs @ file:///${PROJECT_ROOT}/variantplaner_rs",
 ]
 
 [project.urls]

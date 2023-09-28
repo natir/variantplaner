@@ -3,10 +3,8 @@
 # std import
 from __future__ import annotations
 
+import pathlib
 import typing
-
-if typing.TYPE_CHECKING:
-    import pathlib
 
 # 3rd party import
 import pytest
@@ -18,6 +16,8 @@ if typing.TYPE_CHECKING:  # pragma: no cover
 from variantplaner import io
 
 from benchmark import __generate_vcf
+
+DATA_DIR = pathlib.Path(__file__).parent.parent / "tests" / "data"
 
 
 def __generate_parse_vcf(
@@ -34,7 +34,11 @@ def __generate_parse_vcf(
         __generate_vcf(input_path, number_of_line)
 
         benchmark(
-            lambda: io.vcf.into_lazyframe(input_path, extension=io.vcf.IntoLazyFrameExtension.MANAGE_SV).collect(),
+            lambda: io.vcf.into_lazyframe(
+                input_path,
+                DATA_DIR / "grch38.92.csv",
+                extension=io.vcf.IntoLazyFrameExtension.MANAGE_SV,
+            ).collect(),
         )
 
     inner.__doc__ = f"""Parsing a vcf of {number_of_line} variant"""
