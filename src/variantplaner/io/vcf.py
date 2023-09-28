@@ -210,7 +210,7 @@ def format2expr(
             if number == "1":
                 if format_type == "Integer":
                     expressions[name] = __format_one_int
-                elif format_type == "Float":  # Float isn't already support but in future
+                elif format_type == "Float":  # noqa: SIM114 Float isn't already support but in future
                     expressions[name] = __format_one_str
                 elif format_type in {"String", "Character"}:
                     expressions[name] = __format_one_str
@@ -220,7 +220,7 @@ def format2expr(
             else:
                 if format_type == "Integer":
                     expressions[name] = __format_list_int
-                elif format_type == "Float":  # Float isn't already support but in future
+                elif format_type == "Float":  # noqa: SIM114 Float isn't already support but in future
                     expressions[name] = __format_list_str
                 elif format_type in {"String", "Character"}:
                     expressions[name] = __format_list_str

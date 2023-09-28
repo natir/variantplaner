@@ -3,10 +3,8 @@
 # std import
 from __future__ import annotations
 
+import pathlib
 import typing
-
-if typing.TYPE_CHECKING:
-    import pathlib
 
 # 3rd party import
 import polars
@@ -16,10 +14,14 @@ if typing.TYPE_CHECKING:  # pragma: no cover
     import pytest_benchmark
 
 # project import
+from variantplaner.io import csv as io_csv
 from variantplaner.io import vcf as io_vcf
-from variantplaner.normalization import add_variant_id as default_add_id
+from variantplaner.normalization import add_variant_id as __default_add_id
 
 from benchmark import __generate_vcf
+
+DATA_DIR = pathlib.Path(__file__).parent.parent / "tests" / "data"
+chrom2length = io_csv.chr2length_into_lazyframe(DATA_DIR / "grch38.92.csv")
 
 
 def __custom_vcf_parsing(input_path: pathlib.Path) -> polars.LazyFrame:
@@ -59,17 +61,14 @@ def __hash_add_id(lf: polars.LazyFrame) -> polars.LazyFrame:
 
 def __rust_add_id(lf: polars.LazyFrame) -> polars.LazyFrame:
     """Add column id of variant by use rust code."""
-    chrom2offset = chrom2length.with_columns(
-        offset=polars.col("length").cumsum() - polars.col("length"),
-    )
-    real_pos_max = chrom2offset.select([polars.col("length").sum()]).get_column("length").max()
+    real_pos_max = chrom2length.select([polars.col("length").sum()]).collect().get_column("length").max()
 
-    lf = lf.join(chrom2offset.lazy(), on="chr", how="left")
+    lf = lf.join(chrom2length, on="chr", how="left")
     lf = lf.with_columns(real_pos=polars.col("pos") + polars.col("offset"))
     lf = lf.cast({"real_pos": polars.UInt64})
 
     return lf.with_columns(
-        id=polars.col("real_pos").variant_id.compute(
+        id=polars.col("real_pos").variant_id.compute(  # type: ignore # noqa: PGH003
             polars.col("ref"),
             polars.col("alt"),
             real_pos_max,
@@ -138,7 +137,7 @@ def __generate_id_default(
         lf = __custom_vcf_parsing(input_path)
 
         benchmark(
-            lambda: default_add_id(lf, chrom2length).collect(),
+            lambda: __default_add_id(lf, chrom2length).collect(),
         )
 
     inner.__doc__ = f"""Compute default id of {number_of_line} variant"""

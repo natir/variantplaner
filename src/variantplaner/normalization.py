@@ -59,7 +59,7 @@ def add_variant_id(lf: polars.LazyFrame, chrom2length: polars.LazyFrame) -> pola
     lf = lf.cast({"real_pos": polars.UInt64})
 
     lf = lf.with_columns(
-        id=polars.col("real_pos").variant_id.compute(
+        id=polars.col("real_pos").variant_id.compute(  # type: ignore # noqa: PGH003
             polars.col("ref"),
             polars.col("alt"),
             real_pos_max,

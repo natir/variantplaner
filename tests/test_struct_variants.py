@@ -121,7 +121,6 @@ def test_concat_uniq(tmp_path: pathlib.Path) -> None:
 
     lf = polars.scan_parquet(tmp_file)
 
-    print(set(lf.collect().get_column("id").to_list()))
     assert set(lf.collect().get_column("id").to_list()) == MERGE_IDS
 
 

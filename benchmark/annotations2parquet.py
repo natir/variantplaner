@@ -3,10 +3,8 @@
 # std import
 from __future__ import annotations
 
+import pathlib
 import typing
-
-if typing.TYPE_CHECKING:  # pragma: no cover
-    import pathlib
 
 # 3rd party import
 import pytest
@@ -19,6 +17,8 @@ if typing.TYPE_CHECKING:  # pragma: no cover
 from variantplaner import io
 
 from benchmark import __generate_info, __generate_vcf
+
+DATA_DIR = pathlib.Path(__file__).parent.parent / "tests" / "data"
 
 
 def __generate_annotations_extractions(
@@ -38,7 +38,7 @@ def __generate_annotations_extractions(
         def worker() -> polars.DataFrame:
             vcf_header = io.vcf.extract_header(input_path)
             info_parser = io.vcf.info2expr(vcf_header, input_path, set(info_names[:number_of_col]))
-            lf = io.vcf.into_lazyframe(input_path)
+            lf = io.vcf.into_lazyframe(input_path, DATA_DIR / "grch38.92.csv")
 
             lf = lf.with_columns(info_parser).drop(["chr", "pos", "ref", "alt", "filter", "qual", "info"])
 

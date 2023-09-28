@@ -272,8 +272,6 @@ def test_vcf2parquet_sv_genotypes(tmp_path: pathlib.Path) -> None:
         ],
     )
 
-    print(genotypes_path)
-
     assert result.exit_code == 0
     polars.testing.assert_frame_equal(
         polars.scan_parquet(DATA_DIR / "sv.variants.parquet"),

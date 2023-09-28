@@ -123,10 +123,8 @@ def test_transmission_all_mother_gt_null() -> None:
     pedigree_lf = polars.scan_parquet(DATA_DIR / "sample.parquet")
 
     transmission = generate.transmission_ped(genotypes_lf, pedigree_lf).sort(by="id")
-    print(transmission)
 
     assert transmission.get_column("mother_gt").to_list() == [0, 0, 0, 0, 0]
-    print(transmission.get_column("mother_ad").to_list())
     assert transmission.get_column("mother_ad").to_list() == [[0, 4560], [2, 4734], [5, 4828], [1, 4092], [0, 3084]]
     assert transmission.get_column("mother_dp").to_list() == [4560, 4736, 4833, 4093, 3084]
     assert transmission.get_column("mother_gq").to_list() == [99, 99, 99, 99, 99]
