@@ -20,12 +20,13 @@ import polars
 
 logger = logging.getLogger("struct.genotypes")
 
-"""Value use to split variant by id modulo of this value."""
-PARTITION_MOD = 256
+
+NUMBER_OF_BITS = 8
+"""Number of high weight bit used in id to perform partitioning."""
 
 
 def __hive_worker(lfs: tuple[polars.LazyFrame], basename: str, output_prefix: pathlib.Path) -> None:
-    """Concatenate multiple parquet file and group it by id % PARTITION_MOD.
+    """Concatenate several parquet files and group them according to the bits between the 63rd and 55th bits included.
 
     Args:
         lfs: List of [polars.LazyFrame] you want reorganise
@@ -39,12 +40,12 @@ def __hive_worker(lfs: tuple[polars.LazyFrame], basename: str, output_prefix: pa
 
     lf = polars.concat(lf for lf in lfs if lf is not None).with_columns(
         [
-            polars.col("id").mod(PARTITION_MOD).alias("id_mod"),
+            polars.col("id").mul(2).floordiv(pow(2, 64 - NUMBER_OF_BITS)).alias("id_part"),
         ],
     )
 
-    for name, df in lf.collect().group_by(polars.col("id_mod")):
-        df.write_parquet(output_prefix / f"id_mod={name}" / f"{basename}.parquet")
+    for name, df in lf.collect().group_by(polars.col("id_part")):
+        df.write_parquet(output_prefix / f"id_part={name}" / f"{basename}.parquet")
 
 
 def __merge_file(prefix: pathlib.Path, basenames: list[str]) -> None:
@@ -76,11 +77,11 @@ def __merge_file(prefix: pathlib.Path, basenames: list[str]) -> None:
 
 
 def hive(paths: list[pathlib.Path], output_prefix: pathlib.Path, threads: int, file_per_thread: int) -> None:
-    r"""Read all genotypes parquet file and use information to generate a hive like struct, based on $id\ \%\ PARTITION_MOD$  with genotype information.
+    r"""Read all genotypes parquet file and use information to generate a hive like struct, based on 63rd and 55th bits included of variant id with genotype information.
 
     Real number of threads use are equal to $min(threads, len(paths))$.
 
-    Output format look like: `{output_prefix}/id_mod=[0..255]/[0..threads].parquet`.
+    Output format look like: `{output_prefix}/id_part=[0..255]/0.parquet`.
 
     Args:
         paths: list of file you want reorganize
@@ -96,8 +97,8 @@ def hive(paths: list[pathlib.Path], output_prefix: pathlib.Path, threads: int, f
     if len(paths) == 0:
         return
 
-    for i in range(PARTITION_MOD):
-        (output_prefix / f"id_mod={i}").mkdir(parents=True, exist_ok=True)
+    for i in range(pow(2, NUMBER_OF_BITS)):
+        (output_prefix / f"id_part={i}").mkdir(parents=True, exist_ok=True)
 
     path_groups: typing.Iterable[typing.Iterable[pathlib.Path]] = list(
         [[path] for path in paths]
@@ -122,5 +123,5 @@ def hive(paths: list[pathlib.Path], output_prefix: pathlib.Path, threads: int, f
         )
         pool.starmap(
             __merge_file,
-            [(output_prefix / f"id_mod={id_mod}", basenames) for id_mod in range(PARTITION_MOD)],
+            [(output_prefix / f"id_part={id_part}", basenames) for id_part in range(pow(2, NUMBER_OF_BITS))],
         )
