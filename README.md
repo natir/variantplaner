@@ -6,21 +6,19 @@
 
 A toolkit to manage many variants from many samples, with limited resources.
 
-`variantplaner` was initially built for a project concerning the human genome, but is now evolving to support any organism. This feature is planned for version 0.2.0.
-
 ## Installation
 
 With `pip`:
 
 ```bash
-pip install git+https://github.com/natir/variantplaner.git@0.1.0#egg=variantplaner
+pip install git+https://github.com/natir/variantplaner.git@0.2.0#egg=variantplaner
 ```
 
 With [`pipx`](https://github.com/pipxproject/pipx):
 
 ```bash
 python -m pip install --user pipx
-pipx install git+https://github.com/natir/variantplaner.git@0.1.0#egg=variantplaner
+pipx install git+https://github.com/natir/variantplaner.git@0.2.0#egg=variantplaner
 ```
 
 ## Usage
@@ -96,6 +94,7 @@ variantplaner annotations -i $INPUT_FILE -o $OUTPUT_PARQUET $INPUT_TYPE [OPTIONS
 ```
 
 Where:
+
 - `-i|--input-path` is the input file (required)
 - `-o|--output-path` is the output parquet file (required)
 - `$INPUT_TYPE` is whether VCF or CSV (see below for the different value types)
@@ -114,6 +113,7 @@ variantplaner annotations -i annotations.vcf -o clinvar.parquet vcf -r annot_id 
 If not set, all the info columns will end up in the output file.
 
 Options:
+
 - `-r|--rename-id`: Can be used to rename vcf id column name (default is `vid`).
 - `-i|--info`: Lets you select the info fields you wish to output. If not set, this will export them all.
 - `vcf`: If the input file type is VCF
@@ -131,13 +131,13 @@ Unlike the VCF format, `variantplaner` has no way to tell which columns in the C
 This is why you need to specify the column names in the options (requires a header).
 
 Options:
+
 - `-c|--chromosome`: Name of chromosome column
 - `-p|--position`: Name of position column
 - `-r|--reference`: Name of reference column
 - `-a|--alternative`: Name of alternative column
 - `-i|--info`: Lets you select the info fields you'd like to output. If not set, this will export them all.
 - `-s|--separator`: A single byte character to use as a delimiter in the input file (defaults to `,`)
-
 
 ### Metadata
 
@@ -169,7 +169,7 @@ In `transmission.parquet` each line contains an index sample variants, index, mo
 
 Origin column contains a number with 3 digit:
 ```
-231
+#~"
 ││└ father genotype
 │└─ mother genotype
 └── index genotype
@@ -181,7 +181,8 @@ You can also use pedigree file:
 variantplaner generate transmission -i genotypes.parquet -p family.ped -t transmission.parquet
 ```
 
-**Warning**: this command could have important RAM usage (propotionaly to number of sample index variants)
+???+ danger
+	This command could have important RAM usage (propotionaly to number of sample index variants)
 
 ## Contribution
 

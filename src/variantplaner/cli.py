@@ -62,6 +62,13 @@ def main(threads: int = 1, verbose: int = 0) -> None:
     required=True,
 )
 @click.option(
+    "-c",
+    "--chrom2length-path",
+    help="CSV file that associates a chromosome name with its size",
+    type=click.Path(dir_okay=False, writable=True, path_type=pathlib.Path),
+    required=True,
+)
+@click.option(
     "-v",
     "--variants",
     help="Path where the variants will be written in parquet",
@@ -90,6 +97,7 @@ def main(threads: int = 1, verbose: int = 0) -> None:
 )
 def vcf2parquet(
     input_path: pathlib.Path,
+    chrom2length_path: pathlib.Path,
     variants: pathlib.Path,
     genotypes: pathlib.Path | None,
     annotations: pathlib.Path | None,
@@ -98,7 +106,9 @@ def vcf2parquet(
     """Convert a vcf in multiple parquet file."""
     logger = logging.getLogger("vcf2parquet")
 
-    logger.debug(f"parameter: {input_path=} {variants=} {genotypes=}")
+    logger.debug(
+        f"parameter: {input_path=} {chrom2length_path=} {variants=} {genotypes=} {annotations=} {format_string=}",
+    )
 
     try:
         vcf_header = io.vcf.extract_header(input_path)
@@ -107,7 +117,7 @@ def vcf2parquet(
         sys.exit(11)
 
     # Read vcf and manage structural variant
-    lf = io.vcf.into_lazyframe(input_path, extension=io.vcf.IntoLazyFrameExtension.MANAGE_SV)
+    lf = io.vcf.into_lazyframe(input_path, chrom2length_path, extension=io.vcf.IntoLazyFrameExtension.MANAGE_SV)
 
     extract.variants(lf).sink_parquet(variants)
     logger.info(f"finish write {variants}")
@@ -396,13 +406,25 @@ def struct_genotypes(ctx: click.Context, prefix_path: pathlib.Path, file_per_thr
     type=click.Path(writable=True, path_type=pathlib.Path),
     required=True,
 )
-def annotations_main(ctx: click.Context, input_path: pathlib.Path, output_path: pathlib.Path) -> None:
+@click.option(
+    "-c",
+    "--chrom2length-path",
+    help="CSV file that associates a chromosome name with its size",
+    type=click.Path(dir_okay=False, writable=True, path_type=pathlib.Path),
+    required=True,
+)
+def annotations_main(
+    ctx: click.Context,
+    input_path: pathlib.Path,
+    output_path: pathlib.Path,
+    chrom2length_path: pathlib.Path,
+) -> None:
     """Convert an annotation variation file in a compatible parquet."""
     logger = logging.getLogger("annotations")
 
-    ctx.obj = {"input_path": input_path, "output_path": output_path}
+    ctx.obj = {"input_path": input_path, "output_path": output_path, "chrom2length_path": chrom2length_path}
 
-    logger.debug(f"parameter: {input_path=} {output_path=}")
+    logger.debug(f"parameter: {input_path=} {output_path=} {chrom2length_path=}")
 
 
 @annotations_main.command("vcf")  # type: ignore[arg-type]
@@ -420,7 +442,11 @@ def annotations_main(ctx: click.Context, input_path: pathlib.Path, output_path: 
     help="Set column name of variant id",
     type=str,
 )
-def annotations_vcf(ctx: click.Context, info: set[str] | None = None, rename_id: str | None = None) -> None:
+def annotations_vcf(
+    ctx: click.Context,
+    info: set[str] | None = None,
+    rename_id: str | None = None,
+) -> None:
     """Convert a vcf file with INFO field in compatible parquet file."""
     logger = logging.getLogger("annotations-vcf")
 
@@ -428,13 +454,14 @@ def annotations_vcf(ctx: click.Context, info: set[str] | None = None, rename_id:
 
     input_path = ctx.obj["input_path"]
     output_path = ctx.obj["output_path"]
+    chrom2length_path = ctx.obj["chrom2length_path"]
 
-    logger.debug(f"parameter: {input_path=} {output_path=} {info=}")
+    logger.debug(f"parameter: {input_path=} {output_path=} {chrom2length_path=} {info=} {rename_id}")
 
     try:
         vcf_header = io.vcf.extract_header(input_path)
         info_parser = io.vcf.info2expr(vcf_header, input_path, info)
-        lf = io.vcf.into_lazyframe(input_path)
+        lf = io.vcf.into_lazyframe(input_path, chrom2length_path)
     except exception.NotAVCFError:
         logger.exception("")
         sys.exit(21)
@@ -445,7 +472,7 @@ def annotations_vcf(ctx: click.Context, info: set[str] | None = None, rename_id:
         logger.info(f"Rename vcf variant id in {rename_id}")
         lf = lf.rename({"vid": rename_id})
 
-    lf.sink_parquet(output_path, compression="snappy")
+    lf.collect(streaming=True).write_parquet(output_path, compression="snappy")
 
 
 @annotations_main.command("csv")  # type: ignore[arg-type]
@@ -509,22 +536,29 @@ def annotations_csv(
 
     input_path = ctx.obj["input_path"]
     output_path = ctx.obj["output_path"]
+    chrom2length_path = ctx.obj["chrom2length_path"]
 
     logger.debug(
-        f"parameter: {input_path=} {output_path=} {chromosome=} {position=} {reference=} {alternative=} {info=}",
+        f"parameter: {input_path=} {output_path=} {chrom2length_path=} {chromosome=} {position=} {reference=} {alternative=} {info=}",
     )
 
     lf = io.csv.into_lazyframe(
         input_path,
+        chrom2length_path,
         chromosome,
         position,
         reference,
         alternative,
         info,
         separator=separator,
+        dtypes={chromosome: polars.Utf8},
     )
 
+    print(lf.fetch(10))
+
     lf = lf.drop([chromosome, position, reference, alternative])
+
+    print(lf.fetch(10))
 
     lf.collect(streaming=True).write_parquet(output_path)
 

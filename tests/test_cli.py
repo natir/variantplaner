@@ -8,6 +8,7 @@ import pathlib
 
 # 3rd party import
 import polars
+import polars.testing
 from click.testing import CliRunner
 
 try:
@@ -25,54 +26,54 @@ DATA_DIR = pathlib.Path(__file__).parent / "data"
 
 
 MERGE_IDS = {
-    14242097786807219277,
-    11061441912435479070,
-    15556898136537930176,
-    11711297912729185188,
-    10807139693934085530,
-    11754354483181031149,
-    4797423062503056673,
-    12330835685209145,
-    3370214193463694380,
-    13133999947024542022,
-    800025099629731040,
-    9722743600114191928,
-    9554065504802534594,
-    2295086632353399847,
-    8068220590006330225,
-    14452059200390301692,
-    1062943517767600077,
-    3925979271274072158,
-    15044799663914522374,
-    16588824010281864939,
-    1485127797546295921,
-    14498991407705406549,
-    4455610085260365294,
-    6760366560597639209,
-    17246148306088235974,
-    270423859963006067,
-    11952270119407113547,
-    10499890489289074188,
-    11976298723311757531,
-    721273245970054755,
-    7645340256260622458,
-    11033100074712141168,
-    14319454638398535779,
-    17224330959165379425,
-    11920660801823307015,
-    3585291275407140934,
-    18172124183201916611,
-    10212290916779149099,
-    4759541468123016608,
-    11650605831284591550,
-    12945673213782943443,
-    9664051898850350365,
-    2373425740527121342,
-    11903476464390241143,
-    10487392163259126218,
-    5356120651941363990,
-    4235309537048834275,
-    16247809233398557031,
+    21788637528068,
+    22420668831105,
+    22531532652550,
+    28503684677645,
+    216629694693385,
+    2865209939989626902,
+    2865214825649143842,
+    2865214829944111138,
+    2865214831957377026,
+    2865214831957377025,
+    3382250923559485444,
+    3382273467842822145,
+    3382274273283407906,
+    3382286558903140374,
+    3382286559037358105,
+    6356557166639316998,
+    6356557209588989953,
+    6356558437949636610,
+    6356559434382049293,
+    6356561358527397901,
+    6174051668938719235,
+    6174052457065218057,
+    6174053404105506822,
+    6174053880846876681,
+    6174054230886711305,
+    148464268738563,
+    149424193929223,
+    149641089777676,
+    149827920855049,
+    150313252159501,
+    1988454028148743,
+    1988466913050636,
+    1988475502985222,
+    1988486240403458,
+    1988503420272646,
+    1988518452658185,
+    1988527042592774,
+    1988539927494662,
+    1988576434716678,
+    1988591467102222,
+    1988600057036812,
+    1988608646971404,
+    1988623679356940,
+    1988625826840588,
+    1988627974324230,
+    1988632269291526,
+    1997451984633865,
+    1997452387287654,
 }
 
 
@@ -84,7 +85,17 @@ def test_vcf2parquet(tmp_path: pathlib.Path) -> None:
     runner = CliRunner()
     result = runner.invoke(
         cli.main,
-        ["vcf2parquet", "-i", str(DATA_DIR / "no_info.vcf"), "-v", str(variants_path), "-g", str(genotypes_path)],
+        [
+            "vcf2parquet",
+            "-i",
+            str(DATA_DIR / "no_info.vcf"),
+            "-c",
+            str(DATA_DIR / "grch38.92.csv"),
+            "-v",
+            str(variants_path),
+            "-g",
+            str(genotypes_path),
+        ],
     )
 
     assert result.exit_code == 0
@@ -118,6 +129,8 @@ def test_vcf2parquet_ask_annotations(tmp_path: pathlib.Path) -> None:
             "vcf2parquet",
             "-i",
             str(DATA_DIR / "no_genotypes.vcf"),
+            "-c",
+            str(DATA_DIR / "grch38.92.csv"),
             "-v",
             str(variants_path),
             "-a",
@@ -145,7 +158,15 @@ def test_vcf2parquet_not_ask_genotypes(tmp_path: pathlib.Path) -> None:
     runner = CliRunner()
     result = runner.invoke(
         cli.main,
-        ["vcf2parquet", "-i", str(DATA_DIR / "no_info.vcf"), "-v", str(variants_path)],
+        [
+            "vcf2parquet",
+            "-i",
+            str(DATA_DIR / "no_info.vcf"),
+            "-c",
+            str(DATA_DIR / "grch38.92.csv"),
+            "-v",
+            str(variants_path),
+        ],
     )
 
     assert result.exit_code == 0
@@ -163,7 +184,17 @@ def test_vcf2parquet_not_vcf(tmp_path: pathlib.Path) -> None:
     runner = CliRunner()
     result = runner.invoke(
         cli.main,
-        ["vcf2parquet", "-i", str(DATA_DIR / "no_info.tsv"), "-v", str(variants_path), "-g", str(genotypes_path)],
+        [
+            "vcf2parquet",
+            "-i",
+            str(DATA_DIR / "no_info.tsv"),
+            "-c",
+            str(DATA_DIR / "grch38.92.csv"),
+            "-v",
+            str(variants_path),
+            "-g",
+            str(genotypes_path),
+        ],
     )
 
     assert result.exit_code == 11
@@ -177,7 +208,17 @@ def test_vcf2parquet_no_genotype(tmp_path: pathlib.Path) -> None:
     runner = CliRunner()
     result = runner.invoke(
         cli.main,
-        ["vcf2parquet", "-i", str(DATA_DIR / "no_genotypes.vcf"), "-v", str(variants_path), "-g", str(genotypes_path)],
+        [
+            "vcf2parquet",
+            "-i",
+            str(DATA_DIR / "no_genotypes.vcf"),
+            "-c",
+            str(DATA_DIR / "grch38.92.csv"),
+            "-v",
+            str(variants_path),
+            "-g",
+            str(genotypes_path),
+        ],
     )
 
     assert result.exit_code == 12
@@ -190,7 +231,15 @@ def test_vcf2parquet_sv(tmp_path: pathlib.Path) -> None:
     runner = CliRunner()
     result = runner.invoke(
         cli.main,
-        ["vcf2parquet", "-i", str(DATA_DIR / "sv.vcf"), "-v", str(variants_path)],
+        [
+            "vcf2parquet",
+            "-i",
+            str(DATA_DIR / "sv.vcf"),
+            "-c",
+            str(DATA_DIR / "grch38.92.csv"),
+            "-v",
+            str(variants_path),
+        ],
     )
 
     assert result.exit_code == 0
@@ -212,6 +261,8 @@ def test_vcf2parquet_sv_genotypes(tmp_path: pathlib.Path) -> None:
             "vcf2parquet",
             "-i",
             str(DATA_DIR / "sv.vcf"),
+            "-c",
+            str(DATA_DIR / "grch38.92.csv"),
             "-v",
             str(variants_path),
             "-g",
@@ -316,6 +367,29 @@ def test_struct_genotypes(tmp_path: pathlib.Path) -> None:
     assert result.exit_code == 0
 
 
+def test_struct_genotypes_threads(tmp_path: pathlib.Path) -> None:
+    """Basic struct genotypes run."""
+    prefix_path = tmp_path / "hive"
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli.main,
+        [
+            "-vvvv",
+            "-t",
+            "4",
+            "struct",
+            "-i",
+            str(DATA_DIR / "no_info.genotypes.parquet"),
+            "genotypes",
+            "-p",
+            str(prefix_path),
+        ],
+    )
+
+    assert result.exit_code == 0
+
+
 def test_annotations_vcf(tmp_path: pathlib.Path) -> None:
     """Basic annotations vcf run."""
     annotations_path = tmp_path / "annotations.parquet"
@@ -327,6 +401,8 @@ def test_annotations_vcf(tmp_path: pathlib.Path) -> None:
             "annotations",
             "-i",
             str(DATA_DIR / "no_genotypes.vcf"),
+            "-c",
+            str(DATA_DIR / "grch38.92.csv"),
             "-o",
             str(annotations_path),
             "vcf",
@@ -376,6 +452,8 @@ def test_annotations_vcf_not_vcf(tmp_path: pathlib.Path) -> None:
             str(DATA_DIR / "no_info.tsv"),
             "-o",
             str(annotations_path),
+            "-c",
+            str(DATA_DIR / "grch38.92.csv"),
             "vcf",
         ],
     )
@@ -394,6 +472,8 @@ def test_annotations_vcf_select(tmp_path: pathlib.Path) -> None:
             "annotations",
             "-i",
             str(DATA_DIR / "no_genotypes.vcf"),
+            "-c",
+            str(DATA_DIR / "grch38.92.csv"),
             "-o",
             str(annotations_path),
             "vcf",
@@ -423,6 +503,8 @@ def test_annotations_vcf_select_rename_id(tmp_path: pathlib.Path) -> None:
             str(DATA_DIR / "no_genotypes.vcf"),
             "-o",
             str(annotations_path),
+            "-c",
+            str(DATA_DIR / "grch38.92.csv"),
             "vcf",
             "-r",
             "annot_id",
@@ -452,6 +534,8 @@ def test_annotations_csv(tmp_path: pathlib.Path) -> None:
             str(DATA_DIR / "annotations.csv"),
             "-o",
             str(annotations_path),
+            "-c",
+            str(DATA_DIR / "grch38.92.csv"),
             "csv",
             "-c",
             "chr",
@@ -487,6 +571,8 @@ def test_annotations_csv_select(tmp_path: pathlib.Path) -> None:
             str(DATA_DIR / "annotations.csv"),
             "-o",
             str(annotations_path),
+            "-c",
+            str(DATA_DIR / "grch38.92.csv"),
             "csv",
             "-c",
             "chr",

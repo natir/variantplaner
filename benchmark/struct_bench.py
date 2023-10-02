@@ -13,13 +13,14 @@ import polars
 import pytest
 
 # project import
-from variantplaner import normalization, struct
+from variantplaner import io, normalization, struct
 
 if typing.TYPE_CHECKING:  # pragma: no cover
     import pytest_benchmark
 
 
 DATA_DIR = pathlib.Path(__file__).parent.parent / "tests" / "data"
+chrom2length = io.csv.chr2length_into_lazyframe(DATA_DIR / "grch38.92.csv")
 
 
 def __generate_variant(common: int = 10_000, diff: int = 1000) -> polars.LazyFrame:
@@ -53,7 +54,7 @@ def __generate_variant(common: int = 10_000, diff: int = 1000) -> polars.LazyFra
         },
     )
 
-    return normalization.add_variant_id(polars.concat([lf1, lf2, lf1, lf3, lf1]))
+    return normalization.add_variant_id(polars.concat([lf1, lf2, lf1, lf3, lf1]), chrom2length)
 
 
 def __generate_variant_merge(
