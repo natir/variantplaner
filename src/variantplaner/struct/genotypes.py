@@ -8,8 +8,6 @@ import logging
 import multiprocessing
 import typing
 
-import multiprocessing_logging
-
 if typing.TYPE_CHECKING:  # pragma: no cover
     import pathlib
 
@@ -113,8 +111,6 @@ def hive(paths: list[pathlib.Path], output_prefix: pathlib.Path, threads: int, f
     lf_groups = [[polars.scan_parquet(p) for p in g_paths if p is not None] for g_paths in path_groups]
 
     logger.info(f"{path_groups=}, {basenames=}")
-
-    multiprocessing_logging.install_mp_handler()
 
     with multiprocessing.get_context("spawn").Pool(threads) as pool:
         pool.starmap(

@@ -98,7 +98,7 @@ def hash_id_func(data: pandas.DataFrame, _name: str) -> tuple[pandas.DataFrame, 
     data["method"] = data["method"].apply(lambda x: int(x.split("_")[3]))
     data = data.sort_values(by=["method"])
 
-    return data, "Running time compare to number of variant"
+    return data, "Id compute: hash"
 
 
 def rust_id_func(data: pandas.DataFrame, _name: str) -> tuple[pandas.DataFrame, str]:
@@ -106,7 +106,7 @@ def rust_id_func(data: pandas.DataFrame, _name: str) -> tuple[pandas.DataFrame, 
     data["method"] = data["method"].apply(lambda x: int(x.split("_")[3]))
     data = data.sort_values(by=["method"])
 
-    return data, "Running time compare to number of variant"
+    return data, "Id compute: rust"
 
 
 def default_id_func(data: pandas.DataFrame, _name: str) -> tuple[pandas.DataFrame, str]:
@@ -114,7 +114,7 @@ def default_id_func(data: pandas.DataFrame, _name: str) -> tuple[pandas.DataFram
     data["method"] = data["method"].apply(lambda x: int(x.split("_")[3]))
     data = data.sort_values(by=["method"])
 
-    return data, "Running time compare to number of variant"
+    return data, "Id compute: default"
 
 
 def hive_partitioning_func(data: pandas.DataFrame, _name: str) -> tuple[pandas.DataFrame, str]:

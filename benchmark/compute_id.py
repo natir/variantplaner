@@ -145,7 +145,7 @@ def __generate_id_default(
     return inner
 
 
-for i in range(5, 15):
+for i in range(5, 14):
     number_of_line = 2**i
     globals()[f"add_id_hash_{number_of_line}"] = __generate_id_hash(number_of_line)
     globals()[f"add_id_rust_{number_of_line}"] = __generate_id_rust(number_of_line)

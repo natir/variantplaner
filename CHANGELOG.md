@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [0.2.0](https://github.com/natir/variantplaner/releases/tag/0.2.0) - 2023-10-02
 
-<small>[Compare with first commit](https://github.com/natir/variantplaner/compare/0.1.0...0.2.0)</small>
+<small>[Compare with first 0.1.0](https://github.com/natir/variantplaner/compare/0.1.0...0.2.0)</small>
 
 ### Features:
 

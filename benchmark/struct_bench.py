@@ -29,7 +29,7 @@ def __generate_variant(common: int = 10_000, diff: int = 1000) -> polars.LazyFra
 
     lf1 = polars.LazyFrame(
         {
-            "chr": random.choices(range(1, 25), k=common),
+            "chr": random.choices([f"chr{chr_name}" for chr_name in range(1, 25)], k=common),
             "pos": random.choices(range(1, 2**32), k=common),
             "ref": random.choices(nuc, k=common),
             "alt": random.choices(nuc, k=common),
@@ -38,7 +38,7 @@ def __generate_variant(common: int = 10_000, diff: int = 1000) -> polars.LazyFra
 
     lf2 = polars.LazyFrame(
         {
-            "chr": random.choices(range(1, 25), k=diff),
+            "chr": random.choices([f"chr{chr_name}" for chr_name in range(1, 25)], k=diff),
             "pos": random.choices(range(1, 2**32), k=diff),
             "ref": random.choices(nuc, k=diff),
             "alt": random.choices(nuc, k=diff),
@@ -47,7 +47,7 @@ def __generate_variant(common: int = 10_000, diff: int = 1000) -> polars.LazyFra
 
     lf3 = polars.LazyFrame(
         {
-            "chr": random.choices(range(1, 25), k=diff),
+            "chr": random.choices([f"chr{chr_name}" for chr_name in range(1, 25)], k=diff),
             "pos": random.choices(range(1, 2**32), k=diff),
             "ref": random.choices(nuc, k=diff),
             "alt": random.choices(nuc, k=diff),
@@ -89,7 +89,7 @@ def __generate_variant_merge_on_disk(
         paths = []
         for i in range(nb_file):
             paths.append(tmp_path / f"{i}.parquet")
-            __generate_variant().sink_parquet(tmp_path / f"{i}.parquet")
+            __generate_variant().collect().write_parquet(tmp_path / f"{i}.parquet")
 
         os.environ["POLARS_MAX_THREADS"] = str(threads)
         benchmark(lambda: struct.variants.merge(paths, tmp_path / "output.parquet", memory_limit=5_000_000))
@@ -97,11 +97,11 @@ def __generate_variant_merge_on_disk(
     return inner
 
 
-for i in range(15, 25):
+for i in range(10, 20):
     common = 2**i
     globals()[f"variant_merge_id_{common}"] = __generate_variant_merge(common, "id")
     globals()[f"variant_merge_variant_{common}"] = __generate_variant_merge(common, "variant")
 
 
-for i in range(20, 41, 2):
+for i in range(10, 21, 2):
     globals()[f"variant_merge_on_disk_{i}"] = __generate_variant_merge_on_disk(8, i)

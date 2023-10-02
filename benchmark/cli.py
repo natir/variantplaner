@@ -38,7 +38,7 @@ def variants(
     result = benchmark(
         lambda: runner.invoke(
             cli.main,
-            ["vcf2parquet", "-i", str(input_path), "-v", str(variants_path)],
+            ["vcf2parquet", "-i", str(input_path), "-v", str(variants_path), "-c", str(DATA_DIR / "grch38.92.csv")],
         ),
     )
 
@@ -71,6 +71,8 @@ def variants_annotations(
                 str(variants_path),
                 "-a",
                 str(annotations_path),
+                "-c",
+                str(DATA_DIR / "grch38.92.csv"),
             ],
         ),
     )
@@ -100,6 +102,8 @@ def variants_genotypes(
             cli.main,
             [
                 "vcf2parquet",
+                "-c",
+                str(DATA_DIR / "grch38.92.csv"),
                 "-i",
                 str(input_path),
                 "-v",
@@ -138,6 +142,8 @@ def variants_genotypes_annotations(
             cli.main,
             [
                 "vcf2parquet",
+                "-c",
+                str(DATA_DIR / "grch38.92.csv"),
                 "-i",
                 str(input_path),
                 "-v",
