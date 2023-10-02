@@ -15,3 +15,7 @@ class VariantId:
             args=[ref, alt, max_pos],
             symbol="compute",
         )
+
+
+__version__: str = "0.2.0"
+__all__: list[str] = ["VariantId"]

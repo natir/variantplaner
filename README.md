@@ -6,21 +6,19 @@
 
 A toolkit to manage many variants from many samples, with limited resources.
 
-`variantplaner` was initially built for a project concerning the human genome, but is now evolving to support any organism. This feature is planned for version 0.2.0.
-
 ## Installation
 
 With `pip`:
 
 ```bash
-pip install git+https://github.com/natir/variantplaner.git@0.1.0#egg=variantplaner
+pip install git+https://github.com/natir/variantplaner.git@0.2.0#egg=variantplaner
 ```
 
 With [`pipx`](https://github.com/pipxproject/pipx):
 
 ```bash
 python -m pip install --user pipx
-pipx install git+https://github.com/natir/variantplaner.git@0.1.0#egg=variantplaner
+pipx install git+https://github.com/natir/variantplaner.git@0.2.0#egg=variantplaner
 ```
 
 ## Usage
@@ -171,7 +169,7 @@ In `transmission.parquet` each line contains an index sample variants, index, mo
 
 Origin column contains a number with 3 digit:
 ```
-231
+#~"
 ││└ father genotype
 │└─ mother genotype
 └── index genotype
