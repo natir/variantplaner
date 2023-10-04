@@ -308,7 +308,6 @@ def into_lazyframe(
     )
 
     chr2len = io.csv.chr2length_into_lazyframe(chr2len_path)
-
     lf = lf.rename(col_name)
 
     if extension == IntoLazyFrameExtension.MANAGE_SV:

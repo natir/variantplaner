@@ -472,7 +472,11 @@ def annotations_vcf(
         logger.info(f"Rename vcf variant id in {rename_id}")
         lf = lf.rename({"vid": rename_id})
 
-    lf.collect(streaming=True).write_parquet(output_path, compression="snappy")
+    try:
+        lf.sink_parquet(output_path)
+    except BaseException:
+        logger.exception("")
+        lf.collect(streaming=True).write_parquet(output_path)
 
 
 @annotations_main.command("csv")  # type: ignore[arg-type]
@@ -554,11 +558,7 @@ def annotations_csv(
         dtypes={chromosome: polars.Utf8},
     )
 
-    print(lf.fetch(10))
-
     lf = lf.drop([chromosome, position, reference, alternative])
-
-    print(lf.fetch(10))
 
     lf.collect(streaming=True).write_parquet(output_path)
 

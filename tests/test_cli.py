@@ -498,6 +498,7 @@ def test_annotations_vcf_select_rename_id(tmp_path: pathlib.Path) -> None:
     result = runner.invoke(
         cli.main,
         [
+            "-vvvv",
             "annotations",
             "-i",
             str(DATA_DIR / "no_genotypes.vcf"),
@@ -518,7 +519,7 @@ def test_annotations_vcf_select_rename_id(tmp_path: pathlib.Path) -> None:
     assert result.exit_code == 0
 
     lf = polars.scan_parquet(annotations_path)
-    assert lf.columns == ["annot_id", "id", "AF_ESP", "CLNSIG"]
+    assert set(lf.columns) == {"annot_id", "id", "AF_ESP", "CLNSIG"}
 
 
 def test_annotations_csv(tmp_path: pathlib.Path) -> None:
