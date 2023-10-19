@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [0.2.2](https://github.com/natir/variantplaner/releases/tag/0.2.2) - 2023-10-19
+
+<small>[Compare with first 0.2.0](https://github.com/natir/variantplaner/compare/0.2.1...0.2.2)</small>
+
+### Fix:
+
+- Correct typo in readme
+- Correct change in variantplaner_rs/Cargo.lock
+
+## [0.2.1](https://github.com/natir/variantplaner/releases/tag/0.2.1) - 2023-10-09
+
+<small>[Compare with first 0.2.0](https://github.com/natir/variantplaner/compare/0.2.0...0.2.1)</small>
+
+### Fix:
+
+- Hot fix some lazy trouble
+
 ## [0.2.0](https://github.com/natir/variantplaner/releases/tag/0.2.0) - 2023-10-02
 
 <small>[Compare with first 0.1.0](https://github.com/natir/variantplaner/compare/0.1.0...0.2.0)</small>

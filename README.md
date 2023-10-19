@@ -11,14 +11,14 @@ A toolkit to manage many variants from many samples, with limited resources.
 With `pip`:
 
 ```bash
-pip install git+https://github.com/natir/variantplaner.git@0.2.1#egg=variantplaner
+pip install git+https://github.com/natir/variantplaner.git@0.2.2#egg=variantplaner
 ```
 
 With [`pipx`](https://github.com/pipxproject/pipx):
 
 ```bash
 python -m pip install --user pipx
-pipx install git+https://github.com/natir/variantplaner.git@0.2.1#egg=variantplaner
+pipx install git+https://github.com/natir/variantplaner.git@0.2.2#egg=variantplaner
 ```
 
 ## Usage
