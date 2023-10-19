@@ -23,7 +23,7 @@ pipx install git+https://github.com/natir/variantplaner.git@0.2.1#egg=variantpla
 
 ## Usage
 
-This section presents basic usage. For a more complete exemple checkout our [usage page](https://natir.github.io/variantplaner/usages/).
+This section presents basic usage. For a more complete exemple checkout our [usage page](https://natir.github.io/variantplaner/usage/).
 
 !!! warning
     `variantplaner` doesn't support compressed VCFs. This is a downstream trouble we are aware of and sorry about.
