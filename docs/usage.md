@@ -38,13 +38,14 @@ Quering dataset:
 ```bash
 mkdir -p vp_tuto/vcf/
 cd vp_tuto
+curl https://raw.githubusercontent.com/natir/variantplaner/main/tests/data/grch38.92.csv > grch38.92.csv
 URI_ROOT="https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/release"
-curl ${URI_ROOT}/NA12878_HG001/latest/GRCh38/HG001_GRCh38_1_22_v4.2.1_benchmark.vcf.gz | gunzip - > vcf/HG001.vcf
-curl ${URI_ROOT}/AshkenazimTrio/HG002_NA24385_son/latest/GRCh38/HG002_GRCh38_1_22_v4.2.1_benchmark.vcf.gz | gunzip - > vcf/HG002.vcf
-curl ${URI_ROOT}/AshkenazimTrio/HG003_NA24149_father/latest/GRCh38/HG003_GRCh38_1_22_v4.2.1_benchmark.vcf.gz | gunzip - > vcf/HG003.vcf
-curl ${URI_ROOT}/AshkenazimTrio/HG004_NA24143_mother/latest/GRCh38/HG004_GRCh38_1_22_v4.2.1_benchmark.vcf.gz | gunzip - > vcf/HG004.vcf
-curl ${URI_ROOT}/ChineseTrio/HG006_NA24694_father/latest/GRCh38/HG006_GRCh38_1_22_v4.2.1_benchmark.vcf.gz | gunzip - > vcf/HG006.vcf
-curl ${URI_ROOT}/ChineseTrio/HG007_NA24695_mother/latest/GRCh38/HG007_GRCh38_1_22_v4.2.1_benchmark.vcf.gz | gunzip - > vcf/HG007.vcf
+curl ${URI_ROOT}/NA12878_HG001/latest/GRCh38/HG001_GRCh38_1_22_v4.2.1_benchmark.vcf.gz | gunzip - | sed 's/^chr//' > vcf/HG001.vcf
+curl ${URI_ROOT}/AshkenazimTrio/HG002_NA24385_son/latest/GRCh38/HG002_GRCh38_1_22_v4.2.1_benchmark.vcf.gz | gunzip -  | sed 's/^chr//' > vcf/HG002.vcf
+curl ${URI_ROOT}/AshkenazimTrio/HG003_NA24149_father/latest/GRCh38/HG003_GRCh38_1_22_v4.2.1_benchmark.vcf.gz | gunzip -  | sed 's/^chr//' > vcf/HG003.vcf
+curl ${URI_ROOT}/AshkenazimTrio/HG004_NA24143_mother/latest/GRCh38/HG004_GRCh38_1_22_v4.2.1_benchmark.vcf.gz | gunzip -  | sed 's/^chr//' > vcf/HG004.vcf
+curl ${URI_ROOT}/ChineseTrio/HG006_NA24694_father/latest/GRCh38/HG006_GRCh38_1_22_v4.2.1_benchmark.vcf.gz | gunzip -  | sed 's/^chr//' > vcf/HG006.vcf
+curl ${URI_ROOT}/ChineseTrio/HG007_NA24695_mother/latest/GRCh38/HG007_GRCh38_1_22_v4.2.1_benchmark.vcf.gz | gunzip -  | sed 's/^chr//' > vcf/HG007.vcf
 ```
 
 ## Variant planner presentation
@@ -85,6 +86,7 @@ for vcf_path in $(ls vcf/*.vcf)
 do
     sample_name=$(basename ${vcf_path} .vcf)
     variantplaner -t 4 vcf2parquet -i ${vcf_path} \
+    -c grch38.92.csv \
     -v variants/${sample_name}.parquet \
     -g genotypes/samples/${sample_name}.parquet \
     -f GT:PS:DP:ADALL:AD:GQ
@@ -96,8 +98,8 @@ We iterate over all vcf, variants are store in `variants/{sample_name}.parquet`,
 /// details | gnu-parallel method
 ```bash
 find vcf -type f -name *.vcf -exec basename {} .vcf \; | \
-parallel variantplaner -t 2 vcf2parquet -i vcf/{}.vcf -v variants/{}.parquet \
--g genotypes/samples/{}.parquet -f GT:PS:DP:ADALL:AD:GQ
+parallel variantplaner -t 2 vcf2parquet -c grch38.92.csv -i vcf/{}.vcf \
+-v variants/{}.parquet -g genotypes/samples/{}.parquet -f GT:PS:DP:ADALL:AD:GQ
 ```
 ///
 
@@ -237,7 +239,7 @@ Next annotate this `variants.vcf` [with snpeff](https://pcingola.github.io/SnpEf
 To convert annotated vcf in parquet, keep 'ANN' info column and rename vcf id column in snpeff\_id you can run:
 ```bash
 mkdir -p annotations
-variantplaner -t 8 annotations -i variants.snpeff.vcf -o annotations/snpeff.parquet vcf -i ANN -r snpeff_id
+variantplaner -t 8 annotations -c grch38.92.csv -i variants.snpeff.vcf -o annotations/snpeff.parquet vcf -i ANN -r snpeff_id
 ```
 
 If you didn't set any value of option `-i` in vcf subsubcommand all info column are keep.
@@ -255,7 +257,7 @@ curl https://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh38/clinvar.vcf.gz \
 Convert clinvar vcf file in parquet file:
 
 ```bash
-variantplaner annotations -i annotations/clinvar.vcf -o annotations/clinvar.parquet vcf -r clinvar_id
+variantplaner annotations -c grch38.92.csv -i annotations/clinvar.vcf -o annotations/clinvar.parquet vcf -r clinvar_id
 ```
 
 Parquet file produce contains many columns:
