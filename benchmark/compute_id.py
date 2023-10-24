@@ -35,7 +35,7 @@ def __custom_vcf_parsing(input_path: pathlib.Path) -> polars.LazyFrame:
         separator="\t",
         comment_char="#",
         has_header=False,
-        dtypes={"column_1": polars.Utf8},
+        dtypes={"column_1": polars.Utf8, "column_2": polars.UInt64},
         ignore_errors=True,
     )
 

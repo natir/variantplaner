@@ -56,7 +56,6 @@ def add_variant_id(lf: polars.LazyFrame, chrom2length: polars.LazyFrame) -> pola
 
     lf = lf.join(chrom2length, on="chr", how="left")
     lf = lf.with_columns(real_pos=polars.col("pos") + polars.col("offset"))
-    lf = lf.cast({"real_pos": polars.UInt64})
 
     lf = lf.with_columns(
         id=polars.col("real_pos").variant_id.compute(  # type: ignore # noqa: PGH003

@@ -90,6 +90,8 @@ def into_lazyframe(
         },
     )
 
+    lf = lf.cast({"pos": polars.UInt64})
+
     if info_cols:
         lf = lf.select(["chr", "pos", "ref", "alt", *info_cols])
 
