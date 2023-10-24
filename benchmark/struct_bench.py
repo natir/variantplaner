@@ -28,29 +28,47 @@ def __generate_variant(common: int = 10_000, diff: int = 1000) -> polars.LazyFra
     nuc = ["A", "C", "T", "G"]
 
     lf1 = polars.LazyFrame(
-        {
+        data={
             "chr": random.choices([f"chr{chr_name}" for chr_name in range(1, 25)], k=common),
             "pos": random.choices(range(1, 2**32), k=common),
             "ref": random.choices(nuc, k=common),
             "alt": random.choices(nuc, k=common),
         },
+        schema={
+            "chr": polars.Utf8,
+            "pos": polars.UInt64,
+            "ref": polars.Utf8,
+            "alt": polars.Utf8,
+        },
     )
 
     lf2 = polars.LazyFrame(
-        {
+        data={
             "chr": random.choices([f"chr{chr_name}" for chr_name in range(1, 25)], k=diff),
             "pos": random.choices(range(1, 2**32), k=diff),
             "ref": random.choices(nuc, k=diff),
             "alt": random.choices(nuc, k=diff),
         },
+        schema={
+            "chr": polars.Utf8,
+            "pos": polars.UInt64,
+            "ref": polars.Utf8,
+            "alt": polars.Utf8,
+        },
     )
 
     lf3 = polars.LazyFrame(
-        {
+        data={
             "chr": random.choices([f"chr{chr_name}" for chr_name in range(1, 25)], k=diff),
             "pos": random.choices(range(1, 2**32), k=diff),
             "ref": random.choices(nuc, k=diff),
             "alt": random.choices(nuc, k=diff),
+        },
+        schema={
+            "chr": polars.Utf8,
+            "pos": polars.UInt64,
+            "ref": polars.Utf8,
+            "alt": polars.Utf8,
         },
     )
 
