@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from duty import duty
-from duty.callables import black, coverage, lazy, mkdocs, mypy, pytest, ruff, safety
+from duty.callables import coverage, lazy, mkdocs, mypy, pytest, ruff, safety
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -226,7 +226,7 @@ def format(ctx: Context) -> None:
         ruff.check(*PY_SRC_LIST, config="config/ruff.toml", fix_only=True, exit_zero=True),
         title="Auto-fixing code",
     )
-    ctx.run(black.run(*PY_SRC_LIST, config="config/black.toml"), title="Formatting code")
+    ctx.run(ruff.format(*PY_SRC_LIST, config="config/ruff.toml"), title="Formatting code")
 
 
 @duty(post=["docs-deploy"])

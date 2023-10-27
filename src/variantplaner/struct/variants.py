@@ -18,7 +18,6 @@ import polars
 
 # project import
 
-
 logger = logging.getLogger("struct.variants")
 
 

@@ -57,8 +57,6 @@ duty = ["duty>=0.10"]
 #ci-quality = ["variantplaner[duty,docs,quality,typing,security]"]
 #ci-tests = ["variantplaner[duty,tests]"]
 docs = [
-    "altair>=5",
-    "black>=23",
     "markdown-callouts>=0.3",
     "markdown-exec>=1.6",
     "mkdocs-coverage>=0.2",
@@ -70,15 +68,17 @@ docs = [
     "mkdocs-section-index>=0.3",
     "mkdocs>=1",
     "mkdocstrings[python]>=0.22",
+    "ruff>=0.1",
     "toml>=0.10",
+    "altair>=5",
 ]
 maintain = [
-    "black>=23",
     "blacken-docs>=1",
     "git-changelog>=2",
+    "ruff>=0.1",
 ]
 quality = [
-    "ruff>=0.0.276",
+    "ruff>=0.1",
 ]
 tests = [
     "pytest-benchmark[histogram]>=4",

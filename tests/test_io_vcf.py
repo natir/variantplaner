@@ -34,37 +34,40 @@ def test_extract_header() -> None:
     """Check extract_header."""
     header = io.vcf.extract_header(DATA_DIR / "no_info.vcf")
 
-    assert header == [
-        "##fileformat=VCFv4.2",
-        '##FILTER=<ID=PASS,Description="All filters passed">',
-        '##FILTER=<ID=LowQual,Description="Low quality">',
-        '##FORMAT=<ID=AD,Number=R,Type=Integer,Description="Allelic depths for the ref and alt alleles in the order listed">',
-        '##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Approximate read depth (reads with MQ=255 or with bad mates are filtered)">',
-        '##FORMAT=<ID=GQ,Number=1,Type=Integer,Description="Genotype Quality">',
-        '##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">',
-        '##FILTER=<ID=base_qual,Description="alt median base quality">',
-        '##FILTER=<ID=clustered_events,Description="Clustered events observed in the tumor">',
-        '##FILTER=<ID=contamination,Description="contamination">',
-        '##FILTER=<ID=duplicate,Description="evidence for alt allele is overrepresented by apparent duplicates">',
-        '##FILTER=<ID=fragment,Description="abs(ref - alt) median fragment length">',
-        '##FILTER=<ID=germline,Description="Evidence indicates this site is germline, not somatic">',
-        '##FILTER=<ID=haplotype,Description="Variant near filtered variant on same haplotype.">',
-        '##FILTER=<ID=low_allele_frac,Description="Allele fraction is below specified threshold">',
-        '##FILTER=<ID=map_qual,Description="ref - alt median mapping quality">',
-        '##FILTER=<ID=multiallelic,Description="Site filtered because too many alt alleles pass tumor LOD">',
-        '##FILTER=<ID=n_ratio,Description="Ratio of N to alt exceeds specified ratio">',
-        '##FILTER=<ID=normal_artifact,Description="artifact_in_normal">',
-        '##FILTER=<ID=numt_chimera,Description="NuMT variant with too many ALT reads originally from autosome">',
-        '##FILTER=<ID=numt_novel,Description="Alt depth is below expected coverage of NuMT in autosome">',
-        '##FILTER=<ID=orientation,Description="orientation bias detected by the orientation bias mixture model">',
-        '##FILTER=<ID=panel_of_normals,Description="Blacklisted site in panel of normals">',
-        '##FILTER=<ID=position,Description="median distance of alt variants from end of reads">',
-        '##FILTER=<ID=slippage,Description="Site filtered due to contraction of short tandem repeat region">',
-        '##FILTER=<ID=strand_bias,Description="Evidence for alt allele comes from one read direction only">',
-        '##FILTER=<ID=strict_strand,Description="Evidence for alt allele is not represented in both directions">',
-        '##FILTER=<ID=weak_evidence,Description="Mutation does not meet likelihood threshold">',
-        "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tsample_1\tsample_2\tsample_3",
-    ]
+    assert (
+        header
+        == [
+            "##fileformat=VCFv4.2",
+            '##FILTER=<ID=PASS,Description="All filters passed">',
+            '##FILTER=<ID=LowQual,Description="Low quality">',
+            '##FORMAT=<ID=AD,Number=R,Type=Integer,Description="Allelic depths for the ref and alt alleles in the order listed">',
+            '##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Approximate read depth (reads with MQ=255 or with bad mates are filtered)">',
+            '##FORMAT=<ID=GQ,Number=1,Type=Integer,Description="Genotype Quality">',
+            '##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">',
+            '##FILTER=<ID=base_qual,Description="alt median base quality">',
+            '##FILTER=<ID=clustered_events,Description="Clustered events observed in the tumor">',
+            '##FILTER=<ID=contamination,Description="contamination">',
+            '##FILTER=<ID=duplicate,Description="evidence for alt allele is overrepresented by apparent duplicates">',
+            '##FILTER=<ID=fragment,Description="abs(ref - alt) median fragment length">',
+            '##FILTER=<ID=germline,Description="Evidence indicates this site is germline, not somatic">',
+            '##FILTER=<ID=haplotype,Description="Variant near filtered variant on same haplotype.">',
+            '##FILTER=<ID=low_allele_frac,Description="Allele fraction is below specified threshold">',
+            '##FILTER=<ID=map_qual,Description="ref - alt median mapping quality">',
+            '##FILTER=<ID=multiallelic,Description="Site filtered because too many alt alleles pass tumor LOD">',
+            '##FILTER=<ID=n_ratio,Description="Ratio of N to alt exceeds specified ratio">',
+            '##FILTER=<ID=normal_artifact,Description="artifact_in_normal">',
+            '##FILTER=<ID=numt_chimera,Description="NuMT variant with too many ALT reads originally from autosome">',
+            '##FILTER=<ID=numt_novel,Description="Alt depth is below expected coverage of NuMT in autosome">',
+            '##FILTER=<ID=orientation,Description="orientation bias detected by the orientation bias mixture model">',
+            '##FILTER=<ID=panel_of_normals,Description="Blacklisted site in panel of normals">',
+            '##FILTER=<ID=position,Description="median distance of alt variants from end of reads">',
+            '##FILTER=<ID=slippage,Description="Site filtered due to contraction of short tandem repeat region">',
+            '##FILTER=<ID=strand_bias,Description="Evidence for alt allele comes from one read direction only">',
+            '##FILTER=<ID=strict_strand,Description="Evidence for alt allele is not represented in both directions">',
+            '##FILTER=<ID=weak_evidence,Description="Mutation does not meet likelihood threshold">',
+            "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tsample_1\tsample_2\tsample_3",
+        ]
+    )
 
 
 def test_extract_header_exception() -> None:

@@ -1,5 +1,7 @@
 target-version = "py39"
+
 line-length = 132
+
 exclude = [
     "fixtures",
     "site",
@@ -60,6 +62,7 @@ ignore = [
     "ANN401",  # Dynamically typed expressions (typing.Any) are disallowed
     "ARG005",  # Unused lambda argument
     "C901",  # Too complex
+    "COM812",  # Missing trailing comma (ruff formater recommendation)
     "D105",  # Missing docstring in magic method
     "D417",  # Missing argument description in the docstring
     "E501",  # Line too long
@@ -72,6 +75,7 @@ ignore = [
     "SLF001", # Private member accessed
     "TRY003",  # Avoid specifying long messages outside the exception class
     "ICN001",  # Don't short polars name in import
+    "ISC001",  # Single line implicit string concatenation (ruff formater recommendation)
 ]
 
 [per-file-ignores]

@@ -153,11 +153,7 @@ def __format_one_str(expr: polars.Expr, /, name: str) -> polars.Expr:
 
 def __format_list_int(expr: polars.Expr, /, name: str) -> polars.Expr:
     """Manage list of integer field."""
-    return (
-        expr.str.split(",")
-        .list.eval(polars.element().str.parse_int(10, strict=False).cast(polars.UInt16))
-        .alias(name.lower())
-    )
+    return expr.str.split(",").list.eval(polars.element().str.parse_int(10, strict=False).cast(polars.UInt16)).alias(name.lower())
 
 
 def __format_list_str(expr: polars.Expr, /, name: str) -> polars.Expr:
@@ -392,11 +388,7 @@ def __lazy2format(sample_name: str, format_string: str, col2type: dict[str, pola
         lazy_name = f"{sample_name}_{col_name.lower()}"
         if col_name == "GT":
             expression.append(
-                polars.col(lazy_name)
-                .cast(polars.Utf8)
-                .fill_null("./.")
-                .str.replace("1", "0/1")
-                .str.replace("2", "1/1"),
+                polars.col(lazy_name).cast(polars.Utf8).fill_null("./.").str.replace("1", "0/1").str.replace("2", "1/1"),
             )
         elif isinstance(col2type[lazy_name], polars.List):
             expression.append(
