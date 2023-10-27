@@ -94,5 +94,5 @@ typing = [
     "types-toml>=0.10",
 ]
 security = [
-    "safety>=2",
+    "safety>=2.3",
 ]

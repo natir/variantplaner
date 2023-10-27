@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import os
 import re
+import sys
 import typing
 from importlib.metadata import PackageNotFoundError, metadata
 from itertools import chain
@@ -12,15 +14,22 @@ from textwrap import dedent
 if typing.TYPE_CHECKING:
     from collections.abc import Mapping
 
-import toml
 from jinja2 import StrictUndefined
 from jinja2.sandbox import SandboxedEnvironment
 
-project_dir = Path(".")
-pyproject = toml.load(project_dir / "pyproject.toml")
+if sys.version_info >= (3, 11):
+    import tomllib
+else:
+    import tomli as tomllib
+
+project_dir = Path(os.getenv("MKDOCS_CONFIG_DIR", "."))
+with project_dir.joinpath("pyproject.toml").open("rb") as pyproject_file:
+    pyproject = tomllib.load(pyproject_file)
+
 project = pyproject["project"]
 pdm = pyproject["tool"]["pdm"]
-lock_data = toml.load(project_dir / "pdm.lock")
+with project_dir.joinpath("pdm.lock").open("rb") as lock_file:
+    lock_data = tomllib.load(lock_file)
 lock_pkgs = {pkg["name"].lower(): pkg for pkg in lock_data["package"]}
 project_name = project["name"]
 regex = re.compile(r"(?P<dist>[\w.-]+)(?P<spec>.*)$")

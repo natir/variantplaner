@@ -4,14 +4,17 @@ from __future__ import annotations
 
 import os
 import sys
+from contextlib import contextmanager
 from importlib.metadata import version as pkgversion
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from duty import duty
-from duty.callables import black, blacken_docs, coverage, lazy, mkdocs, mypy, pytest, ruff, safety
+from duty.callables import black, coverage, lazy, mkdocs, mypy, pytest, ruff, safety
 
 if TYPE_CHECKING:
+    from collections.abc import Iterator
+
     from duty.context import Context
 
 PY_SRC_PATHS = (Path(_) for _ in ("src", "tests", "benchmark", "duties.py", "scripts"))
@@ -30,32 +33,16 @@ def pyprefix(title: str) -> str:  # noqa: D103
     return title
 
 
-def merge(d1: Any, d2: Any) -> Any:  # noqa: D103
-    basic_types = (int, float, str, bool, complex)
-    if isinstance(d1, dict) and isinstance(d2, dict):
-        for key, value in d2.items():
-            if key in d1:
-                if isinstance(d1[key], basic_types):
-                    d1[key] = value
-                else:
-                    d1[key] = merge(d1[key], value)
-            else:
-                d1[key] = value
-        return d1
-    if isinstance(d1, list) and isinstance(d2, list):
-        return d1 + d2
-    return d2
-
-
-def mkdocs_config() -> str:  # noqa: D103
-    import mergedeep
-
-    # force YAML loader to merge arrays
-    mergedeep.merge = merge
-
+@contextmanager
+def material_insiders() -> Iterator[bool]:  # noqa: D103
     if "+insiders" in pkgversion("mkdocs-material"):
-        return "mkdocs.insiders.yml"
-    return "mkdocs.yml"
+        os.environ["MATERIAL_INSIDERS"] = "true"
+        try:
+            yield True
+        finally:
+            os.environ.pop("MATERIAL_INSIDERS")
+    else:
+        yield False
 
 
 @duty
@@ -77,7 +64,7 @@ def changelog(ctx: Context) -> None:
             parse_trailers=True,
             parse_refs=False,
             sections=["build", "deps", "feat", "fix", "refactor"],
-            bump_latest=True,
+            bump="auto",
             in_place=True,
         ),
         title="Updating changelog",
@@ -141,11 +128,10 @@ def check_docs(ctx: Context) -> None:
     Path(".benchmarks").mkdir(parents=True, exist_ok=True)
     Path(".benchmarks/tmp.json").touch(exist_ok=True)
 
-    config = mkdocs_config()
     ctx.run(
-        mkdocs.build(strict=True, config_file=config, verbose=True),
+        mkdocs.build(strict=True, verbose=True),
         title=pyprefix("Building documentation"),
-        command=f"mkdocs build -vsf {config}",
+        command="mkdocs build -vs",
     )
 
 
@@ -210,11 +196,12 @@ def docs(ctx: Context, host: str = "127.0.0.1", port: int = 8000) -> None:
         host: The host to serve the docs from.
         port: The port to serve the docs on.
     """
-    ctx.run(
-        mkdocs.serve(dev_addr=f"{host}:{port}", config_file=mkdocs_config()),
-        title="Serving documentation",
-        capture=False,
-    )
+    with material_insiders():
+        ctx.run(
+            mkdocs.serve(dev_addr=f"{host}:{port}"),
+            title="Serving documentation",
+            capture=False,
+        )
 
 
 @duty
@@ -225,8 +212,7 @@ def docs_deploy(ctx: Context) -> None:
         ctx: The context instance (passed automatically).
     """
     os.environ["DEPLOY"] = "true"
-    config_file = mkdocs_config()
-    ctx.run(mkdocs.gh_deploy(config_file=config_file, no_history=True), title="Deploying documentation")
+    ctx.run(mkdocs.gh_deploy(), title="Deploying documentation")
 
 
 @duty
@@ -241,11 +227,6 @@ def format(ctx: Context) -> None:
         title="Auto-fixing code",
     )
     ctx.run(black.run(*PY_SRC_LIST, config="config/black.toml"), title="Formatting code")
-    ctx.run(
-        blacken_docs.run(*PY_SRC_LIST, "docs", exts=["py", "md"], line_length=120),
-        title="Formatting docs",
-        nofail=True,
-    )
 
 
 @duty(post=["docs-deploy"])

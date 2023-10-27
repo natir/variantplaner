@@ -24,15 +24,14 @@ import click
 import polars
 
 # project import
-from variantplaner import exception, extract, generate, io, struct
-
-# mypy: warn_unused_ignores = false
+from variantplaner import debug, exception, extract, generate, io, struct
 
 
-@click.group(name="variantplaner")  # type: ignore[arg-type]
+@click.group(name="variantplaner")
 @click.option("-t", "--threads", help="Number of threads usable", default=1, type=click.IntRange(0), show_default=True)
 @click.option("-v", "--verbose", help="Verbosity level", count=True, type=click.IntRange(0, 4))
-def main(threads: int = 1, verbose: int = 0) -> None:
+@click.option("--debug-info", help="Get debug information", is_flag=True, show_default=True, default=False)
+def main(*, threads: int = 1, verbose: int = 0, debug_info: bool = False) -> None:
     """Run VariantPlanner."""
     logging.basicConfig(
         style="{",
@@ -44,7 +43,11 @@ def main(threads: int = 1, verbose: int = 0) -> None:
 
     logger = logging.getLogger("main")
 
-    logger.debug(f"parameter: {threads=} {verbose=}")
+    logger.debug(f"parameter: {threads=} {verbose=} {debug_info=}")
+
+    if debug_info:
+        debug.print_info()
+        sys.exit(0)
 
     polars.set_random_seed(42)
     os.environ["POLARS_MAX_THREADS"] = str(threads)
@@ -53,7 +56,7 @@ def main(threads: int = 1, verbose: int = 0) -> None:
 ###############
 # vcf2parquet #
 ###############
-@main.command()  # type: ignore[arg-type]
+@main.command()
 @click.option(
     "-i",
     "--input-path",
@@ -142,7 +145,7 @@ def vcf2parquet(
 ###############
 # parquet2vcf #
 ###############
-@main.command()  # type: ignore[arg-type]
+@main.command()
 @click.option(
     "-i",
     "--input-path",
@@ -286,7 +289,7 @@ def parquet2vcf(
 ##########
 # Struct #
 ##########
-@main.group("struct")  # type: ignore[arg-type]
+@main.group("struct")
 @click.pass_context
 @click.option(
     "-i",
@@ -305,7 +308,7 @@ def struct_main(ctx: click.Context, input_paths: list[pathlib.Path]) -> None:
     logger.debug(f"parameter: {input_paths=}")
 
 
-@struct_main.command("variants")  # type: ignore[arg-type]
+@struct_main.command("variants")
 @click.pass_context
 @click.option(
     "-o",
@@ -351,7 +354,7 @@ def struct_variants(
     struct.variants.merge(input_paths, output_path, bytes_memory_limit, polars_threads)
 
 
-@struct_main.command("genotypes")  # type: ignore[arg-type]
+@struct_main.command("genotypes")
 @click.pass_context
 @click.option(
     "-p",
@@ -390,7 +393,7 @@ def struct_genotypes(ctx: click.Context, prefix_path: pathlib.Path, file_per_thr
 ###############
 # Annotations #
 ###############
-@main.group("annotations")  # type: ignore[arg-type]
+@main.group("annotations")
 @click.pass_context
 @click.option(
     "-i",
@@ -427,7 +430,7 @@ def annotations_main(
     logger.debug(f"parameter: {input_path=} {output_path=} {chrom2length_path=}")
 
 
-@annotations_main.command("vcf")  # type: ignore[arg-type]
+@annotations_main.command("vcf")
 @click.pass_context
 @click.option(
     "-i",
@@ -479,7 +482,7 @@ def annotations_vcf(
         lf.collect(streaming=True).write_parquet(output_path)
 
 
-@annotations_main.command("csv")  # type: ignore[arg-type]
+@annotations_main.command("csv")
 @click.pass_context
 @click.option(
     "-c",
@@ -566,7 +569,7 @@ def annotations_csv(
 ############
 # Metadata #
 ############
-@main.group()  # type: ignore[arg-type]
+@main.group()
 @click.pass_context
 @click.option(
     "-i",
@@ -591,7 +594,7 @@ def metadata(ctx: click.Context, input_path: pathlib.Path, output_path: pathlib.
     logger.debug(f"parameter: {input_path=} {output_path=}")
 
 
-@metadata.command("json")  # type: ignore[arg-type]
+@metadata.command("json")
 @click.pass_context
 @click.option(
     "-f",
@@ -630,7 +633,7 @@ def metadata_json(
     lf.write_parquet(output_path)
 
 
-@metadata.command("csv")  # type: ignore[arg-type]
+@metadata.command("csv")
 @click.pass_context
 @click.option(
     "-c",
@@ -677,7 +680,7 @@ def generate_main() -> None:
     logger.debug("parameter: ")
 
 
-@generate_main.command("transmission")  # type: ignore[arg-type]
+@generate_main.command("transmission")
 @click.option(
     "-i",
     "--input-path",
