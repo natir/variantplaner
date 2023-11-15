@@ -38,7 +38,7 @@ def __hive_worker(lfs: tuple[polars.LazyFrame], basename: str, output_prefix: pa
 
     lf = polars.concat(lf for lf in lfs if lf is not None).with_columns(
         [
-            polars.col("id").mul(2).floordiv(pow(2, 64 - NUMBER_OF_BITS)).alias("id_part"),
+            polars.col("id").floordiv(pow(2, 64 - NUMBER_OF_BITS)).alias("id_part"),
         ],
     )
 
