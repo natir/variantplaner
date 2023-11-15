@@ -10,7 +10,7 @@ class VariantId:
         self._expr = expr
 
     def compute(self, ref: polars.Expr, alt: polars.Expr, max_pos: int) -> polars.Expr:
-        return self._expr._register_plugin(
+        return self._expr.register_plugin(
             lib=lib,
             args=[ref, alt, max_pos],
             symbol="compute",

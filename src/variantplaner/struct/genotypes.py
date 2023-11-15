@@ -62,7 +62,7 @@ def __merge_file(prefix: pathlib.Path, basenames: list[str]) -> None:
 
     logging.info(f"{paths=}")
 
-    lfs = [polars.scan_parquet(path) for path in paths if path.is_file()]
+    lfs = [polars.scan_parquet(path, hive_partitioning=False) for path in paths if path.is_file()]
 
     logging.info(f"{lfs=}")
     if lfs:
