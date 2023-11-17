@@ -102,6 +102,7 @@ def test_vcf2parquet(tmp_path: pathlib.Path) -> None:
     polars.testing.assert_frame_equal(
         polars.scan_parquet(DATA_DIR / "no_info.variants.parquet"),
         polars.scan_parquet(variants_path),
+        check_row_order=False,
     )
     try:
         polars.testing.assert_frame_equal(
@@ -142,10 +143,12 @@ def test_vcf2parquet_ask_annotations(tmp_path: pathlib.Path) -> None:
     polars.testing.assert_frame_equal(
         polars.scan_parquet(DATA_DIR / "no_genotypes.variants.parquet"),
         polars.scan_parquet(variants_path),
+        check_row_order=False,
     )
+
     polars.testing.assert_frame_equal(
-        polars.scan_parquet(DATA_DIR / "no_genotypes.annotations.parquet"),
-        polars.scan_parquet(annotations_path),
+        polars.scan_parquet(DATA_DIR / "no_genotypes.annotations.parquet").sort("id"),
+        polars.scan_parquet(annotations_path).sort("id"),
         check_column_order=False,
     )
 
@@ -173,6 +176,7 @@ def test_vcf2parquet_not_ask_genotypes(tmp_path: pathlib.Path) -> None:
     polars.testing.assert_frame_equal(
         polars.scan_parquet(DATA_DIR / "no_info.variants.parquet"),
         polars.scan_parquet(variants_path),
+        check_row_order=False,
     )
 
 
@@ -246,6 +250,7 @@ def test_vcf2parquet_sv(tmp_path: pathlib.Path) -> None:
     polars.testing.assert_frame_equal(
         polars.scan_parquet(DATA_DIR / "sv.variants.parquet"),
         polars.scan_parquet(variants_path),
+        check_row_order=False,
     )
 
 
@@ -276,10 +281,12 @@ def test_vcf2parquet_sv_genotypes(tmp_path: pathlib.Path) -> None:
     polars.testing.assert_frame_equal(
         polars.scan_parquet(DATA_DIR / "sv.variants.parquet"),
         polars.scan_parquet(variants_path),
+        check_row_order=False,
     )
     polars.testing.assert_frame_equal(
         polars.scan_parquet(DATA_DIR / "sv.genotypes.parquet"),
         polars.scan_parquet(genotypes_path),
+        check_row_order=False,
     )
 
 
@@ -619,6 +626,7 @@ def test_metadata_json(tmp_path: pathlib.Path) -> None:
     polars.testing.assert_frame_equal(
         polars.scan_parquet(metadata_path),
         polars.scan_parquet(DATA_DIR / "metadata.parquet"),
+        check_row_order=False,
     )
 
 
@@ -645,6 +653,7 @@ def test_metadata_jsonl(tmp_path: pathlib.Path) -> None:
     polars.testing.assert_frame_equal(
         polars.scan_parquet(metadata_path),
         polars.scan_parquet(DATA_DIR / "metadata.parquet"),
+        check_row_order=False,
     )
 
 
@@ -678,7 +687,7 @@ def test_metadata_json_select(tmp_path: pathlib.Path) -> None:
     truth = polars.scan_parquet(DATA_DIR / "metadata.parquet").select(["sample", "link", "gender", "kindex"])
     value = polars.scan_parquet(metadata_path)
 
-    polars.testing.assert_frame_equal(truth, value)
+    polars.testing.assert_frame_equal(truth, value, check_row_order=False)
 
 
 def test_metadata_csv(tmp_path: pathlib.Path) -> None:
@@ -736,7 +745,7 @@ def test_metadata_csv_select(tmp_path: pathlib.Path) -> None:
     truth = polars.scan_parquet(DATA_DIR / "metadata.parquet").select(["sample", "link", "gender", "kindex"])
     value = polars.scan_parquet(metadata_path)
 
-    polars.testing.assert_frame_equal(truth, value)
+    polars.testing.assert_frame_equal(truth, value, check_row_order=False)
 
 
 def test_generate_transmission_ped(tmp_path: pathlib.Path) -> None:

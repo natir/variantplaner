@@ -122,7 +122,7 @@ def vcf2parquet(
     # Read vcf and manage structural variant
     lf = io.vcf.into_lazyframe(input_path, chrom2length_path, extension=io.vcf.IntoLazyFrameExtension.MANAGE_SV)
 
-    extract.variants(lf).sink_parquet(variants)
+    extract.variants(lf).sink_parquet(variants, maintain_order=False)
     logger.info(f"finish write {variants}")
 
     if genotypes:
@@ -132,12 +132,12 @@ def vcf2parquet(
             logger.exception("")
             sys.exit(12)
 
-        genotypes_lf.sink_parquet(genotypes)
+        genotypes_lf.sink_parquet(genotypes, maintain_order=False)
 
     if annotations:
         annotations_lf = lf.with_columns(io.vcf.info2expr(vcf_header, input_path))
         annotations_lf = annotations_lf.drop(["chr", "pos", "ref", "alt", "filter", "qual", "info"])
-        annotations_lf.sink_parquet(annotations)
+        annotations_lf.sink_parquet(annotations, maintain_order=False)
 
     logger.info(f"finish write {genotypes}")
 
@@ -464,7 +464,7 @@ def annotations_vcf(
     try:
         vcf_header = io.vcf.extract_header(input_path)
         info_parser = io.vcf.info2expr(vcf_header, input_path, info)
-        lf = io.vcf.into_lazyframe(input_path, chrom2length_path)
+        lf = io.vcf.into_lazyframe(input_path, chrom2length_path, extension=io.vcf.IntoLazyFrameExtension.MANAGE_SV)
     except exception.NotAVCFError:
         logger.exception("")
         sys.exit(21)
@@ -475,11 +475,7 @@ def annotations_vcf(
         logger.info(f"Rename vcf variant id in {rename_id}")
         lf = lf.rename({"vid": rename_id})
 
-    try:
-        lf.sink_parquet(output_path)
-    except BaseException:
-        logger.exception("")
-        lf.collect(streaming=True).write_parquet(output_path)
+    lf.sink_parquet(output_path, maintain_order=False)
 
 
 @annotations_main.command("csv")
@@ -666,7 +662,7 @@ def metadata_csv(ctx: click.Context, columns: list[str], separator: str = ",") -
     if columns:
         lf = lf.select(columns)
 
-    lf.sink_parquet(output_path)
+    lf.sink_parquet(output_path, maintain_order=False)
 
 
 ############
