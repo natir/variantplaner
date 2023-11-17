@@ -52,4 +52,4 @@ def from_lazyframe(lf: polars.LazyFrame, output_path: pathlib.Path) -> None:
     Returns:
         None
     """
-    lf.collect().write_csv(output_path, has_header=False, separator="\t")
+    lf.collect().write_csv(output_path, include_header=False, separator="\t")
