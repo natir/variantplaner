@@ -35,7 +35,7 @@ def add_variant_id(lf: polars.LazyFrame, chrom2length: polars.LazyFrame) -> pola
     """
     if "SVTYPE" in lf.columns and "SVLEN" in lf.columns:
         lf = lf.with_columns(
-            polars.when(
+            alt=polars.when(
                 polars.col("alt").str.replace("<(?<type>[^:]+).*>", "$type") == polars.col("SVTYPE"),
             )
             .then(

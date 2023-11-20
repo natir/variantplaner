@@ -23,7 +23,7 @@ if typing.TYPE_CHECKING:  # pragma: no cover
 
         has_header: bool
         separator: str
-        comment_char: str | None
+        comment_prefix: str | None
         quote_char: str | None
         skip_rows: int
         dtypes: polars.type_aliases.SchemaDict | Sequence[polars.type_aliases.PolarsDataType] | None
@@ -109,5 +109,5 @@ def chr2length_into_lazyframe(input_path: pathlib.Path) -> polars.LazyFrame:
     """
     lf = polars.scan_csv(input_path, schema={"chr": polars.Utf8, "length": polars.UInt64})
     return lf.with_columns(
-        offset=polars.col("length").cumsum() - polars.col("length"),
+        offset=polars.col("length").cum_sum() - polars.col("length"),
     )

@@ -1,12 +1,11 @@
 //! Function required to compute variant id
 
 /* std use */
-use std::hash::Hasher;
 
 /* crate use */
 
 /* polars use */
-use polars::prelude::*;
+use polars_core::prelude::*;
 use pyo3_polars::derive::polars_expr;
 
 #[inline(always)]
@@ -36,6 +35,8 @@ fn local_compute(
     let sep_len = (pos_mov as f64 / 2.0).floor().log2().ceil() as u64;
     let sep_mov = pos_mov - sep_len;
     let nuc_len_max = sep_mov / 2;
+    let hasher = ahash::RandomState::with_seeds(42, 42, 42, 42);
+    let mut key = Vec::with_capacity(128);
 
     let out: ChunkedArray<UInt64Type> = real_pos
         .into_iter()
@@ -43,14 +44,15 @@ fn local_compute(
         .zip(alt_seq)
         .map(|((p, r), a)| match (p, r, a) {
             (Some(p), Some(r), Some(a)) => {
-                let mut hasher = rustc_hash::FxHasher::default();
                 let mut hash = 0;
                 if r.len() + a.len() > nuc_len_max as usize {
-                    hash |= 1 << 63;
-                    hasher.write_u64(p);
-                    hasher.write(r.as_bytes());
-                    hasher.write(a.as_bytes());
-                    hash |= hasher.finish() >> 1;
+                    key.clear();
+
+                    key.extend(p.to_be_bytes());
+                    key.extend(r.as_bytes());
+                    key.extend(a.as_bytes());
+
+                    hash = (1 << 63) | (hasher.hash_one(&key) >> 1);
                 } else {
                     hash |= p << pos_mov;
                     hash |= (r.len() as u64) << sep_mov;
@@ -67,7 +69,7 @@ fn local_compute(
 }
 
 #[polars_expr(output_type=UInt64)]
-fn compute(inputs: &[Series]) -> PolarsResult<Series> {
+fn compute(inputs: &Vec<Series>) -> PolarsResult<Series> {
     let real_pos = inputs[0].u64()?;
     let ref_seq = inputs[1].utf8()?;
     let alt_seq = inputs[2].utf8()?;
@@ -125,7 +127,7 @@ mod tests {
                     AnyValue::UInt64(1846542345),
                     AnyValue::UInt64(5477969788016787468),
                     AnyValue::UInt64(5477969788017836044),
-                    AnyValue::UInt64(16290893548283143531),
+                    AnyValue::UInt64(13756669010756803764),
                     AnyValue::Null,
                 ],
                 &DataType::UInt64,

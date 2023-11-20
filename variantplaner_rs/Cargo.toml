@@ -1,6 +1,6 @@
 [package]
 name = "variantplaner_rs"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -9,11 +9,12 @@ name = "variantplaner_rs"
 crate-type = ["cdylib"]
 
 [dependencies]
-rustc-hash  = { version = "1" }
+# hashing
+ahash        = { version = "0.8",  features = ["no-rng"] }
 
-polars = { version = "0.34.2", default-features = false, features = ["fmt", "dtype-full"] }
-polars-plan = { version = "0.34.2", default-feautres = false }
-pyo3        = { version = "0.20", features = ["extension-module"] }
-pyo3-polars = { version = "0.8", features = ["derive"] }
-
-jemallocator = { version = "0.5", features = ["disable_initial_exec_tls"] }
+# polars thing
+polars       = { version = "0.35", default-features = false, features = ["fmt", "dtype-full"] }
+polars-plan  = { version = "0.35", default-features = false }
+pyo3         = { version = "0.20", features = ["extension-module"] }
+pyo3-polars  = { version = "0.9",  features = ["derive"] }
+jemallocator = { version = "0.5",  features = ["disable_initial_exec_tls"] }

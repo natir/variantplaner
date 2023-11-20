@@ -143,7 +143,7 @@ def __format_gt(expr: polars.Expr, /, name: str) -> polars.Expr:
 
 def __format_one_int(expr: polars.Expr, /, name: str) -> polars.Expr:
     """Manage integer field."""
-    return expr.str.parse_int(10, strict=False).cast(polars.UInt16).alias(name.lower())
+    return expr.str.to_integer(base=10, strict=False).cast(polars.UInt16).alias(name.lower())
 
 
 def __format_one_str(expr: polars.Expr, /, name: str) -> polars.Expr:
@@ -153,7 +153,11 @@ def __format_one_str(expr: polars.Expr, /, name: str) -> polars.Expr:
 
 def __format_list_int(expr: polars.Expr, /, name: str) -> polars.Expr:
     """Manage list of integer field."""
-    return expr.str.split(",").list.eval(polars.element().str.parse_int(10, strict=False).cast(polars.UInt16)).alias(name.lower())
+    return (
+        expr.str.split(",")
+        .list.eval(polars.element().str.to_integer(base=10, strict=False).cast(polars.UInt16))
+        .alias(name.lower())
+    )
 
 
 def __format_list_str(expr: polars.Expr, /, name: str) -> polars.Expr:
@@ -297,7 +301,7 @@ def into_lazyframe(
     lf = polars.scan_csv(
         input_path,
         separator="\t",
-        comment_char="#",
+        comment_prefix="#",
         has_header=False,
         dtypes={"column_1": polars.Utf8, "column_2": polars.UInt64},
         ignore_errors=True,

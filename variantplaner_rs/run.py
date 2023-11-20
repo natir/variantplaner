@@ -17,7 +17,13 @@ df = polars.DataFrame(
 lf = df.lazy()
 
 lf_id = lf.with_columns(
-    id = polars.col("real_pos").variant_id.compute(polars.col("ref"), polars.col("alt"), polars.lit(120).cast(polars.UInt64))
+    id = polars.col("real_pos")
+    .variant_id.compute(
+        polars.col("ref"),
+        polars.col("alt"),
+        polars.lit(120)
+        .cast(polars.UInt64)
+    )
 )
 
 print(lf_id.collect())
