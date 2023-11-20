@@ -464,7 +464,7 @@ def annotations_vcf(
     try:
         vcf_header = io.vcf.extract_header(input_path)
         info_parser = io.vcf.info2expr(vcf_header, input_path, info)
-        lf = io.vcf.into_lazyframe(input_path, chrom2length_path, extension=io.vcf.IntoLazyFrameExtension.MANAGE_SV)
+        lf = io.vcf.into_lazyframe(input_path, chrom2length_path)
     except exception.NotAVCFError:
         logger.exception("")
         sys.exit(21)
@@ -475,7 +475,7 @@ def annotations_vcf(
         logger.info(f"Rename vcf variant id in {rename_id}")
         lf = lf.rename({"vid": rename_id})
 
-    lf.sink_parquet(output_path, maintain_order=False)
+    lf.collect(streaming=True).write_parquet(output_path)
 
 
 @annotations_main.command("csv")
