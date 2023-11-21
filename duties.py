@@ -220,7 +220,7 @@ def release(ctx: Context, version: str) -> None:
         ctx: The context instance (passed automatically).
         version: The new version number to use.
     """
-    ctx.run("git add pyproject.toml CHANGELOG.md", title="Staging files", pty=PTY)
+    ctx.run("git add pyproject.toml CHANGELOG.md README.md src/variantplaner/__init__.py", title="Staging files", pty=PTY)
     ctx.run(["git", "commit", "-m", f"chore: Prepare release {version}"], title="Committing changes", pty=PTY)
     ctx.run(f"git tag {version}", title="Tagging commit", pty=PTY)
     ctx.run("git push", title="Pushing commits", pty=False)

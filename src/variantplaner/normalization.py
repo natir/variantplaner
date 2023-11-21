@@ -33,26 +33,28 @@ def add_variant_id(lf: polars.LazyFrame, chrom2length: polars.LazyFrame) -> pola
     Returns:
         [polars.LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html) with chr column normalized
     """
+    real_pos_max = chrom2length.select([polars.col("length").sum()]).collect().get_column("length").max()
+
     if "SVTYPE" in lf.columns and "SVLEN" in lf.columns:
         lf = lf.with_columns(
             alt=polars.when(
                 polars.col("alt").str.replace("<(?<type>[^:]+).*>", "$type") == polars.col("SVTYPE"),
             )
             .then(
-                polars.col("alt").str.replace(
+                polars.col("alt")
+                .str.replace(
                     ".+",
                     polars.concat_str(
                         [polars.col("SVTYPE"), polars.col("SVLEN").list.get(0)],
                         separator="-",
                     ),
-                ),
+                )
+                .str.pad_end(28, "-"),
             )
             .otherwise(
                 polars.col("alt"),
             ),
         )
-
-    real_pos_max = chrom2length.select([polars.col("length").sum()]).collect().get_column("length").max()
 
     lf = lf.join(chrom2length, on="chr", how="left")
     lf = lf.with_columns(real_pos=polars.col("pos") + polars.col("offset"))

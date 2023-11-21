@@ -208,7 +208,6 @@ def test_into_lazyframe_sv() -> None:
         extension=io.vcf.IntoLazyFrameExtension.MANAGE_SV,
     )
 
-    lf.sink_parquet(DATA_DIR / "sv.parquet", maintain_order=False)
     polars.testing.assert_frame_equal(lf, polars.scan_parquet(DATA_DIR / "sv.parquet"), check_row_order=False)
 
 
