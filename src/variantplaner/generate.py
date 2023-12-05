@@ -106,9 +106,9 @@ def transmission(
 
     transmission_lf = transmission_lf.with_columns(
         polars.concat_str(
-            polars.col("index_gt").map_dict(gt2chr, default="~", return_dtype=polars.Utf8),
-            polars.col("mother_gt").fill_null(94).map_dict(gt2chr, default="~", return_dtype=polars.Utf8),
-            polars.col("father_gt").fill_null(94).map_dict(gt2chr, default="~", return_dtype=polars.Utf8),
+            polars.col("index_gt").replace(gt2chr, default="~", return_dtype=polars.Utf8),
+            polars.col("mother_gt").fill_null(94).replace(gt2chr, default="~", return_dtype=polars.Utf8),
+            polars.col("father_gt").fill_null(94).replace(gt2chr, default="~", return_dtype=polars.Utf8),
         ).alias("origin"),
     )
 
