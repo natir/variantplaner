@@ -15,6 +15,7 @@ if typing.TYPE_CHECKING:  # pragma: no cover
 import polars
 
 # project import
+from variantplaner import normalization
 
 logger = logging.getLogger("struct.genotypes")
 
@@ -36,11 +37,7 @@ def __hive_worker(lfs: tuple[polars.LazyFrame], basename: str, output_prefix: pa
     """
     logging.info(f"Call hive worker {lfs=}, {basename=}, {output_prefix=}")
 
-    lf = polars.concat(lf for lf in lfs if lf is not None).with_columns(
-        [
-            polars.col("id").floordiv(pow(2, 64 - NUMBER_OF_BITS)).alias("id_part"),
-        ],
-    )
+    lf = normalization.add_id_part(polars.concat(lf for lf in lfs if lf is not None))
 
     for name, df in lf.collect().group_by(polars.col("id_part")):
         df.write_parquet(output_prefix / f"id_part={name}" / f"{basename}.parquet")

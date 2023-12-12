@@ -16,7 +16,7 @@ df = polars.DataFrame(
 
 lf = df.lazy()
 
-lf_id = lf.with_columns(
+lf = lf.with_columns(
     id = polars.col("real_pos")
     .variant_id.compute(
         polars.col("ref"),
@@ -26,4 +26,9 @@ lf_id = lf.with_columns(
     )
 )
 
-print(lf_id.collect())
+lf = lf.with_columns(
+    part = polars.col("id")
+    .variant_id.partition()
+)
+
+print(lf.collect())

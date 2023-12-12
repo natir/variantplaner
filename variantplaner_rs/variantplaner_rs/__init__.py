@@ -16,6 +16,12 @@ class VariantId:
             symbol="compute",
         )
 
+    def partition(self) -> polars.Expr:
+        return self._expr.register_plugin(
+            lib=lib,
+            symbol="partition",
+        )
+
 
 __version__: str = "0.3.0"
 __all__: list[str] = ["VariantId"]

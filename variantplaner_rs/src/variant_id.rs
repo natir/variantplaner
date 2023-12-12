@@ -78,6 +78,24 @@ fn compute(inputs: &Vec<Series>) -> PolarsResult<Series> {
     local_compute(real_pos, ref_seq, alt_seq, max_pos)
 }
 
+fn local_part(id: &UInt64Chunked) -> PolarsResult<Series> {
+    Ok(id
+        .into_iter()
+        .map(|i| match i {
+            Some(i) if i >> 63 == 0b1 => Some(255),
+            Some(i) => Some((i << 1) >> 56),
+            _ => None,
+        })
+        .collect())
+}
+
+#[polars_expr(output_type=UInt8)]
+fn partition(inputs: &Vec<Series>) -> PolarsResult<Series> {
+    let id = inputs[0].u64()?;
+
+    local_part(id)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -131,6 +149,42 @@ mod tests {
                     AnyValue::Null,
                 ],
                 &DataType::UInt64,
+                false
+            )
+            .unwrap()
+        );
+    }
+
+    #[test]
+    fn compute_part() {
+        let mut real_pos = UInt64Chunked::new_vec(
+            "real_pos",
+            vec![10, 50, 110, 326512443305, 326512443305, 224],
+        );
+        let mut ref_seq = Utf8Chunked::new("ref", vec!["A", "C", "T", "G", "GA", "CATGAGCGGACTG"]);
+        let mut alt_seq = Utf8Chunked::new("alt", vec!["G", "T", "C", "A", "", "AC"]);
+
+        real_pos.extend(&UInt64Chunked::full_null("", 1));
+        ref_seq.extend(&Utf8Chunked::full_null("", 1));
+        alt_seq.extend(&Utf8Chunked::full_null("", 1));
+
+        let id = local_compute(&real_pos, &ref_seq, &alt_seq, 326512443305).unwrap();
+        let partition = local_part(id.u64().unwrap()).unwrap();
+
+        assert_eq!(
+            partition,
+            Series::from_any_values_and_dtype(
+                "",
+                &[
+                    AnyValue::UInt8(0),
+                    AnyValue::UInt8(0),
+                    AnyValue::UInt8(0),
+                    AnyValue::UInt8(152),
+                    AnyValue::UInt8(152),
+                    AnyValue::UInt8(255),
+                    AnyValue::Null,
+                ],
+                &DataType::UInt8,
                 false
             )
             .unwrap()

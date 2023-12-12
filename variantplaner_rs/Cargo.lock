@@ -1338,7 +1338,7 @@ checksum = "c7de7d73e1754487cb58364ee906a499937a0dfabd86bcb980fa99ec8c8fa2ce"
 
 [[package]]
 name = "variantplaner_rs"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "ahash",
  "jemallocator",
