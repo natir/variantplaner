@@ -192,7 +192,7 @@ def render_plot() -> str:
         return ""
 
     name2func = {
-        name: globals()[f"{name}_func"] if f"{name}_func" in globals() else nothing
+        name: globals().get(f"{name}_func", nothing)
         for name in df.get_column("benchmark").unique().to_list()
     }
 

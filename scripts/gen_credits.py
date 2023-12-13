@@ -56,7 +56,11 @@ def _get_deps(base_deps: Mapping[str, Mapping[str, str]]) -> dict[str, dict[str,
         dep_name = parsed["dist"].lower()
         if dep_name not in lock_pkgs:
             continue
-        deps[dep_name] = {"license": _get_license(dep_name), **parsed, **lock_pkgs[dep_name]}
+        deps[dep_name] = {
+            "license": _get_license(dep_name),
+            **parsed,
+            **lock_pkgs[dep_name],
+        }
 
     again = True
     while again:
@@ -67,7 +71,11 @@ def _get_deps(base_deps: Mapping[str, Mapping[str, str]]) -> dict[str, dict[str,
                     parsed = regex.match(pkg_dependency).groupdict()  # type: ignore[union-attr]
                     dep_name = parsed["dist"].lower()
                     if dep_name in lock_pkgs and dep_name not in deps and dep_name != project["name"]:
-                        deps[dep_name] = {"license": _get_license(dep_name), **parsed, **lock_pkgs[dep_name]}
+                        deps[dep_name] = {
+                            "license": _get_license(dep_name),
+                            **parsed,
+                            **lock_pkgs[dep_name],
+                        }
                         again = True
 
     return deps

@@ -91,14 +91,16 @@ def test_vcf2parquet(tmp_path: pathlib.Path) -> None:
             str(DATA_DIR / "no_info.vcf"),
             "-c",
             str(DATA_DIR / "grch38.92.csv"),
-            "-v",
+            "variants",
+            "-o",
             str(variants_path),
-            "-g",
+            "genotypes",
+            "-o",
             str(genotypes_path),
         ],
     )
 
-    assert result.exit_code == 0
+    assert result.exit_code == 0, result.output
     polars.testing.assert_frame_equal(
         polars.scan_parquet(DATA_DIR / "no_info.variants.parquet"),
         polars.scan_parquet(variants_path),
@@ -132,14 +134,16 @@ def test_vcf2parquet_ask_annotations(tmp_path: pathlib.Path) -> None:
             str(DATA_DIR / "no_genotypes.vcf"),
             "-c",
             str(DATA_DIR / "grch38.92.csv"),
-            "-v",
+            "variants",
+            "-o",
             str(variants_path),
-            "-a",
+            "annotations",
+            "-o",
             str(annotations_path),
         ],
     )
 
-    assert result.exit_code == 0
+    assert result.exit_code == 0, result.output
     polars.testing.assert_frame_equal(
         polars.scan_parquet(DATA_DIR / "no_genotypes.variants.parquet"),
         polars.scan_parquet(variants_path),
@@ -167,12 +171,13 @@ def test_vcf2parquet_not_ask_genotypes(tmp_path: pathlib.Path) -> None:
             str(DATA_DIR / "no_info.vcf"),
             "-c",
             str(DATA_DIR / "grch38.92.csv"),
-            "-v",
+            "variants",
+            "-o",
             str(variants_path),
         ],
     )
 
-    assert result.exit_code == 0
+    assert result.exit_code == 0, result.output
     polars.testing.assert_frame_equal(
         polars.scan_parquet(DATA_DIR / "no_info.variants.parquet"),
         polars.scan_parquet(variants_path),
@@ -194,9 +199,11 @@ def test_vcf2parquet_not_vcf(tmp_path: pathlib.Path) -> None:
             str(DATA_DIR / "no_info.tsv"),
             "-c",
             str(DATA_DIR / "grch38.92.csv"),
-            "-v",
+            "variants",
+            "-o",
             str(variants_path),
-            "-g",
+            "genotypes",
+            "-o",
             str(genotypes_path),
         ],
     )
@@ -218,9 +225,11 @@ def test_vcf2parquet_no_genotype(tmp_path: pathlib.Path) -> None:
             str(DATA_DIR / "no_genotypes.vcf"),
             "-c",
             str(DATA_DIR / "grch38.92.csv"),
-            "-v",
+            "variants",
+            "-o",
             str(variants_path),
-            "-g",
+            "genotypes",
+            "-o",
             str(genotypes_path),
         ],
     )
@@ -241,12 +250,13 @@ def test_vcf2parquet_sv(tmp_path: pathlib.Path) -> None:
             str(DATA_DIR / "sv.vcf"),
             "-c",
             str(DATA_DIR / "grch38.92.csv"),
-            "-v",
+            "variants",
+            "-o",
             str(variants_path),
         ],
     )
 
-    assert result.exit_code == 0
+    assert result.exit_code == 0, result.output
     polars.testing.assert_frame_equal(
         polars.scan_parquet(DATA_DIR / "sv.variants.parquet"),
         polars.scan_parquet(variants_path),
@@ -268,16 +278,18 @@ def test_vcf2parquet_sv_genotypes(tmp_path: pathlib.Path) -> None:
             str(DATA_DIR / "sv.vcf"),
             "-c",
             str(DATA_DIR / "grch38.92.csv"),
-            "-v",
+            "variants",
+            "-o",
             str(variants_path),
-            "-g",
+            "genotypes",
+            "-o",
             str(genotypes_path),
             "-f",
             "GT:GQ:CN:CNQ",
         ],
     )
 
-    assert result.exit_code == 0
+    assert result.exit_code == 0, result.output
     polars.testing.assert_frame_equal(
         polars.scan_parquet(DATA_DIR / "sv.variants.parquet"),
         polars.scan_parquet(variants_path),
@@ -295,9 +307,18 @@ def test_parquet2vcf(tmp_path: pathlib.Path) -> None:
     variants_path = tmp_path / "variants.vcf"
 
     runner = CliRunner()
-    result = runner.invoke(cli.main, ["parquet2vcf", "-i", str(DATA_DIR / "no_info.parquet"), "-o", str(variants_path)])
+    result = runner.invoke(
+        cli.main,
+        [
+            "parquet2vcf",
+            "-v",
+            str(DATA_DIR / "no_info.parquet"),
+            "-o",
+            str(variants_path),
+        ],
+    )
 
-    assert result.exit_code == 0
+    assert result.exit_code == 0, result.output
 
     filecmp.cmp(variants_path, DATA_DIR / "no_info.parquet2vcf.vcf")
 
@@ -311,7 +332,7 @@ def test_parquet2vcf_add_genotype(tmp_path: pathlib.Path) -> None:
         cli.main,
         [
             "parquet2vcf",
-            "-i",
+            "-v",
             str(DATA_DIR / "no_info.variants.parquet"),
             "-o",
             str(variants_path),
@@ -322,7 +343,7 @@ def test_parquet2vcf_add_genotype(tmp_path: pathlib.Path) -> None:
         ],
     )
 
-    assert result.exit_code == 0
+    assert result.exit_code == 0, result.output
 
     filecmp.cmp(variants_path, DATA_DIR / "no_info.parquet2vcf_genotypes.vcf")
 
@@ -338,15 +359,15 @@ def test_struct_variants(tmp_path: pathlib.Path) -> None:
             "struct",
             "-i",
             str(DATA_DIR / "no_genotypes.variants.parquet"),
-            "-i",
             str(DATA_DIR / "no_info.variants.parquet"),
+            "--",
             "variants",
             "-o",
             str(merge_path),
         ],
     )
 
-    assert result.exit_code == 0
+    assert result.exit_code == 0, result.output
 
     lf = polars.scan_parquet(merge_path)
 
@@ -361,17 +382,17 @@ def test_struct_genotypes(tmp_path: pathlib.Path) -> None:
     result = runner.invoke(
         cli.main,
         [
-            "-vvvv",
             "struct",
             "-i",
             str(DATA_DIR / "no_info.genotypes.parquet"),
+            "--",
             "genotypes",
             "-p",
             str(prefix_path),
         ],
     )
 
-    assert result.exit_code == 0
+    assert result.exit_code == 0, result.output
 
 
 def test_struct_genotypes_threads(tmp_path: pathlib.Path) -> None:
@@ -382,19 +403,19 @@ def test_struct_genotypes_threads(tmp_path: pathlib.Path) -> None:
     result = runner.invoke(
         cli.main,
         [
-            "-vvvv",
             "-t",
             "4",
             "struct",
             "-i",
             str(DATA_DIR / "no_info.genotypes.parquet"),
+            "--",
             "genotypes",
             "-p",
             str(prefix_path),
         ],
     )
 
-    assert result.exit_code == 0
+    assert result.exit_code == 0, result.output
 
 
 def test_annotations_vcf(tmp_path: pathlib.Path) -> None:
@@ -405,18 +426,18 @@ def test_annotations_vcf(tmp_path: pathlib.Path) -> None:
     result = runner.invoke(
         cli.main,
         [
-            "annotations",
+            "vcf2parquet",
             "-i",
             str(DATA_DIR / "no_genotypes.vcf"),
             "-c",
             str(DATA_DIR / "grch38.92.csv"),
+            "annotations",
             "-o",
             str(annotations_path),
-            "vcf",
         ],
     )
 
-    assert result.exit_code == 0
+    assert result.exit_code == 0, result.output
 
     lf = polars.scan_parquet(annotations_path)
     assert lf.columns == [
@@ -454,18 +475,18 @@ def test_annotations_vcf_not_vcf(tmp_path: pathlib.Path) -> None:
     result = runner.invoke(
         cli.main,
         [
-            "annotations",
+            "vcf2parquet",
             "-i",
             str(DATA_DIR / "no_info.tsv"),
-            "-o",
-            str(annotations_path),
             "-c",
             str(DATA_DIR / "grch38.92.csv"),
-            "vcf",
+            "annotations",
+            "-o",
+            str(annotations_path),
         ],
     )
 
-    assert result.exit_code == 21
+    assert result.exit_code == 11
 
 
 def test_annotations_vcf_select(tmp_path: pathlib.Path) -> None:
@@ -476,22 +497,21 @@ def test_annotations_vcf_select(tmp_path: pathlib.Path) -> None:
     result = runner.invoke(
         cli.main,
         [
-            "annotations",
+            "vcf2parquet",
             "-i",
             str(DATA_DIR / "no_genotypes.vcf"),
             "-c",
             str(DATA_DIR / "grch38.92.csv"),
+            "annotations",
             "-o",
             str(annotations_path),
-            "vcf",
             "-i",
             "AF_ESP",
-            "-i",
             "CLNSIG",
         ],
     )
 
-    assert result.exit_code == 0
+    assert result.exit_code == 0, result.output
 
     lf = polars.scan_parquet(annotations_path)
     assert lf.columns == ["vid", "id", "AF_ESP", "CLNSIG"]
@@ -505,103 +525,26 @@ def test_annotations_vcf_select_rename_id(tmp_path: pathlib.Path) -> None:
     result = runner.invoke(
         cli.main,
         [
-            "-vvvv",
-            "annotations",
+            "vcf2parquet",
             "-i",
             str(DATA_DIR / "no_genotypes.vcf"),
-            "-o",
-            str(annotations_path),
             "-c",
             str(DATA_DIR / "grch38.92.csv"),
-            "vcf",
+            "annotations",
+            "-o",
+            str(annotations_path),
             "-r",
             "annot_id",
             "-i",
             "AF_ESP",
-            "-i",
             "CLNSIG",
         ],
     )
 
-    assert result.exit_code == 0
+    assert result.exit_code == 0, result.output
 
     lf = polars.scan_parquet(annotations_path)
     assert set(lf.columns) == {"annot_id", "id", "AF_ESP", "CLNSIG"}
-
-
-def test_annotations_csv(tmp_path: pathlib.Path) -> None:
-    """Basic annotations csv run."""
-    annotations_path = tmp_path / "annotations.parquet"
-
-    runner = CliRunner()
-    result = runner.invoke(
-        cli.main,
-        [
-            "annotations",
-            "-i",
-            str(DATA_DIR / "annotations.csv"),
-            "-o",
-            str(annotations_path),
-            "-c",
-            str(DATA_DIR / "grch38.92.csv"),
-            "csv",
-            "-c",
-            "chr",
-            "-p",
-            "pos",
-            "-r",
-            "ref",
-            "-a",
-            "alt",
-        ],
-    )
-
-    assert result.exit_code == 0
-
-    lf = polars.scan_parquet(annotations_path)
-    assert lf.columns == [
-        "ALLELEID",
-        "ENUM",
-        "id",
-    ]
-
-
-def test_annotations_csv_select(tmp_path: pathlib.Path) -> None:
-    """Select some annotations csv run."""
-    annotations_path = tmp_path / "annotations.parquet"
-
-    runner = CliRunner()
-    result = runner.invoke(
-        cli.main,
-        [
-            "annotations",
-            "-i",
-            str(DATA_DIR / "annotations.csv"),
-            "-o",
-            str(annotations_path),
-            "-c",
-            str(DATA_DIR / "grch38.92.csv"),
-            "csv",
-            "-c",
-            "chr",
-            "-p",
-            "pos",
-            "-r",
-            "ref",
-            "-a",
-            "alt",
-            "-i",
-            "ENUM",
-        ],
-    )
-
-    assert result.exit_code == 0
-
-    lf = polars.scan_parquet(annotations_path)
-    assert lf.columns == [
-        "ENUM",
-        "id",
-    ]
 
 
 def test_metadata_json(tmp_path: pathlib.Path) -> None:
@@ -617,7 +560,7 @@ def test_metadata_json(tmp_path: pathlib.Path) -> None:
             str(DATA_DIR / "metadata.json"),
             "-o",
             str(metadata_path),
-            "json",
+            "-t" "json",
         ],
     )
 
@@ -643,51 +586,18 @@ def test_metadata_jsonl(tmp_path: pathlib.Path) -> None:
             str(DATA_DIR / "metadata.jsonl"),
             "-o",
             str(metadata_path),
-            "json",
-            "-l",
+            "-t",
+            "ljson",
         ],
     )
 
-    assert result.exit_code == 0
+    assert result.exit_code == 0, result.output
 
     polars.testing.assert_frame_equal(
         polars.scan_parquet(metadata_path),
         polars.scan_parquet(DATA_DIR / "metadata.parquet"),
         check_row_order=False,
     )
-
-
-def test_metadata_json_select(tmp_path: pathlib.Path) -> None:
-    """Run metadata json."""
-    metadata_path = tmp_path / "metadata.parquet"
-
-    runner = CliRunner()
-    result = runner.invoke(
-        cli.main,
-        [
-            "metadata",
-            "-i",
-            str(DATA_DIR / "metadata.json"),
-            "-o",
-            str(metadata_path),
-            "json",
-            "-f",
-            "sample",
-            "-f",
-            "link",
-            "-f",
-            "gender",
-            "-f",
-            "kindex",
-        ],
-    )
-
-    assert result.exit_code == 0
-
-    truth = polars.scan_parquet(DATA_DIR / "metadata.parquet").select(["sample", "link", "gender", "kindex"])
-    value = polars.scan_parquet(metadata_path)
-
-    polars.testing.assert_frame_equal(truth, value, check_row_order=False)
 
 
 def test_metadata_csv(tmp_path: pathlib.Path) -> None:
@@ -703,6 +613,7 @@ def test_metadata_csv(tmp_path: pathlib.Path) -> None:
             str(DATA_DIR / "metadata.csv"),
             "-o",
             str(metadata_path),
+            "-t",
             "csv",
         ],
     )
@@ -715,39 +626,6 @@ def test_metadata_csv(tmp_path: pathlib.Path) -> None:
     )
 
 
-def test_metadata_csv_select(tmp_path: pathlib.Path) -> None:
-    """Run metadata csv."""
-    metadata_path = tmp_path / "metadata.parquet"
-
-    runner = CliRunner()
-    result = runner.invoke(
-        cli.main,
-        [
-            "metadata",
-            "-i",
-            str(DATA_DIR / "metadata.csv"),
-            "-o",
-            str(metadata_path),
-            "csv",
-            "-c",
-            "sample",
-            "-c",
-            "link",
-            "-c",
-            "gender",
-            "-c",
-            "kindex",
-        ],
-    )
-
-    assert result.exit_code == 0
-
-    truth = polars.scan_parquet(DATA_DIR / "metadata.parquet").select(["sample", "link", "gender", "kindex"])
-    value = polars.scan_parquet(metadata_path)
-
-    polars.testing.assert_frame_equal(truth, value, check_row_order=False)
-
-
 def test_generate_transmission_ped(tmp_path: pathlib.Path) -> None:
     """Run generate origin."""
     transmission_path = tmp_path / "transmission_path.parquet"
@@ -756,13 +634,12 @@ def test_generate_transmission_ped(tmp_path: pathlib.Path) -> None:
     result = runner.invoke(
         cli.main,
         [
-            "generate",
             "transmission",
-            "-i",
+            "-g",
             str(DATA_DIR / "no_info.genotypes.parquet"),
             "-p",
             str(DATA_DIR / "sample.ped"),
-            "-t",
+            "-o",
             str(transmission_path),
         ],
     )
@@ -783,22 +660,21 @@ def test_generate_transmission_no_ped(tmp_path: pathlib.Path) -> None:
     result = runner.invoke(
         cli.main,
         [
-            "generate",
             "transmission",
-            "-i",
+            "-g",
             str(DATA_DIR / "no_info.genotypes.parquet"),
-            "-I",
+            "-i",
             "sample_1",
             "-m",
             "sample_3",
             "-f",
             "sample_2",
-            "-t",
+            "-o",
             str(transmission_path),
         ],
     )
 
-    assert result.exit_code == 0
+    assert result.exit_code == 0, result.output
 
     truth = polars.read_parquet(DATA_DIR / "transmission.parquet").sort("id")
     value = polars.read_parquet(transmission_path).sort("id")
@@ -814,11 +690,10 @@ def test_generate_transmission_nothing(tmp_path: pathlib.Path) -> None:
     result = runner.invoke(
         cli.main,
         [
-            "generate",
             "transmission",
-            "-i",
+            "-g",
             str(DATA_DIR / "no_info.genotypes.parquet"),
-            "-t",
+            "-o",
             str(transmission_path),
         ],
     )

@@ -281,7 +281,7 @@ def __column_name(header: list[str], input_path: pathlib.Path) -> list[str]:
 
 def into_lazyframe(
     input_path: pathlib.Path,
-    chr2len_path: pathlib.Path,
+    chr2len_path: pathlib.Path | None,
     extension: IntoLazyFrameExtension = IntoLazyFrameExtension.NOTHING,
 ) -> polars.LazyFrame:
     """Read a vcf file and convert it in [polars.LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html).
@@ -307,6 +307,9 @@ def into_lazyframe(
         ignore_errors=True,
     )
 
+    if not chr2len_path:
+        return polars.LazyFrame()
+
     chr2len = io.csv.chr2length_into_lazyframe(chr2len_path)
     lf = lf.rename(col_name)
 
@@ -317,7 +320,7 @@ def into_lazyframe(
 
     if extension == IntoLazyFrameExtension.MANAGE_SV:
         drop_column = {"SVTYPE", "SVLEN"}
-        lf = lf.collect().select([col for col in lf.columns if col not in drop_column]).lazy()
+        lf = lf.select([col for col in lf.columns if col not in drop_column]).collect().lazy()
 
     return lf
 

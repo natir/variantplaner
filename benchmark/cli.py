@@ -38,7 +38,15 @@ def variants(
     result = benchmark(
         lambda: runner.invoke(
             cli.main,
-            ["vcf2parquet", "-i", str(input_path), "-v", str(variants_path), "-c", str(DATA_DIR / "grch38.92.csv")],
+            [
+                "vcf2parquet",
+                "-i",
+                str(input_path),
+                "-v",
+                str(variants_path),
+                "-c",
+                str(DATA_DIR / "grch38.92.csv"),
+            ],
         ),
     )
 
@@ -173,7 +181,13 @@ def basic(
     result = benchmark(
         lambda: runner.invoke(
             cli.main,
-            ["parquet2vcf", "-i", str(DATA_DIR / "no_info.parquet"), "-o", str(variants_path)],
+            [
+                "parquet2vcf",
+                "-i",
+                str(DATA_DIR / "no_info.parquet"),
+                "-o",
+                str(variants_path),
+            ],
         ),
     )
 

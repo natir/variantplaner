@@ -115,7 +115,10 @@ def test_concat_uniq(tmp_path: pathlib.Path) -> None:
     tmp_file = tmp_path / "merge_by_id.parquet"
 
     struct.variants.__concat_uniq(
-        [DATA_DIR / "no_genotypes.variants.parquet", DATA_DIR / "no_info.variants.parquet"],
+        [
+            DATA_DIR / "no_genotypes.variants.parquet",
+            DATA_DIR / "no_info.variants.parquet",
+        ],
         tmp_file,
     )
 
@@ -131,7 +134,10 @@ def test_merge(tmp_path: pathlib.Path) -> None:
     os.environ["POLARS_MAX_THREADS"] = str(2)
 
     struct.variants.merge(
-        [DATA_DIR / "no_genotypes.variants.parquet", DATA_DIR / "no_info.variants.parquet"],
+        [
+            DATA_DIR / "no_genotypes.variants.parquet",
+            DATA_DIR / "no_info.variants.parquet",
+        ],
         tmp_file,
     )
 

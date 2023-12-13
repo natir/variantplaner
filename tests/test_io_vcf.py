@@ -116,7 +116,12 @@ def test_format2expr() -> None:
     """Check format2expr."""
     header = io.vcf.extract_header(DATA_DIR / "no_info.vcf")
 
-    assert set(io.vcf.format2expr(header, DATA_DIR / "no_info.vcf").keys()) == {"AD", "DP", "GQ", "GT"}
+    assert set(io.vcf.format2expr(header, DATA_DIR / "no_info.vcf").keys()) == {
+        "AD",
+        "DP",
+        "GQ",
+        "GT",
+    }
 
 
 def test_format2expr_exception() -> None:
@@ -283,7 +288,14 @@ def test_build_rename_column() -> None:
         "FILTER": "FILTER",
         "INFO": [("GENE", "gene_name")],
         "FORMAT": "GT:AD:DP:GQ",
-        "sample": {"sample": {"gt": "sample_gt", "ad": "sample_ad", "dp": "sample_dp", "gq": "sample_gq"}},
+        "sample": {
+            "sample": {
+                "gt": "sample_gt",
+                "ad": "sample_ad",
+                "dp": "sample_dp",
+                "gq": "sample_gq",
+            }
+        },
     }
 
 
@@ -297,7 +309,11 @@ def test_from_lazyframe(tmp_path: pathlib.Path) -> None:
 
     assert filecmp.cmp(tmp_file, DATA_DIR / "no_info.parquet2vcf.vcf")
 
-    io.vcf.from_lazyframe(lf, tmp_file, io.vcf.build_rename_column("chr", "pos", "id", "ref", "alt", "vid", "vid"))
+    io.vcf.from_lazyframe(
+        lf,
+        tmp_file,
+        io.vcf.build_rename_column("chr", "pos", "id", "ref", "alt", "vid", "vid"),
+    )
 
     assert filecmp.cmp(tmp_file, DATA_DIR / "no_info.parquet2vcf.vcf")
 

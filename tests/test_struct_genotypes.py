@@ -36,7 +36,10 @@ def __scantree(path: pathlib.Path) -> typing.Iterator[pathlib.Path]:
 def test_hive(tmp_path: pathlib.Path) -> None:
     """Check partition genotype parquet."""
     struct.genotypes.hive(
-        [DATA_DIR / "no_info.genotypes.parquet", DATA_DIR / "no_info.genotypes.parquet"],
+        [
+            DATA_DIR / "no_info.genotypes.parquet",
+            DATA_DIR / "no_info.genotypes.parquet",
+        ],
         tmp_path,
         threads=2,
         file_per_thread=1,
