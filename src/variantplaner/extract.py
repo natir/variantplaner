@@ -129,6 +129,6 @@ def merge_variants_genotypes(
             )
             .drop("sample")
         )
-        variants_lf = variants_lf.join(geno2sample, on="id", how="outer")
+        variants_lf = variants_lf.join(geno2sample, on="id", how="outer_coalesce")
 
     return variants_lf

@@ -428,10 +428,10 @@ def test_generate_header() -> None:
     header = io.vcf.__generate_header(lf, info)
     truth = """##fileformat=VCFv4.3
 ##source=VariantPlanner
-##INFO=<ID=AF_ESP,Number=1,Type=String,Description="Unknow">
-##INFO=<ID=AF_EXAC,Number=1,Type=String,Description="Unknow">
-##INFO=<ID=AF_TGP,Number=1,Type=String,Description="Unknow">
-##INFO=<ID=ALLELEID,Number=1,Type=String,Description="Unknow">
+##INFO=<ID=AF_ESP,Number=1,Type=Float,Description="Unknow">
+##INFO=<ID=AF_EXAC,Number=1,Type=Float,Description="Unknow">
+##INFO=<ID=AF_TGP,Number=1,Type=Float,Description="Unknow">
+##INFO=<ID=ALLELEID,Number=1,Type=Integer,Description="Unknow">
 ##INFO=<ID=CLNDN,Number=.,Type=String,Description="Unknow">
 ##INFO=<ID=CLNDNINCL,Number=.,Type=String,Description="Unknow">
 ##INFO=<ID=CLNDISDB,Number=.,Type=String,Description="Unknow">

@@ -44,7 +44,7 @@ def test_hive(tmp_path: pathlib.Path) -> None:
 
     partition_paths = set(__scantree(tmp_path))
 
-    value = polars.concat([polars.read_parquet(path) for path in partition_paths]).drop("id_part")
+    value = polars.concat([polars.read_parquet(path, hive_partitioning=False) for path in partition_paths]).drop("id_part")
     truth = polars.concat(
         [
             polars.read_parquet(DATA_DIR / "no_info.genotypes.parquet"),
