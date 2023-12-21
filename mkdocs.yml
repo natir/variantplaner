@@ -37,6 +37,7 @@ nav:
 
 theme:
   name: material
+  logo: logo.svg
   features:
     - announce.dismiss
     - content.action.edit
@@ -137,10 +138,6 @@ extra:
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/natir
-    - icon: fontawesome/brands/gitter
-      link: https://gitter.im/variantplaner/community
-    - icon: fontawesome/brands/python
-      link: https://pypi.org/project/variantplaner/
 
 extra_javascript:
   - javascripts/mathjax.js
