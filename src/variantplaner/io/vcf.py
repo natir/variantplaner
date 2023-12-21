@@ -143,7 +143,7 @@ def __format_gt(expr: polars.Expr, /, name: str) -> polars.Expr:
 
 def __format_one_int(expr: polars.Expr, /, name: str) -> polars.Expr:
     """Manage integer field."""
-    return expr.str.to_integer(base=10, strict=False).cast(polars.UInt16).alias(name.lower())
+    return expr.str.to_integer(base=10, strict=False).cast(polars.UInt32).alias(name.lower())
 
 
 def __format_one_str(expr: polars.Expr, /, name: str) -> polars.Expr:
@@ -155,7 +155,7 @@ def __format_list_int(expr: polars.Expr, /, name: str) -> polars.Expr:
     """Manage list of integer field."""
     return (
         expr.str.split(",")
-        .list.eval(polars.element().str.to_integer(base=10, strict=False).cast(polars.UInt16))
+        .list.eval(polars.element().str.to_integer(base=10, strict=False).cast(polars.UInt32))
         .alias(name.lower())
     )
 

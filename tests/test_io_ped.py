@@ -9,6 +9,7 @@ import filecmp
 import pathlib
 
 import polars
+import polars.testing
 
 # project import
 from variantplaner import io

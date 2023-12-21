@@ -81,4 +81,4 @@ def add_id_part(lf: polars.LazyFrame) -> polars.LazyFrame:
     Returns:
         [polars.LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html) with column id_part added
     """
-    return lf.with_columns(id_part=polars.col("id").variant_id.partition())
+    return lf.with_columns(id_part=polars.col("id").variant_id.partition())  # type: ignore # noqa: PGH003
