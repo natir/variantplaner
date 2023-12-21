@@ -188,6 +188,9 @@ def render_plot() -> str:
 
     df = polars.DataFrame(bench_data)
 
+    if df.shape[0] == 0:
+        return ""
+
     name2func = {
         name: globals()[f"{name}_func"] if f"{name}_func" in globals() else nothing
         for name in df.get_column("benchmark").unique().to_list()
