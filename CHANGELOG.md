@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+<!-- insertion marker -->
+## [0.2.4](https://github.com/natir/variantplaner/releases/tag/0.2.4) - 2023-12-21
+
+<small>[Compare with 0.2.4](https://github.com/natir/variantplaner/compare/0.2.3...0.2.4)</small>
+
+### Features
+
+- add variantplaner logo.
+- add method to compute partition value of id.
+
+### Bug Fixes
+
+- fix: #41 vcf spec indicate Integer must be store in 32bits.
+- update to polars 0.20.
+
 ## [0.2.3](https://github.com/natir/variantplaner/releases/tag/0.2.2) - 2023-11-21
 
 <small>[Compare with 0.2.2](https://github.com/natir/variantplaner/compare/0.2.2..0.2.3)</small>
@@ -52,7 +67,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Documentation fix
 - Test coverage improvement
 
-<!-- insertion marker -->
 ## [0.1.0](https://github.com/natir/variantplaner/releases/tag/0.1.0) - 2023-07-25
 
 <small>[Compare with first commit](https://github.com/natir/variantplaner/compare/265a95ea26746b7aa796c3df6cee2451a608dd49...0.1.0)</small>
