@@ -105,7 +105,6 @@ parallel variantplaner -t 2 vcf2parquet -c grch38.92.csv -i vcf/{}.vcf \
 
 Parquet variants file contains 5 column:
 
-- chr: Chromosome name, X -> 22, Y -> 23, MT -> 24 (**warning**: this behavior could change in next version)
 - pos: Position of variant
 - ref: Reference sequence
 - alt: Alternative sequence
@@ -176,7 +175,7 @@ Here, we'll organize the genotypes information by variants to make it easier to 
 ```bash
 mkdir -p genotypes/variants/
 input=$(ls genotypes/samples/ | xargs -I {} -x echo "-i genotypes/samples/"{} | tr '\n' ' ')
-variantplaner -t 8 struct $(echo $input) genotypes -p genotypes/variants/
+variantplaner -t 8 struct $(echo $input) genotypes -p genotypes/variants
 ```
 
 All genotypes information are split in [hive like structure](https://duckdb.org/docs/data/partitioning/hive_partitioning) to optimize request on data.
