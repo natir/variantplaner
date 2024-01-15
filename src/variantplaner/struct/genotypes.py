@@ -40,7 +40,9 @@ def __hive_worker(lfs: tuple[polars.LazyFrame], basename: str, output_prefix: pa
     lf = normalization.add_id_part(polars.concat(lf for lf in lfs if lf is not None))
 
     for name, df in lf.collect().group_by(polars.col("id_part")):
-        df.write_parquet(output_prefix / f"id_part={name}" / f"{basename}.parquet")
+        # required for python 3.11 and polars 0.20.4 wired
+        fix_name = name[0] if isinstance(name, tuple) else name
+        df.write_parquet(output_prefix / f"id_part={fix_name}" / f"{basename}.parquet")
 
 
 def __merge_file(prefix: pathlib.Path, basenames: list[str]) -> None:
