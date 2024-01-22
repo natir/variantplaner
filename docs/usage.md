@@ -376,7 +376,6 @@ Get all variant and sample with GENEINFO equal to 'SAMD11:148398'
 
 ### duckdb
 
-
 #### Count variants
 
 ```sql
@@ -438,3 +437,83 @@ D select distinct chr, pos, ref, alt, sample from read_parquet('variants.parquet
 │ 10 rows                            5 columns │
 └──────────────────────────────────────────────┘
 ```
+
+### Use genotype partition
+
+In this example, I'll show how I interact with the data structures created by variantplaner.
+
+#### Import
+
+```python
+import duckdb
+import polars
+import variantplaner
+```
+
+#### Get variants
+
+```python
+query = f"""
+SELECT
+  *
+FROM
+  read_parquet('variants.parquet') as v
+WHERE
+  v.chr == '19'
+"""
+
+variants = duckdb.query(query).pl()
+```
+
+
+#### Add annotations
+
+```python
+query = f"""
+SELECT
+  v.*, c.CLNSIG
+FROM
+  variants as v
+  JOIN
+  read_parquet('annotations/clinvar.parquet') as c
+  ON
+  v.id == c.id
+WHERE
+  c.CLNSIG LIKE '%Patho%'
+"""
+
+annotations = duckdb.query(query).pl()
+```
+
+#### Add genotypes
+
+```python
+def worker(name_data: (str, polars.DataFrame)) -> polars.DataFrame:
+    """Request genotype homozygote variant."""
+    name, data = name_data
+    query = f"""
+SELECT
+  data.*, g.*,
+FROM
+  data
+  JOIN
+  read_parquet('genotypes/variants/id_part={name}/0.parquet') as g ON data.id = g.id
+WHERE
+  g.gt == 2
+"""
+	df = duckdb.query(query).pl()
+	return df
+
+
+annotations = variantplaner.normalization.add_id_part(annotations)
+
+all_genotypes = []
+
+for data in map(worker, annotations.group_by(by="id_part")):
+    if data is not None:
+        all_genotypes.append(data)
+
+genotypes = polars.concat(all_genotypes)
+```
+
+genotypes is polars.DataFrame with pathogene homozygote variants in chromosome 19.
