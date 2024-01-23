@@ -28,9 +28,22 @@ from variantplaner import debug, exception, extract, generate, io, struct
 
 
 @click.group(name="variantplaner")
-@click.option("-t", "--threads", help="Number of threads usable", default=1, type=click.IntRange(0), show_default=True)
+@click.option(
+    "-t",
+    "--threads",
+    help="Number of threads usable",
+    default=1,
+    type=click.IntRange(0),
+    show_default=True,
+)
 @click.option("-v", "--verbose", help="Verbosity level", count=True, type=click.IntRange(0, 4))
-@click.option("--debug-info", help="Get debug information", is_flag=True, show_default=True, default=False)
+@click.option(
+    "--debug-info",
+    help="Get debug information",
+    is_flag=True,
+    show_default=True,
+    default=False,
+)
 def main(*, threads: int = 1, verbose: int = 0, debug_info: bool = False) -> None:
     """Run VariantPlanner."""
     logging.basicConfig(
@@ -61,7 +74,13 @@ def main(*, threads: int = 1, verbose: int = 0, debug_info: bool = False) -> Non
     "-i",
     "--input-path",
     help="Path to vcf input file",
-    type=click.Path(exists=True, dir_okay=False, readable=True, allow_dash=True, path_type=pathlib.Path),
+    type=click.Path(
+        exists=True,
+        dir_okay=False,
+        readable=True,
+        allow_dash=True,
+        path_type=pathlib.Path,
+    ),
     required=True,
 )
 @click.option(
@@ -150,7 +169,13 @@ def vcf2parquet(
     "-i",
     "--input-path",
     help="Path to variants in parquet format",
-    type=click.Path(exists=True, dir_okay=False, readable=True, allow_dash=True, path_type=pathlib.Path),
+    type=click.Path(
+        exists=True,
+        dir_okay=False,
+        readable=True,
+        allow_dash=True,
+        path_type=pathlib.Path,
+    ),
     required=True,
 )
 @click.option(
@@ -399,7 +424,13 @@ def struct_genotypes(ctx: click.Context, prefix_path: pathlib.Path, file_per_thr
     "-i",
     "--input-path",
     help="Path to input file",
-    type=click.Path(exists=True, dir_okay=False, readable=True, allow_dash=True, path_type=pathlib.Path),
+    type=click.Path(
+        exists=True,
+        dir_okay=False,
+        readable=True,
+        allow_dash=True,
+        path_type=pathlib.Path,
+    ),
     required=True,
 )
 @click.option(
@@ -425,7 +456,11 @@ def annotations_main(
     """Convert an annotation variation file in a compatible parquet."""
     logger = logging.getLogger("annotations")
 
-    ctx.obj = {"input_path": input_path, "output_path": output_path, "chrom2length_path": chrom2length_path}
+    ctx.obj = {
+        "input_path": input_path,
+        "output_path": output_path,
+        "chrom2length_path": chrom2length_path,
+    }
 
     logger.debug(f"parameter: {input_path=} {output_path=} {chrom2length_path=}")
 
@@ -571,7 +606,13 @@ def annotations_csv(
     "-i",
     "--input-path",
     help="Path to input file",
-    type=click.Path(exists=True, dir_okay=False, readable=True, allow_dash=True, path_type=pathlib.Path),
+    type=click.Path(
+        exists=True,
+        dir_okay=False,
+        readable=True,
+        allow_dash=True,
+        path_type=pathlib.Path,
+    ),
     required=True,
 )
 @click.option(
@@ -681,7 +722,13 @@ def generate_main() -> None:
     "-i",
     "--input-path",
     help="Path genotypes parquet file",
-    type=click.Path(exists=True, dir_okay=False, readable=True, allow_dash=True, path_type=pathlib.Path),
+    type=click.Path(
+        exists=True,
+        dir_okay=False,
+        readable=True,
+        allow_dash=True,
+        path_type=pathlib.Path,
+    ),
     required=True,
 )
 @click.option(

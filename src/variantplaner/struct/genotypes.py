@@ -73,7 +73,12 @@ def __merge_file(prefix: pathlib.Path, basenames: list[str]) -> None:
         path.unlink(missing_ok=True)
 
 
-def hive(paths: list[pathlib.Path], output_prefix: pathlib.Path, threads: int, file_per_thread: int) -> None:
+def hive(
+    paths: list[pathlib.Path],
+    output_prefix: pathlib.Path,
+    threads: int,
+    file_per_thread: int,
+) -> None:
     r"""Read all genotypes parquet file and use information to generate a hive like struct, based on 63rd and 55th bits included of variant id with genotype information.
 
     Real number of threads use are equal to $min(threads, len(paths))$.

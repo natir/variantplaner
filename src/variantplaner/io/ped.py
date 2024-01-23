@@ -28,7 +28,14 @@ def into_lazyframe(input_path: pathlib.Path) -> polars.LazyFrame:
         separator="\t",
         has_header=False,
         null_values="None",
-        new_columns=["family_id", "personal_id", "father_id", "mother_id", "sex", "affected"],
+        new_columns=[
+            "family_id",
+            "personal_id",
+            "father_id",
+            "mother_id",
+            "sex",
+            "affected",
+        ],
         dtypes={
             "family_id": polars.Utf8,
             "personal_id": polars.Utf8,

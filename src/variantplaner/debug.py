@@ -79,7 +79,10 @@ def get_debug_info() -> Environment:
     """
     py_name, py_version = _interpreter_name_version()
     packages = ["variantplaner"]
-    variables = ["PYTHONPATH", *[var for var in os.environ if var.startswith("VARIANTPLANER")]]
+    variables = [
+        "PYTHONPATH",
+        *[var for var in os.environ if var.startswith("VARIANTPLANER")],
+    ]
     return Environment(
         interpreter_name=py_name,
         interpreter_version=py_version,

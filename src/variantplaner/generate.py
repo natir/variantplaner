@@ -38,7 +38,12 @@ def transmission_ped(
 
     familly_info = pedigree_lf.collect().row(0, named=True)
 
-    return transmission(genotypes_lf, familly_info["personal_id"], familly_info["mother_id"], familly_info["father_id"])
+    return transmission(
+        genotypes_lf,
+        familly_info["personal_id"],
+        familly_info["mother_id"],
+        familly_info["father_id"],
+    )
 
 
 def transmission(

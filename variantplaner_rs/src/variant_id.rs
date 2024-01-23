@@ -25,6 +25,11 @@ pub(crate) fn seq2bit(seq: &[u8]) -> u64 {
     two_bit
 }
 
+#[inline(always)]
+pub(crate) fn ref_alt_space_usage(refs: &[u8], alts: &[u8]) -> u64 {
+    (refs.len() as f64).log2().ceil() as u64 + (alts.len() as u64 * 2)
+}
+
 fn local_compute(
     real_pos: &UInt64Chunked,
     ref_seq: &Utf8Chunked,
@@ -32,11 +37,10 @@ fn local_compute(
     max_pos: u64,
 ) -> PolarsResult<Series> {
     let pos_mov = max_pos.leading_zeros() as u64 - 1;
-    let sep_len = (pos_mov as f64 / 2.0).floor().log2().ceil() as u64;
-    let sep_mov = pos_mov - sep_len;
-    let nuc_len_max = sep_mov / 2;
     let hasher = ahash::RandomState::with_seeds(42, 42, 42, 42);
     let mut key = Vec::with_capacity(128);
+
+    println!("max_pos, pos_mov {}", pos_mov);
 
     let out: ChunkedArray<UInt64Type> = real_pos
         .into_iter()
@@ -45,7 +49,7 @@ fn local_compute(
         .map(|((p, r), a)| match (p, r, a) {
             (Some(p), Some(r), Some(a)) => {
                 let mut hash = 0;
-                if r.len() + a.len() > nuc_len_max as usize {
+                if ref_alt_space_usage(r.as_bytes(), a.as_bytes()) > pos_mov {
                     key.clear();
 
                     key.extend(p.to_be_bytes());
@@ -55,8 +59,7 @@ fn local_compute(
                     hash = (1 << 63) | (hasher.hash_one(&key) >> 1);
                 } else {
                     hash |= p << pos_mov;
-                    hash |= (r.len() as u64) << sep_mov;
-                    hash |= seq2bit(r.as_bytes()) << (a.len() * 2);
+                    hash |= (r.len() as u64) << (a.len() * 2);
                     hash |= seq2bit(a.as_bytes());
                 }
                 Some(hash)
@@ -126,8 +129,8 @@ mod tests {
             "real_pos",
             vec![10, 50, 110, 326512443305, 326512443305, 224],
         );
-        let mut ref_seq = Utf8Chunked::new("ref", vec!["A", "C", "T", "G", "GA", "CATGAGCGGACTG"]);
-        let mut alt_seq = Utf8Chunked::new("alt", vec!["G", "T", "C", "A", "", "AC"]);
+        let mut ref_seq = Utf8Chunked::new("ref", vec!["A", "C", "T", "G", "GA", "AC"]);
+        let mut alt_seq = Utf8Chunked::new("alt", vec!["G", "T", "C", "A", "", "CATGAGCGGACTG"]);
 
         real_pos.extend(&UInt64Chunked::full_null("", 1));
         ref_seq.extend(&Utf8Chunked::full_null("", 1));
@@ -140,12 +143,12 @@ mod tests {
             Series::from_any_values_and_dtype(
                 "",
                 &[
-                    AnyValue::UInt64(168820739),
-                    AnyValue::UInt64(839909382),
-                    AnyValue::UInt64(1846542345),
-                    AnyValue::UInt64(5477969788016787468),
-                    AnyValue::UInt64(5477969788017836044),
-                    AnyValue::UInt64(13756669010756803764),
+                    AnyValue::UInt64(167772167),
+                    AnyValue::UInt64(838860806),
+                    AnyValue::UInt64(1845493765),
+                    AnyValue::UInt64(5477969788015738884),
+                    AnyValue::UInt64(5477969788015738882),
+                    AnyValue::UInt64(17294972461992989018),
                     AnyValue::Null,
                 ],
                 &DataType::UInt64,
@@ -156,13 +159,41 @@ mod tests {
     }
 
     #[test]
+    fn homopolymer_colision() {
+        let real_pos = UInt64Chunked::new_vec("real_pos", vec![110; 400]);
+
+        let mut refs = vec!["A"; 4];
+        refs.extend(vec!["AA"; 20]);
+        let ref_seq = Utf8Chunked::new("ref", refs.clone());
+
+        let alts = vec![
+            "A", "C", "G", "T", "AA", "AC", "AG", "AT", "CA", "CC", "CG", "CT", "GA", "GC", "GG",
+            "GT", "TA", "TC", "TG", "TT", "A", "C", "G", "T",
+        ];
+
+        let alt_seq = Utf8Chunked::new("alt", alts.clone());
+
+        let mut ids: Vec<u64> = local_compute(&real_pos, &ref_seq, &alt_seq, 326512443305)
+            .unwrap()
+            .u64()
+            .unwrap()
+            .into_no_null_iter()
+            .collect();
+
+        ids.sort_unstable();
+        ids.dedup();
+
+        assert_eq!(ids.len(), 24);
+    }
+
+    #[test]
     fn compute_part() {
         let mut real_pos = UInt64Chunked::new_vec(
             "real_pos",
             vec![10, 50, 110, 326512443305, 326512443305, 224],
         );
-        let mut ref_seq = Utf8Chunked::new("ref", vec!["A", "C", "T", "G", "GA", "CATGAGCGGACTG"]);
-        let mut alt_seq = Utf8Chunked::new("alt", vec!["G", "T", "C", "A", "", "AC"]);
+        let mut ref_seq = Utf8Chunked::new("ref", vec!["A", "C", "T", "G", "GA", "AC"]);
+        let mut alt_seq = Utf8Chunked::new("alt", vec!["G", "T", "C", "A", "", "CATGAGCGGACTGACC"]);
 
         real_pos.extend(&UInt64Chunked::full_null("", 1));
         ref_seq.extend(&Utf8Chunked::full_null("", 1));

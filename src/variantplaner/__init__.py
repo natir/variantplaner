@@ -9,5 +9,12 @@ from __future__ import annotations
 
 from variantplaner import exception, extract, generate, io, normalization, struct
 
-__all__: list[str] = ["exception", "extract", "generate", "io", "normalization", "struct"]
+__all__: list[str] = [
+    "exception",
+    "extract",
+    "generate",
+    "io",
+    "normalization",
+    "struct",
+]
 __version__: str = "0.2.4"

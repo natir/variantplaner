@@ -476,7 +476,11 @@ def from_lazyframe(
         for sample_name in renaming["sample"]:
             lf = lf.with_columns(
                 [
-                    __lazy2format(sample_name, renaming["FORMAT"], dict(zip(lf.columns, lf.dtypes))).alias(sample_name),
+                    __lazy2format(
+                        sample_name,
+                        renaming["FORMAT"],
+                        dict(zip(lf.columns, lf.dtypes)),
+                    ).alias(sample_name),
                 ],
             )
             select_column.append(sample_name)
