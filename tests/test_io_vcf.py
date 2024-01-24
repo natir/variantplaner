@@ -182,15 +182,15 @@ def test__column_name() -> None:
 
 def test_into_lazyframe() -> None:
     """Check into lazyframe."""
-    truth = polars.scan_parquet(DATA_DIR / "no_info.parquet")
-
     lf = io.vcf.into_lazyframe(DATA_DIR / "no_info.vcf", DATA_DIR / "grch38.92.csv")
+
+    truth = polars.scan_parquet(DATA_DIR / "no_info.parquet")
 
     polars.testing.assert_frame_equal(truth, lf)
 
-    truth = polars.scan_parquet(DATA_DIR / "no_genotypes.parquet")
-
     lf = io.vcf.into_lazyframe(DATA_DIR / "no_genotypes.vcf", DATA_DIR / "grch38.92.csv")
+
+    truth = polars.scan_parquet(DATA_DIR / "no_genotypes.parquet")
 
     polars.testing.assert_frame_equal(truth, lf)
 

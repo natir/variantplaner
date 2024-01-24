@@ -18,60 +18,31 @@ if typing.TYPE_CHECKING:  # pragma: no cover
     else:
         from typing_extensions import Unpack
 
-    if sys.version_info >= (3, 11):
+    class ScanCsv(typing.TypedDict, total=False):
+        """A struct to check type of parameter give to [polars.scan_csv][]."""
 
-        class ScanCsv(typing.TypedDict, total=False):
-            """A struct to check type of parameter give to [polars.scan_csv][]."""
-
-            has_header: bool
-            separator: str
-            comment_prefix: str | None
-            quote_char: str | None
-            skip_rows: int
-            dtypes: polars.type_aliases.SchemaDict | Sequence[polars.type_aliases.PolarsDataType] | None
-            null_values: str | Sequence[str] | dict[str, str] | None
-            missing_utf8_is_empty_string: bool
-            ignore_errors: bool
-            cache: bool
-            with_column_names: typing.Callable[[list[str]], list[str]] | None
-            infer_schema_length: int | None
-            n_rows: int | None
-            encoding: polars.type_aliases.CsvEncoding
-            low_memory: bool
-            rechunk: bool
-            skip_rows_after_header: int
-            row_index_name: str | None
-            row_index_offset: int
-            try_parse_dates: bool
-            eol_char: str
-            new_columns: Sequence[str] | None
-    else:
-
-        class ScanCsv(typing.TypedDict, total=False):
-            """A struct to check type of parameter give to [polars.scan_csv][]."""
-
-            has_header: bool
-            separator: str
-            comment_prefix: str | None
-            quote_char: str | None
-            skip_rows: int
-            dtypes: polars.type_aliases.SchemaDict | Sequence[polars.type_aliases.PolarsDataType] | None
-            null_values: str | Sequence[str] | dict[str, str] | None
-            missing_utf8_is_empty_string: bool
-            ignore_errors: bool
-            cache: bool
-            with_column_names: typing.Callable[[list[str]], list[str]] | None
-            infer_schema_length: int | None
-            n_rows: int | None
-            encoding: polars.type_aliases.CsvEncoding
-            low_memory: bool
-            rechunk: bool
-            skip_rows_after_header: int
-            row_count_name: str | None
-            row_count_offset: int
-            try_parse_dates: bool
-            eol_char: str
-            new_columns: Sequence[str] | None
+        has_header: bool
+        separator: str
+        comment_prefix: str | None
+        quote_char: str | None
+        skip_rows: int
+        dtypes: polars.type_aliases.SchemaDict | Sequence[polars.type_aliases.PolarsDataType] | None
+        null_values: str | Sequence[str] | dict[str, str] | None
+        missing_utf8_is_empty_string: bool
+        ignore_errors: bool
+        cache: bool
+        with_column_names: typing.Callable[[list[str]], list[str]] | None
+        infer_schema_length: int | None
+        n_rows: int | None
+        encoding: polars.type_aliases.CsvEncoding
+        low_memory: bool
+        rechunk: bool
+        skip_rows_after_header: int
+        row_index_name: str | None
+        row_index_offset: int
+        try_parse_dates: bool
+        eol_char: str
+        new_columns: Sequence[str] | None
 
 
 # project import

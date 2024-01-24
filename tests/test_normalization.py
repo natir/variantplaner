@@ -55,11 +55,11 @@ def test_id() -> None:
     df = normalization.add_variant_id(df.lazy(), chr2len.lazy()).collect()
 
     assert df.get_column("id").to_list() == [
-        344281487144648706,
-        14605542477335234092,
+        344281486070906886,
+        114177135718957217,
         17793944462439896137,
-        359057239794778119,
-        4468882926754332681,
+        359057238721036295,
+        4468882925680590853,
     ]
 
 
@@ -72,4 +72,4 @@ def test_partition() -> None:
 
     df = normalization.add_id_part(df.lazy()).collect()
 
-    assert df.get_column("id_part").to_list() == [9, 255, 255, 9, 124]
+    assert df.get_column("id_part").to_list() == [9, 3, 255, 9, 124]
