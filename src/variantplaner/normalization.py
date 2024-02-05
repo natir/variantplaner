@@ -9,6 +9,7 @@ import logging
 import polars
 
 # project import
+from variantplaner_rs import VariantId  # noqa: F401 ruff miss this import is use
 
 logger = logging.getLogger("normalization")
 
@@ -56,7 +57,7 @@ def add_variant_id(lf: polars.LazyFrame, chrom2length: polars.LazyFrame) -> pola
             ),
         )
 
-    lf = lf.join(chrom2length, on="chr", how="left")
+    lf = lf.join(chrom2length, right_on="contig", left_on="chr", how="left")
     lf = lf.with_columns(real_pos=polars.col("pos") + polars.col("offset"))
 
     lf = lf.with_columns(

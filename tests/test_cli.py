@@ -208,7 +208,7 @@ def test_vcf2parquet_not_vcf(tmp_path: pathlib.Path) -> None:
         ],
     )
 
-    assert result.exit_code == 11
+    assert result.exit_code == 12
 
 
 def test_vcf2parquet_no_genotype(tmp_path: pathlib.Path) -> None:
@@ -486,7 +486,7 @@ def test_annotations_vcf_not_vcf(tmp_path: pathlib.Path) -> None:
         ],
     )
 
-    assert result.exit_code == 11
+    assert result.exit_code == 12
 
 
 def test_annotations_vcf_select(tmp_path: pathlib.Path) -> None:

@@ -11,7 +11,7 @@ import click
 import polars
 
 # project import
-from variantplaner import cli, extract, io
+from variantplaner import VcfHeader, cli, extract, io
 
 
 @cli.main.command("parquet2vcf")  # type: ignore[has-type]
@@ -138,45 +138,49 @@ def parquet2vcf(
         f"parameter: {variants_path} {output_path} {genotypes_path} {headers_path} {chromosome} {position} {identifier} {reference} {alternative} {quality} {filter_col} {format_str}"
     )
 
-    variants_lf = polars.scan_parquet(variants_path)
+    lf = polars.scan_parquet(variants_path)
+
+    if headers_path:
+        headers = VcfHeader()
+        headers.from_files(headers_path)
+    else:
+        headers = None
 
     if genotypes_path and format_str:
         genotypes_lf = polars.scan_parquet(genotypes_path)
         sample_name = genotypes_lf.select("sample").collect().get_column("sample").to_list()
-        merge_lf = extract.merge_variants_genotypes(variants_lf, genotypes_lf, sample_name)
+        lf = extract.merge_variants_genotypes(lf, genotypes_lf, sample_name)
         sample2vcf_col2polars_col: dict[str, dict[str, str]] = {}
         for sample in sample_name:
             sample2vcf_col2polars_col[sample] = {}
             for format_col in format_str.split(":"):
                 sample2vcf_col2polars_col[sample][format_col] = f"{sample}_{format_col.lower()}"
-
-        io.vcf.from_lazyframe(
-            merge_lf,
-            output_path,
-            io.vcf.build_rename_column(
-                chromosome,
-                position,
-                identifier,
-                reference,
-                alternative,
-                quality,
-                filter_col,
-                [],
-                format_str,
-                sample2vcf_col2polars_col,
-            ),
+        rename_column = io.vcf.build_rename_column(
+            chromosome,
+            position,
+            identifier,
+            reference,
+            alternative,
+            quality,
+            filter_col,
+            [],
+            format_str,
+            sample2vcf_col2polars_col,
         )
     else:
-        io.vcf.from_lazyframe(
-            variants_lf,
-            output_path,
-            io.vcf.build_rename_column(
-                chromosome,
-                position,
-                identifier,
-                reference,
-                alternative,
-                quality,
-                filter_col,
-            ),
+        rename_column = io.vcf.build_rename_column(
+            chromosome,
+            position,
+            identifier,
+            reference,
+            alternative,
+            quality,
+            filter_col,
         )
+
+    io.vcf.lazyframe_in_vcf(
+        lf,
+        output_path,
+        vcf_header=headers,
+        renaming=rename_column,
+    )

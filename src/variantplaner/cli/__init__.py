@@ -21,7 +21,7 @@ class MultipleValueOption(click.Option):
 
     def __init__(self, *args: list[typing.Any], **kwargs: dict[typing.Any, typing.Any]):
         """Intialise click option parser."""
-        super(MultipleValueOption, self).__init__(*args,**kwargs) # type: ignore[arg-type] # noqa: UP008  false positive and complexe type
+        super(MultipleValueOption, self).__init__(*args, **kwargs)  # type: ignore[arg-type] # noqa: UP008  false positive and complexe type
         self._previous_parser_process = None
         self._eat_all_parser = None
 
@@ -109,8 +109,8 @@ def main(ctx: click.Context, *, threads: int = 1, verbose: int = 0, debug_info: 
 
 
 # module import required after main definition
-from variantplaner.cli import metadata # noqa: E402 F401 I001 these import should be here
-from variantplaner.cli import parquet2vcf # noqa: E402 F401  these import should be here
-from variantplaner.cli import struct # noqa: E402 F401  these import should be here
-from variantplaner.cli import transmission # noqa: E402 F401  these import should be here
-from variantplaner.cli import vcf2parquet # noqa: E402 F401  these import should be here
+from variantplaner.cli import metadata  # noqa: E402 F401 I001 these import should be here
+from variantplaner.cli import parquet2vcf  # noqa: E402 F401  these import should be here
+from variantplaner.cli import struct  # noqa: E402 F401  these import should be here
+from variantplaner.cli import transmission  # noqa: E402 F401  these import should be here
+from variantplaner.cli import vcf2parquet  # noqa: E402 F401  these import should be here

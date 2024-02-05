@@ -9,12 +9,15 @@ import sys
 
 # 3rd party import
 import click
+import polars
 
 # project import
-from variantplaner import cli, exception, extract, io
+from variantplaner import Vcf, VcfParsingBehavior, cli, exception
+
+logger = logging.getLogger("__name__")
 
 
-@cli.main.group("vcf2parquet", chain=True) # type: ignore[has-type]
+@cli.main.group("vcf2parquet", chain=True)  # type: ignore[has-type]
 @click.pass_context
 @click.option(
     "-i",
@@ -54,26 +57,27 @@ def vcf2parquet(
 
     logger.debug(f"parameter: {input_path=} {chrom2length_path=} {append=}")
 
-    if not chrom2length_path:
-        logger.error("--chrom2length-path argument is required")
-
-    try:
-        logger.debug("Start extract header")
-        headers = io.vcf.extract_header(input_path)
-        logger.debug("End extract header")
-    except exception.NotAVCFError:
-        logger.error("Input file seems no be a vcf")  # noqa: TRY400  we are in cli exception isn't readable
-        sys.exit(11)
+    lf = Vcf()
 
     # Read vcf and manage structural variant
     logger.debug("Start read vcf")
-    lf = io.vcf.into_lazyframe(input_path, chrom2length_path, extension=io.vcf.IntoLazyFrameExtension.MANAGE_SV)
+    try:
+        lf.from_path(input_path, chrom2length_path, behavior=VcfParsingBehavior.MANAGE_SV)
+    except exception.NotVcfHeaderError:
+        logging.error(f"Path {input_path} seems not contains Vcf.")  # noqa: TRY400  we are in cli exception isn't readable
+        sys.exit(11)
+    except exception.NotAVCFError:
+        logging.error(f"Path {input_path} seems not contains Vcf.")  # noqa: TRY400  we are in cli exception isn't readable
+        sys.exit(12)
+    except exception.NoContigsLengthInformationError:
+        logging.error("Vcf didn't contains contigs length information you could use chrom2length-path argument.")  # noqa: TRY400  we are in cli exception isn't readable
+        sys.exit(13)
     logger.debug("End read vcf")
 
     ctx.obj["vcf_path"] = input_path
     ctx.obj["lazyframe"] = lf
     ctx.obj["append"] = append
-    ctx.obj["headers"] = headers
+    ctx.obj["headers"] = lf.header
 
 
 @vcf2parquet.command("variants")
@@ -93,12 +97,20 @@ def variants(
     logger = logging.getLogger("vcf2parquet.variants")
 
     lf = ctx.obj["lazyframe"]
-    append = ctx.obj["append"]  # noqa: F841 not used now
+    append = ctx.obj["append"]  # not used now
 
     logger.debug(f"parameter: {output_path=}")
 
     logger.info(f"Start write variants in {output_path}")
-    extract.variants(lf).sink_parquet(output_path, maintain_order=False)
+    variants = lf.variants()
+
+    if append:
+        variants = __append(output_path, variants)
+
+    try:
+        variants.sink_parquet(output_path, maintain_order=False)
+    except polars.exceptions.InvalidOperationError:
+        variants.collect(streaming=True).write_parquet(output_path)
     logger.info(f"End write variants in {output_path}")
 
 
@@ -128,20 +140,24 @@ def genotypes(
     logger = logging.getLogger("vcf2parquet.genotypes")
 
     lf = ctx.obj["lazyframe"]
-    append = ctx.obj["append"]  # noqa: F841 not used now
-    headers = ctx.obj["headers"]
-    input_path = ctx.obj["vcf_path"]
+    append = ctx.obj["append"]  # not used now
 
     logger.debug(f"parameter: {output_path=} {format_string=}")
 
     try:
-        genotypes_lf = extract.genotypes(lf, io.vcf.format2expr(headers, input_path), format_string)
+        genotypes_data = lf.genotypes(format_string)
     except exception.NoGenotypeError:
         logger.error("It's seems vcf not contains genotypes information.")  # noqa: TRY400  we are in cli exception isn't readable
         sys.exit(12)
 
+    if append:
+        genotypes_data = __append(output_path, genotypes_data)
+
     logger.info(f"Start write genotypes in {output_path}")
-    genotypes_lf.sink_parquet(output_path, maintain_order=False)
+    try:
+        genotypes_data.lf.sink_parquet(output_path, maintain_order=False)
+    except polars.exceptions.InvalidOperationError:
+        genotypes_data.lf.collect(streaming=True).write_parquet(output_path)
     logger.info(f"End write genotypes in {output_path}")
 
 
@@ -177,23 +193,28 @@ def annotations_subcommand(
     logger = logging.getLogger("vcf2parquet.annotations")
 
     lf = ctx.obj["lazyframe"]
-    append = ctx.obj["append"]  # noqa: F841 not used now
-    headers = ctx.obj["headers"]
-    input_path = ctx.obj["vcf_path"]
+    append = ctx.obj["append"]  # not used now
+    headers_obj = ctx.obj["headers"]
 
     logger.debug(f"parameter: {output_path=}")
 
     logger.info("Start extract annotations")
-    annotations_lf = lf.with_columns(io.vcf.info2expr(headers, input_path, info))
-    annotations_lf = annotations_lf.drop(["chr", "pos", "ref", "alt", "filter", "qual", "info"])
+    annotations_data = lf.lf.with_columns(headers_obj.info_parser(info))
+    annotations_data = annotations_data.drop(["chr", "pos", "ref", "alt", "filter", "qual", "info"])
 
     if rename_id:
         logger.info(f"Rename vcf variant id in {rename_id}")
-        annotations_lf = annotations_lf.rename({"vid": rename_id})
+        annotations_data = annotations_data.rename({"vid": rename_id})
     logger.info("End extract annotations")
 
+    if append:
+        annotations_data = __append(output_path, annotations_data)
+
     logger.info(f"Start write annotations in {output_path}")
-    annotations_lf.sink_parquet(output_path, maintain_order=False)
+    try:
+        annotations_data.sink_parquet(output_path, maintain_order=False)
+    except polars.exceptions.InvalidOperationError:
+        annotations_data.collect(streaming=True).write_parquet(output_path)
     logger.info(f"End write annotations in {output_path}")
 
 
@@ -213,12 +234,25 @@ def headers(
     """Write vcf headers."""
     logger = logging.getLogger("vcf2parquet.headers")
 
-    headers = ctx.obj["headers"]
+    headers_obj = ctx.obj["headers"]
 
     logger.debug(f"parameter: {output_path=}")
 
     logger.info(f"Start write headers in {output_path}")
     with open(output_path, "w") as fh_out:
-        for line in headers:
+        for line in headers_obj:
             print(line, file=fh_out)
     logger.info(f"End write headers in {output_path}")
+
+
+def __append(output_path: pathlib.Path, lf: polars.LazyFrame) -> polars.LazyFrame:
+    """Concatenate contante of output_path with lf content if output_path exists.
+
+    If parquet schema not match an error will be raise.
+    """
+    if not output_path.is_file():
+        logger.error("Target file not exist append mode isn't apply.")
+    else:
+        lf = polars.concat([polars.scan_parquet(output_path), lf])
+
+    return lf

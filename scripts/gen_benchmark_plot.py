@@ -191,10 +191,7 @@ def render_plot() -> str:
     if df.shape[0] == 0:
         return ""
 
-    name2func = {
-        name: globals().get(f"{name}_func", nothing)
-        for name in df.get_column("benchmark").unique().to_list()
-    }
+    name2func = {name: globals().get(f"{name}_func", nothing) for name in df.get_column("benchmark").unique().to_list()}
 
     bench2plot = {}
     for name, data in df.group_by("benchmark"):

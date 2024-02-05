@@ -13,6 +13,30 @@ if typing.TYPE_CHECKING:  # pragma: no cover
 # project import
 
 
+class NoContigsLengthInformationError(Exception):
+    """Exception raise if we didn't get Contigs Length information in vcf or in compagnion file."""
+
+    def __init__(self):
+        """Initize no contigs length information error."""
+        super().__init__("Contigs length information is required in vcf header of in compagnion file.")
+
+
+class NotAVariantCsvError(Exception):
+    """Exception raise if file is a csv should contains variants info but columns name not match minimal requirement."""
+
+    def __init__(self, path: pathlib.Path):
+        """Initialize not a variant csv error."""
+        super().__init__(f"{path} seems not be a csv variant.")
+
+
+class NotVcfHeaderError(Exception):
+    """Exception raise if header isn't compatible with vcf."""
+
+    def __init__(self):
+        """Initialize not a vcf header error."""
+        super().__init__("Not a vcf header")
+
+
 class NotAVCFError(Exception):
     """Exception raise if file read seems not be a vcf, generally not contains a line starts with '#CHROM'."""
 
