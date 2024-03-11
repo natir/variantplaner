@@ -25,7 +25,7 @@ def __generate_chr2len() -> polars.DataFrame:
     """Generate a chr2len dataframe."""
     chr2len = polars.DataFrame(
         data={
-            "chr": ["1", "2", "3", "22", "X"],
+            "contig": ["1", "2", "3", "22", "X"],
             "length": [10_000_000, 50_000, 120_000_500, 99_239_816, 10_000],
         },
         schema_overrides={"length": polars.UInt64},

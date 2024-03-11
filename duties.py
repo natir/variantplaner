@@ -55,7 +55,15 @@ def changelog(ctx: Context) -> None:
     )
 
 
-@duty(pre=["check_quality", "check_types", "check_docs", "check_dependencies", "check-api"])
+@duty(
+    pre=[
+        "check_quality",
+        "check_types",
+        "check_docs",
+        "check_dependencies",
+        "check-api",
+    ]
+)
 def check(ctx: Context) -> None:  # noqa: ARG001
     """Check it all!
 
@@ -220,8 +228,16 @@ def release(ctx: Context, version: str) -> None:
         ctx: The context instance (passed automatically).
         version: The new version number to use.
     """
-    ctx.run("git add pyproject.toml CHANGELOG.md README.md src/variantplaner/__init__.py", title="Staging files", pty=PTY)
-    ctx.run(["git", "commit", "-m", f"chore: Prepare release {version}"], title="Committing changes", pty=PTY)
+    ctx.run(
+        "git add pyproject.toml CHANGELOG.md README.md src/variantplaner/__init__.py",
+        title="Staging files",
+        pty=PTY,
+    )
+    ctx.run(
+        ["git", "commit", "-m", f"chore: Prepare release {version}"],
+        title="Committing changes",
+        pty=PTY,
+    )
     ctx.run(f"git tag {version}", title="Tagging commit", pty=PTY)
     ctx.run("git push", title="Pushing commits", pty=False)
     ctx.run("git push --tags", title="Pushing tags", pty=False)
@@ -251,7 +267,14 @@ def test(ctx: Context, match: str = "") -> None:
     py_version = f"{sys.version_info.major}{sys.version_info.minor}"
     os.environ["COVERAGE_FILE"] = f".coverage.{py_version}"
     ctx.run(
-        pytest.run("-n", "auto", "tests", config_file="config/pytest.ini", select=match, color="yes"),
+        pytest.run(
+            "-n",
+            "auto",
+            "tests",
+            config_file="config/pytest.ini",
+            select=match,
+            color="yes",
+        ),
         title=pyprefix("Running tests"),
         command=f"pytest -c config/pytest.ini -n auto -k{match!r} --color=yes tests",
     )

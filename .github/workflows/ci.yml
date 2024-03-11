@@ -55,7 +55,6 @@ jobs:
       run: pdm run duty check-api
 
   tests:
-
     strategy:
       max-parallel: 4
       matrix:
@@ -67,8 +66,8 @@ jobs:
         - "3.9"
         - "3.10"
         - "3.11"
+        - "3.12"
     runs-on: ${{ matrix.os }}
-    continue-on-error: ${{ matrix.python-version == '3.12' }}
 
     steps:
     - name: Checkout

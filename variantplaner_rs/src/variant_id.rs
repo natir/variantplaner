@@ -40,8 +40,6 @@ fn local_compute(
     let hasher = ahash::RandomState::with_seeds(42, 42, 42, 42);
     let mut key = Vec::with_capacity(128);
 
-    println!("max_pos, pos_mov {}", pos_mov);
-
     let out: ChunkedArray<UInt64Type> = real_pos
         .into_iter()
         .zip(ref_seq)

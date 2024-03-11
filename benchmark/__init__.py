@@ -34,7 +34,10 @@ def __generate_info() -> tuple[str, dict[str, typing.Callable[[], str]]]:
                     info_name2value[id_name] = lambda: str(random.randint(0, 2 ^ 32))
                 elif number == "R" and number == "G" and number == "2":
                     info_name2value[id_name] = lambda: ",".join(
-                        [str(random.randint(0, 2 ^ 32)), str(random.randint(0, 2 ^ 32))],
+                        [
+                            str(random.randint(0, 2 ^ 32)),
+                            str(random.randint(0, 2 ^ 32)),
+                        ],
                     )
                 else:
                     info_name2value[id_name] = lambda: ",".join(
@@ -45,7 +48,10 @@ def __generate_info() -> tuple[str, dict[str, typing.Callable[[], str]]]:
                     info_name2value[id_name] = lambda: str(random.uniform(0, 2 ^ 32))
                 elif number == "R" and number == "G" and number == "2":
                     info_name2value[id_name] = lambda: ",".join(
-                        [str(random.uniform(0, 2 ^ 32)), str(random.uniform(0, 2 ^ 32))],
+                        [
+                            str(random.uniform(0, 2 ^ 32)),
+                            str(random.uniform(0, 2 ^ 32)),
+                        ],
                     )
                 else:
                     info_name2value[id_name] = lambda: ",".join(
@@ -56,7 +62,10 @@ def __generate_info() -> tuple[str, dict[str, typing.Callable[[], str]]]:
                     info_name2value[id_name] = lambda: random.choice(string.ascii_letters)
                 elif number == "R" and number == "G" and number == "2":
                     info_name2value[id_name] = lambda: ",".join(
-                        [random.choice(string.ascii_letters), random.choice(string.ascii_letters)],
+                        [
+                            random.choice(string.ascii_letters),
+                            random.choice(string.ascii_letters),
+                        ],
                     )
                 else:
                     info_name2value[id_name] = lambda: ",".join(
@@ -95,7 +104,10 @@ def __generate_format() -> tuple[str, dict[str, typing.Callable[[], str]]]:
                     format_name2value[format_name] = lambda: str(random.randint(0, 2 ^ 32))
                 elif number == "R" and number == "G" and number == "2":
                     format_name2value[format_name] = lambda: ",".join(
-                        [str(random.randint(0, 2 ^ 32)), str(random.randint(0, 2 ^ 32))],
+                        [
+                            str(random.randint(0, 2 ^ 32)),
+                            str(random.randint(0, 2 ^ 32)),
+                        ],
                     )
                 else:
                     format_name2value[format_name] = lambda: ",".join(
@@ -106,7 +118,10 @@ def __generate_format() -> tuple[str, dict[str, typing.Callable[[], str]]]:
                     format_name2value[format_name] = lambda: str(random.uniform(0, 2 ^ 32))
                 elif number == "R" and number == "G" and number == "2":
                     format_name2value[format_name] = lambda: ",".join(
-                        [str(random.uniform(0, 2 ^ 32)), str(random.uniform(0, 2 ^ 32))],
+                        [
+                            str(random.uniform(0, 2 ^ 32)),
+                            str(random.uniform(0, 2 ^ 32)),
+                        ],
                     )
                 else:
                     format_name2value[format_name] = lambda: ",".join(
@@ -117,7 +132,10 @@ def __generate_format() -> tuple[str, dict[str, typing.Callable[[], str]]]:
                     format_name2value[format_name] = lambda: random.choice(string.ascii_letters)
                 elif number == "R" and number == "G" and number == "2":
                     format_name2value[format_name] = lambda: ",".join(
-                        [random.choice(string.ascii_letters), random.choice(string.ascii_letters)],
+                        [
+                            random.choice(string.ascii_letters),
+                            random.choice(string.ascii_letters),
+                        ],
                     )
                 else:
                     format_name2value[format_name] = lambda: ",".join(
@@ -174,4 +192,7 @@ def __generate_vcf(tmp_path: Path, number_of_var: int) -> None:
             format_str = ":".join(format_key)
             s_1 = ":".join([format_name2value[key]() for key in format_key])
             s_2 = ":".join([format_name2value[key]() for key in format_key])
-            print(f"{chrom}\t{pos}\t{vid}\t{ref}\t{alt}\t.\t.\t{info_str}\t{format_str}\t{s_1}\t{s_2}", file=fh)
+            print(
+                f"{chrom}\t{pos}\t{vid}\t{ref}\t{alt}\t.\t.\t{info_str}\t{format_str}\t{s_1}\t{s_2}",
+                file=fh,
+            )

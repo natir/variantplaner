@@ -83,11 +83,41 @@ def test_transmission_missing_mother() -> None:
 
     polars.Config.set_tbl_cols(500)
 
-    assert transmission.get_column("mother_gt").to_list() == [None, None, None, None, None]
-    assert transmission.get_column("mother_ad").to_list() == [None, None, None, None, None]
-    assert transmission.get_column("mother_dp").to_list() == [None, None, None, None, None]
-    assert transmission.get_column("mother_gq").to_list() == [None, None, None, None, None]
-    assert transmission.get_column("origin").to_list() == ['#~"', '#~"', '#~"', '#~"', '#~"']
+    assert transmission.get_column("mother_gt").to_list() == [
+        None,
+        None,
+        None,
+        None,
+        None,
+    ]
+    assert transmission.get_column("mother_ad").to_list() == [
+        None,
+        None,
+        None,
+        None,
+        None,
+    ]
+    assert transmission.get_column("mother_dp").to_list() == [
+        None,
+        None,
+        None,
+        None,
+        None,
+    ]
+    assert transmission.get_column("mother_gq").to_list() == [
+        None,
+        None,
+        None,
+        None,
+        None,
+    ]
+    assert transmission.get_column("origin").to_list() == [
+        '#~"',
+        '#~"',
+        '#~"',
+        '#~"',
+        '#~"',
+    ]
 
 
 def test_transmission_missing_father() -> None:
@@ -101,11 +131,41 @@ def test_transmission_missing_father() -> None:
 
     polars.Config.set_tbl_cols(500)
 
-    assert transmission.get_column("father_gt").to_list() == [None, None, None, None, None]
-    assert transmission.get_column("father_ad").to_list() == [None, None, None, None, None]
-    assert transmission.get_column("father_dp").to_list() == [None, None, None, None, None]
-    assert transmission.get_column("father_gq").to_list() == [None, None, None, None, None]
-    assert transmission.get_column("origin").to_list() == ["##~", "##~", "##~", "##~", "##~"]
+    assert transmission.get_column("father_gt").to_list() == [
+        None,
+        None,
+        None,
+        None,
+        None,
+    ]
+    assert transmission.get_column("father_ad").to_list() == [
+        None,
+        None,
+        None,
+        None,
+        None,
+    ]
+    assert transmission.get_column("father_dp").to_list() == [
+        None,
+        None,
+        None,
+        None,
+        None,
+    ]
+    assert transmission.get_column("father_gq").to_list() == [
+        None,
+        None,
+        None,
+        None,
+        None,
+    ]
+    assert transmission.get_column("origin").to_list() == [
+        "##~",
+        "##~",
+        "##~",
+        "##~",
+        "##~",
+    ]
 
 
 def test_transmission_all_mother_gt_null() -> None:
@@ -126,7 +186,25 @@ def test_transmission_all_mother_gt_null() -> None:
 
     transmission = generate.transmission_ped(genotypes_lf, pedigree_lf).sort(by="id")
 
-    assert transmission.get_column("mother_gt").to_list() == [None, None, None, None, None]
-    assert transmission.get_column("mother_ad").to_list() == [[0, 4560], [2, 4734], [5, 4828], [1, 4092], [0, 3084]]
-    assert transmission.get_column("mother_dp").to_list() == [4560, 4736, 4833, 4093, 3084]
+    assert transmission.get_column("mother_gt").to_list() == [
+        None,
+        None,
+        None,
+        None,
+        None,
+    ]
+    assert transmission.get_column("mother_ad").to_list() == [
+        [0, 4560],
+        [2, 4734],
+        [5, 4828],
+        [1, 4092],
+        [0, 3084],
+    ]
+    assert transmission.get_column("mother_dp").to_list() == [
+        4560,
+        4736,
+        4833,
+        4093,
+        3084,
+    ]
     assert transmission.get_column("mother_gq").to_list() == [99, 99, 99, 99, 99]
