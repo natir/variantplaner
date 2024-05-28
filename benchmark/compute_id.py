@@ -14,8 +14,8 @@ if typing.TYPE_CHECKING:  # pragma: no cover
     import pytest_benchmark
 
 # project import
+from variantplaner import VcfHeader
 from variantplaner.io import csv as io_csv
-from variantplaner.io import vcf as io_vcf
 from variantplaner.normalization import add_variant_id as __default_add_id
 
 from benchmark import __generate_vcf
@@ -26,9 +26,10 @@ chrom2length = io_csv.chr2length_into_lazyframe(DATA_DIR / "grch38.92.csv")
 
 def __custom_vcf_parsing(input_path: pathlib.Path) -> polars.LazyFrame:
     """Custom local vcf reading in polars LazyFrame."""
-    header = io_vcf.extract_header(input_path)
+    header = VcfHeader()
+    header.from_files(input_path)
 
-    col_name = {f"column_{i}": name for (i, name) in enumerate(io_vcf.__column_name(header, input_path), start=1)}
+    col_name = {f"column_{i}": name for (i, name) in enumerate(header.column_name(), start=1)}
 
     lf = polars.scan_csv(
         input_path,

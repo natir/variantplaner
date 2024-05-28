@@ -79,7 +79,7 @@ def build_rename_column(
     format_string: str | None = None,
     sample: dict[str, dict[str, str]] | None = None,
 ) -> RenameCol:
-    """A helper function to generate rename column dict for [variantplaner.io.vcf.from_lazyframe][] function parameter.
+    """A helper function to generate rename column dict for [variantplaner.io.vcf.lazyframe_in_vcf][] function parameter.
 
     Returns:
         A rename column dictionary.

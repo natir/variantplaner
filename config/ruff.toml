@@ -1,11 +1,12 @@
 target-version = "py39"
-
 line-length = 132
 
 exclude = [
     "fixtures",
     "site",
 ]
+
+[lint]
 select = [
     "A",
     "ANN",
@@ -78,7 +79,7 @@ ignore = [
     "ISC001",  # Single line implicit string concatenation (ruff formater recommendation)
 ]
 
-[per-file-ignores]
+[lint.per-file-ignores]
 "src/*/cli.py" = [
     "T201",  # Print statement
 ]
@@ -103,15 +104,19 @@ ignore = [
     "S311",  # Use of random but for not cryptographic
 ]
 
-[flake8-quotes]
+[lint.flake8-quotes]
 docstring-quotes = "double"
 
-[flake8-tidy-imports]
+[lint.flake8-tidy-imports]
 ban-relative-imports = "all"
 
-[isort]
+[lint.isort]
 known-first-party = ["variantplanner"]
 known-third-party = ["polars", "click", "typing-extensions"]
 
-[pydocstyle]
+[lint.pydocstyle]
 convention = "google"
+
+[format]
+docstring-code-format = true
+docstring-code-line-length = 80

@@ -12,9 +12,13 @@ import polars
 class Variants(polars.LazyFrame):
     """Object to manage lazyframe as Variants."""
 
-    def __init__(self):
+    def __init__(self, data: polars.LazyFrame | None = None):
         """Initialize a Variants object."""
-        self.lf = polars.LazyFrame(schema=Variants.minimal_schema())
+        if data is None:
+            self.lf = polars.LazyFrame(schema=Variants.minimal_schema())
+        else:
+            self.lf = data
+
 
     @classmethod
     def minimal_schema(cls) -> dict[str, type]:

@@ -14,7 +14,7 @@ if typing.TYPE_CHECKING:  # pragma: no cover
     import pytest_benchmark
 
 # project import
-from variantplaner import io
+from variantplaner import Vcf, VcfHeader
 
 from benchmark import __generate_info, __generate_vcf
 
@@ -36,11 +36,16 @@ def __generate_annotations_extractions(
         __generate_vcf(input_path, 1_000)
 
         def worker() -> polars.DataFrame:
-            vcf_header = io.vcf.extract_header(input_path)
-            info_parser = io.vcf.info2expr(vcf_header, input_path, set(info_names[:number_of_col]))
-            lf = io.vcf.into_lazyframe(input_path, DATA_DIR / "grch38.92.csv")
+            header = VcfHeader()
+            header.from_files(input_path)
+            info_parser = header.info_parser(set(info_names[:number_of_col]))
 
-            lf = lf.with_columns(info_parser).drop(["chr", "pos", "ref", "alt", "filter", "qual", "info"])
+            vcf = Vcf()
+            vcf.from_path(input_path, DATA_DIR / "grch38.92.csv")
+
+            lf = vcf.lf.with_columns(info_parser).drop(
+                ["chr", "pos", "ref", "alt", "filter", "qual", "info"]
+            )
 
             return lf.collect()
 

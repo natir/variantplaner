@@ -4,18 +4,22 @@
 from __future__ import annotations
 
 import enum
-
-# 3rd party import
 import typing
 
+# 3rd party import
 import polars
 
 # project import
-from variantplaner import ContigsLength, Genotypes, Variants, VcfHeader, normalization
+from variantplaner import normalization
 from variantplaner.exception import NoContigsLengthInformationError, NoGenotypeError, NotAVCFError, NotVcfHeaderError
+from variantplaner.objects.contigs_length import ContigsLength
+from variantplaner.objects.genotypes import Genotypes
+from variantplaner.objects.variants import Variants
+from variantplaner.objects.vcf_header import VcfHeader
 
 # type checking block
 if typing.TYPE_CHECKING:
+    import collections
     import pathlib
 
     from variantplaner import Annotations
@@ -76,6 +80,10 @@ class Vcf:
         """Get variants of vcf."""
         return self.lf.select(Variants.minimal_schema())
 
+    def set_variants(self, variants: Variants) -> None:
+        """Set variants of vcf."""
+        self.lf = variants
+
     def genotypes(self, format_str: str = "GT:AD:DP:GQ") -> Genotypes:
         """Get genotype of vcf."""
         if "format" not in self.lf.columns:
@@ -119,14 +127,29 @@ class Vcf:
 
         return genotypes
 
+    def add_genotypes(self, genotypes_lf: Genotypes) -> None:
+        """Add genotypes information in vcf."""
+        for sample in genotypes_lf.samples_names():
+            geno2sample = (
+                genotypes_lf.lf.filter(polars.col("sample") == sample)
+                .rename(
+                    {col: f"{sample}_{col}" for col in genotypes_lf.lf.columns[2:]},
+                )
+                .drop("sample")
+            )
+
+            self.lf = self.lf.join(geno2sample, on="id", how="outer_coalesce")
+
+
     def annotations(self, select_info: set[str] | None = None) -> Annotations:
         """Get annotations of vcf."""
         lf = self.lf.with_columns(self.lf.header.info_parser(select_info))
 
         return lf.drop("chr", "pos", "ref", "alt", "format", "info")
 
+
     @classmethod
-    def schema(cls) -> dict[str, type]:
+    def schema(cls) -> collections.abc.Mapping[polars.type_aliases.ColumnNameOrSelector, polars.type_aliases.PolarsDataType]:
         """Get schema of Vcf polars.LazyFrame."""
         return {
             "chr": polars.String,
