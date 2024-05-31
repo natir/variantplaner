@@ -41,8 +41,9 @@ def test_hive(tmp_path: pathlib.Path) -> None:
             DATA_DIR / "no_info.genotypes.parquet",
         ],
         tmp_path,
-        threads=2,
-        file_per_thread=1,
+        2,
+        1,
+        append=False
     )
 
     partition_paths = set(__scantree(tmp_path))

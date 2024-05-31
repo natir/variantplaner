@@ -78,6 +78,8 @@ def hive(
     output_prefix: pathlib.Path,
     threads: int,
     file_per_thread: int,
+    *,
+    append: bool,
 ) -> None:
     r"""Read all genotypes parquet file and use information to generate a hive like struct, based on 63rd and 55th bits included of variant id with genotype information.
 
@@ -94,7 +96,7 @@ def hive(
     Returns:
         None
     """
-    logger.info(f"{paths=} {output_prefix=}, {threads=}, {file_per_thread=}")
+    logger.info(f"{paths=} {output_prefix=}, {threads=}, {file_per_thread=}, {append=}")
 
     if len(paths) == 0:
         return
@@ -121,6 +123,10 @@ def hive(
             __hive_worker,
             [(lf_group, basename, output_prefix) for lf_group, basename in zip(lf_groups, basenames)],
         )
+
+        if append:
+            basenames.append(output_prefix / f"id_part={id_part}.parquet")
+
         pool.starmap(
             __merge_file,
             [(output_prefix / f"id_part={id_part}", basenames) for id_part in range(pow(2, NUMBER_OF_BITS))],

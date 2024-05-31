@@ -70,6 +70,7 @@ def __generate_hive(
                 tmp_path / f"hive_{group_size}",
                 threads=8,
                 file_per_thread=group_size,
+                append=False,
             ),
         )
 

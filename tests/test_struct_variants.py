@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import os
 import pathlib
-import random
 
 # 3rd party import
 import polars
@@ -132,7 +131,7 @@ def test_merge(tmp_path: pathlib.Path) -> None:
             DATA_DIR / "no_info.variants.parquet",
         ],
         tmp_file,
-        False,
+        append=False,
     )
 
     lf = polars.scan_parquet(tmp_file)
@@ -141,7 +140,6 @@ def test_merge(tmp_path: pathlib.Path) -> None:
 
 def test_merge_append(tmp_path: pathlib.Path) -> None:
     """Check merge append."""
-
     tmp_file = tmp_path / "merge_parquet.parquet"
 
     os.environ["POLARS_MAX_THREADS"] = str(2)
@@ -152,7 +150,7 @@ def test_merge_append(tmp_path: pathlib.Path) -> None:
             DATA_DIR / "no_info.variants.parquet",
         ],
         tmp_file,
-        False,
+        append=False,
     )
 
     lf = polars.scan_parquet(tmp_file)
@@ -164,7 +162,7 @@ def test_merge_append(tmp_path: pathlib.Path) -> None:
             DATA_DIR / "sv.variants.parquet",
         ],
         tmp_file,
-        True,
+        append=True,
     )
 
     lf_sv = polars.scan_parquet(DATA_DIR / "sv.variants.parquet")

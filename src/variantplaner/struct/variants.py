@@ -7,9 +7,7 @@ import logging
 import multiprocessing
 import os
 import pathlib
-import random
 import shutil
-import string
 import tempfile
 import typing
 
@@ -72,9 +70,10 @@ def __concat_uniq(paths: list[pathlib.Path], output: pathlib.Path) -> None:
 def merge(
     paths: list[pathlib.Path],
     output: pathlib.Path,
-    append: bool,
     memory_limit: int = 10_000_000_000,
     polars_threads: int = 4,
+    *,
+    append: bool,
 ) -> None:
     """Perform merge of multiple parquet variants file in one file.
 
@@ -96,7 +95,7 @@ def merge(
     if append:
         inputs.append(output)
 
-    temp_files = list()
+    temp_files = []
 
     while len(inputs) != 1:
         new_inputs = []

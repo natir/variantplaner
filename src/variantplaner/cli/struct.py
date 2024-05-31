@@ -88,7 +88,7 @@ def variants(
 
     logger.debug(f"parameter: {output_path=} {chunk_size}")
 
-    vp_struct.variants.merge(input_paths, output_path, append, chunk_size, polars_threads)
+    vp_struct.variants.merge(input_paths, output_path, chunk_size, polars_threads, append=append)
 
 
 @struct.command("genotypes")
@@ -147,7 +147,8 @@ def genotypes(
 
     input_paths = ctx.obj["input_paths"]
     threads = ctx.obj["threads"]
+    append = ctx.obj["append"]
 
     logger.debug(f"parameter: {prefix_path=} {partition_mode=} {number_of_part=} {file_per_thread=} {polars_threads=}")
 
-    vp_struct.genotypes.hive(input_paths, prefix_path, threads=threads, file_per_thread=file_per_thread)
+    vp_struct.genotypes.hive(input_paths, prefix_path, threads, file_per_thread, append=append)
