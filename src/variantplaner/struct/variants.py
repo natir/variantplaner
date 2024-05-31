@@ -21,19 +21,6 @@ import polars
 logger = logging.getLogger("struct.variants")
 
 
-def __random_string(size: int = 30) -> str:
-    """Generate a random string of 30 ascii character.
-
-    Args:
-        size: length of string
-
-    Returns:
-        A random string ascii character
-    """
-    # We didn't use this random for cryptographics usage
-    return "".join(random.choice(string.ascii_letters) for _ in range(size))  # noqa: S311
-
-
 def __chunk_by_memory(
     paths: list[pathlib.Path],
     bytes_limit: int = 10_000_000_000,
@@ -85,6 +72,7 @@ def __concat_uniq(paths: list[pathlib.Path], output: pathlib.Path) -> None:
 def merge(
     paths: list[pathlib.Path],
     output: pathlib.Path,
+    append: bool,
     memory_limit: int = 10_000_000_000,
     polars_threads: int = 4,
 ) -> None:
@@ -105,9 +93,10 @@ def merge(
     os.environ["POLARS_MAX_THREADS"] = str(polars_threads)
 
     inputs = paths
-    temp_directory = tempfile.TemporaryDirectory()
-    temp_prefix = pathlib.Path(temp_directory.name)
-    logger.debug(f"{temp_prefix=}")
+    if append:
+        inputs.append(output)
+
+    temp_files = list()
 
     while len(inputs) != 1:
         new_inputs = []
@@ -117,8 +106,9 @@ def merge(
             logger.debug(f"{len(input_chunk)=}")
             if len(input_chunk) > 1:
                 # general case
-                temp_output = temp_prefix / __random_string()
+                temp_output = pathlib.Path(tempfile.mkstemp()[1])
 
+                temp_files.append(temp_output)
                 new_inputs.append(temp_output)
                 inputs_outputs.append((input_chunk, temp_output))
 
@@ -138,4 +128,5 @@ def merge(
     shutil.move(inputs[0], output)
 
     # Call cleanup to remove all tempfile generate durring merging
-    temp_directory.cleanup()
+    for path in temp_files[:-1]:
+        path.unlink()

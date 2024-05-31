@@ -84,10 +84,11 @@ def variants(
     ctx.ensure_object(dict)
 
     input_paths = ctx.obj["input_paths"]
+    append = ctx.obj["append"]
 
     logger.debug(f"parameter: {output_path=} {chunk_size}")
 
-    vp_struct.variants.merge(input_paths, output_path, chunk_size, polars_threads)
+    vp_struct.variants.merge(input_paths, output_path, append, chunk_size, polars_threads)
 
 
 @struct.command("genotypes")

@@ -68,13 +68,6 @@ MERGE_IDS = {
 }
 
 
-def test_random_string() -> None:
-    """Check random string."""
-    random.seed(42)
-
-    assert struct.variants.__random_string() == "OhbVrpoiVgRVIfLBcbfnoGMbJmTPSI"
-
-
 def test_chunk_by_memory() -> None:
     """Check by memory."""
     paths = [
@@ -139,8 +132,44 @@ def test_merge(tmp_path: pathlib.Path) -> None:
             DATA_DIR / "no_info.variants.parquet",
         ],
         tmp_file,
+        False,
     )
 
     lf = polars.scan_parquet(tmp_file)
 
     assert set(lf.collect().get_column("id").to_list()) == MERGE_IDS
+
+def test_merge_append(tmp_path: pathlib.Path) -> None:
+    """Check merge append."""
+
+    tmp_file = tmp_path / "merge_parquet.parquet"
+
+    os.environ["POLARS_MAX_THREADS"] = str(2)
+
+    struct.variants.merge(
+        [
+            DATA_DIR / "no_genotypes.variants.parquet",
+            DATA_DIR / "no_info.variants.parquet",
+        ],
+        tmp_file,
+        False,
+    )
+
+    lf = polars.scan_parquet(tmp_file)
+
+    assert set(lf.collect().get_column("id").to_list()) == MERGE_IDS
+
+    struct.variants.merge(
+        [
+            DATA_DIR / "sv.variants.parquet",
+        ],
+        tmp_file,
+        True,
+    )
+
+    lf_sv = polars.scan_parquet(DATA_DIR / "sv.variants.parquet")
+    sv_merge = MERGE_IDS | set(lf_sv.collect().get_column("id").to_list())
+
+    lf = polars.scan_parquet(tmp_file)
+
+    assert set(lf.collect().get_column("id").to_list()) == sv_merge

@@ -82,7 +82,7 @@ class Vcf:
 
     def set_variants(self, variants: Variants) -> None:
         """Set variants of vcf."""
-        self.lf = variants
+        self.lf = variants.lf
 
     def genotypes(self, format_str: str = "GT:AD:DP:GQ") -> Genotypes:
         """Get genotype of vcf."""
@@ -138,7 +138,11 @@ class Vcf:
                 .drop("sample")
             )
 
-            self.lf = self.lf.join(geno2sample, on="id", how="outer_coalesce")
+            self.lf = self.lf.join(
+                geno2sample,
+                on="id",
+                how="outer_coalesce"
+            )
 
 
     def annotations(self, select_info: set[str] | None = None) -> Annotations:
