@@ -97,7 +97,7 @@ def variants(
     logger = logging.getLogger("vcf2parquet.variants")
 
     lf = ctx.obj["lazyframe"]
-    append = ctx.obj["append"]  # not used now
+    append = ctx.obj["append"]
 
     logger.debug(f"parameter: {output_path=}")
 
@@ -140,7 +140,7 @@ def genotypes(
     logger = logging.getLogger("vcf2parquet.genotypes")
 
     lf = ctx.obj["lazyframe"]
-    append = ctx.obj["append"]  # not used now
+    append = ctx.obj["append"]
 
     logger.debug(f"parameter: {output_path=} {format_string=}")
 
@@ -193,7 +193,7 @@ def annotations_subcommand(
     logger = logging.getLogger("vcf2parquet.annotations")
 
     lf = ctx.obj["lazyframe"]
-    append = ctx.obj["append"]  # not used now
+    append = ctx.obj["append"]
     headers_obj = ctx.obj["headers"]
 
     logger.debug(f"parameter: {output_path=}")

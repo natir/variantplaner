@@ -47,7 +47,6 @@ MERGE_IDS = {
     2865209939855409174,
     2865214825380708362,
     2865214829675675658,
-    2865214831823159301,
     2865214831823159302,
     3382250923425267716,
     3382273467708604421,
@@ -64,6 +63,7 @@ MERGE_IDS = {
     6356558437815418886,
     6356559434247831557,
     6356561358393180165,
+    17244892489187240251,
 }
 
 
@@ -137,6 +137,7 @@ def test_merge(tmp_path: pathlib.Path) -> None:
     lf = polars.scan_parquet(tmp_file)
 
     assert set(lf.collect().get_column("id").to_list()) == MERGE_IDS
+
 
 def test_merge_append(tmp_path: pathlib.Path) -> None:
     """Check merge append."""

@@ -43,7 +43,7 @@ def test_hive(tmp_path: pathlib.Path) -> None:
         tmp_path,
         2,
         1,
-        append=False
+        append=False,
     )
 
     partition_paths = set(__scantree(tmp_path))

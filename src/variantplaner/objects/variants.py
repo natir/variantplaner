@@ -19,7 +19,6 @@ class Variants(polars.LazyFrame):
         else:
             self.lf = data
 
-
     @classmethod
     def minimal_schema(cls) -> dict[str, type]:
         """Get schema of variants polars.LazyFrame."""

@@ -138,19 +138,13 @@ class Vcf:
                 .drop("sample")
             )
 
-            self.lf = self.lf.join(
-                geno2sample,
-                on="id",
-                how="outer_coalesce"
-            )
-
+            self.lf = self.lf.join(geno2sample, on="id", how="outer_coalesce")
 
     def annotations(self, select_info: set[str] | None = None) -> Annotations:
         """Get annotations of vcf."""
         lf = self.lf.with_columns(self.lf.header.info_parser(select_info))
 
         return lf.drop("chr", "pos", "ref", "alt", "format", "info")
-
 
     @classmethod
     def schema(cls) -> collections.abc.Mapping[polars.type_aliases.ColumnNameOrSelector, polars.type_aliases.PolarsDataType]:

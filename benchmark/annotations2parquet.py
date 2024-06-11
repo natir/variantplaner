@@ -43,9 +43,7 @@ def __generate_annotations_extractions(
             vcf = Vcf()
             vcf.from_path(input_path, DATA_DIR / "grch38.92.csv")
 
-            lf = vcf.lf.with_columns(info_parser).drop(
-                ["chr", "pos", "ref", "alt", "filter", "qual", "info"]
-            )
+            lf = vcf.lf.with_columns(info_parser).drop(["chr", "pos", "ref", "alt", "filter", "qual", "info"])
 
             return lf.collect()
 

@@ -125,7 +125,7 @@ def hive(
         )
 
         if append:
-            basenames.append(output_prefix / f"id_part={id_part}.parquet")
+            basenames.extend([str(output_prefix / f"id_part={id_part}.parquet") for id_part in range(pow(2, NUMBER_OF_BITS))])
 
         pool.starmap(
             __merge_file,

@@ -57,6 +57,7 @@ def add_variant_id(lf: polars.LazyFrame, chrom2length: polars.LazyFrame) -> pola
             ),
         )
 
+    lf = lf.with_columns(alt=polars.col("alt").str.replace("\\*", "*" * 30))
     lf = lf.join(chrom2length, right_on="contig", left_on="chr", how="left")
     lf = lf.with_columns(real_pos=polars.col("pos") + polars.col("offset"))
 

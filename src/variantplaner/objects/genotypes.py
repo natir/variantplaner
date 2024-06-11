@@ -19,7 +19,6 @@ class Genotypes(polars.LazyFrame):
         else:
             self.lf = data
 
-
     def samples_names(self) -> list[str]:
         """Get list of sample name."""
         return self.lf.select("sample").collect().get_column("sample").to_list()
