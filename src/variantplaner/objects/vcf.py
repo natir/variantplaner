@@ -63,6 +63,8 @@ class Vcf:
             separator="\t",
             comment_prefix="#",
             has_header=False,
+            schema=Vcf.schema(),
+            new_columns=list(Vcf.schema().keys())
         )
 
         self.lf = self.lf.rename(dict(zip(self.lf.columns, self.header.column_name(self.lf.width))))
