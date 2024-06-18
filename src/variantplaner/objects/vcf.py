@@ -140,7 +140,7 @@ class Vcf:
                 .drop("sample")
             )
 
-            self.lf = self.lf.join(geno2sample, on="id", how="outer_coalesce")
+            self.lf = self.lf.join(geno2sample, on="id", how='full', coalesce=True)
 
     def annotations(self, select_info: set[str] | None = None) -> Annotations:
         """Get annotations of vcf."""

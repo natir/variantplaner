@@ -13,8 +13,7 @@ crate-type = ["cdylib"]
 ahash        = { version = "0.8",  features = ["no-rng"] }
 
 # polars thing
-polars       = { version = "0.36", default-features = false, features = ["fmt", "dtype-full"] }
-polars-plan  = { version = "0.36", default-features = false }
-pyo3         = { version = "0.20", features = ["extension-module"] }
-pyo3-polars  = { version = "0.10",  features = ["derive"] }
+polars       = { version = "0.40", default-features = false, features = ["fmt", "dtype-date", "timezones"] }
+pyo3         = { version = "0.21", features = ["extension-module"] }
+pyo3-polars  = { version = "0.14",  features = ["derive", "lazy"] }
 jemallocator = { version = "0.5",  features = ["disable_initial_exec_tls"] }

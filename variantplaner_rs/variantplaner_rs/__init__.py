@@ -1,8 +1,7 @@
+import pathlib
 import polars
 from polars.type_aliases import IntoExpr
-from polars.utils.udfs import _get_shared_lib_location
-
-lib = _get_shared_lib_location(__file__)
+from polars.plugins import register_plugin_function
 
 @polars.api.register_expr_namespace("variant_id")
 class VariantId:
@@ -10,16 +9,17 @@ class VariantId:
         self._expr = expr
 
     def compute(self, ref: polars.Expr, alt: polars.Expr, max_pos: int) -> polars.Expr:
-        return self._expr.register_plugin(
-            lib=lib,
-            args=[ref, alt, max_pos],
-            symbol="compute",
+        return register_plugin_function(
+            plugin_path=pathlib.Path(__file__).parent,
+            function_name="compute",
+            args=[self._expr, ref, alt, max_pos],
         )
 
     def partition(self) -> polars.Expr:
-        return self._expr.register_plugin(
-            lib=lib,
-            symbol="partition",
+        return register_plugin_function(
+            plugin_path=pathlib.Path(__file__).parent,
+            function_name="partition",
+            args=[self._expr],
         )
 
 

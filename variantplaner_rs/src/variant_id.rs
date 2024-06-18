@@ -47,11 +47,6 @@ fn local_compute(
         .map(|((p, r), a)| match (p, r, a) {
             (Some(p), Some(r), Some(a)) => {
                 let mut hash = 0;
-                println!(
-                    "{} > {}",
-                    ref_alt_space_usage(r.as_bytes(), a.as_bytes()),
-                    pos_mov
-                );
                 if ref_alt_space_usage(r.as_bytes(), a.as_bytes()) > pos_mov {
                     key.clear();
 
@@ -60,7 +55,6 @@ fn local_compute(
                     key.extend(a.as_bytes());
 
                     hash = (1 << 63) | (hasher.hash_one(&key) >> 1);
-                    println!("hash {:640b}", hash)
                 } else {
                     hash |= p << pos_mov;
                     hash |= (r.len() as u64) << (a.len() * 2);
@@ -96,7 +90,7 @@ fn local_part(id: &UInt64Chunked) -> PolarsResult<Series> {
         .collect())
 }
 
-#[polars_expr(output_type=UInt8)]
+#[polars_expr(output_type=UInt64)]
 fn partition(inputs: &[Series]) -> PolarsResult<Series> {
     let id = inputs[0].u64()?;
 
@@ -152,7 +146,7 @@ mod tests {
                     AnyValue::UInt64(1845493765),
                     AnyValue::UInt64(5477969788015738884),
                     AnyValue::UInt64(5477969788015738882),
-                    AnyValue::UInt64(17294972461992989018),
+                    AnyValue::UInt64(15149852326290402176),
                     AnyValue::Null,
                 ],
                 &DataType::UInt64,
@@ -212,15 +206,15 @@ mod tests {
             Series::from_any_values_and_dtype(
                 "",
                 &[
-                    AnyValue::UInt8(0),
-                    AnyValue::UInt8(0),
-                    AnyValue::UInt8(0),
-                    AnyValue::UInt8(152),
-                    AnyValue::UInt8(152),
-                    AnyValue::UInt8(255),
+                    AnyValue::UInt64(0),
+                    AnyValue::UInt64(0),
+                    AnyValue::UInt64(0),
+                    AnyValue::UInt64(152),
+                    AnyValue::UInt64(152),
+                    AnyValue::UInt64(255),
                     AnyValue::Null,
                 ],
-                &DataType::UInt8,
+                &DataType::UInt64,
                 false
             )
             .unwrap()

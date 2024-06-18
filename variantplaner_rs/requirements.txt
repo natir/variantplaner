@@ -1,2 +1,2 @@
 maturin[patchelf]
-polars
+polars>=0.20.31

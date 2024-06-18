@@ -36,7 +36,7 @@ def into_lazyframe(input_path: pathlib.Path) -> polars.LazyFrame:
             "sex",
             "affected",
         ],
-        dtypes={
+        schema_overrides={
             "family_id": polars.Utf8,
             "personal_id": polars.Utf8,
             "father_id": polars.Utf8,
