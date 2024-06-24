@@ -38,10 +38,10 @@ def __generate_variants() -> polars.DataFrame:
     """Generate a variant dataframe."""
     return polars.DataFrame(
         data={
-            "chr": ["2", "1", "X", "3", "22"],
-            "pos": [19910, 3322992, 1292939, 399941, 11111],
-            "ref": ["A", "AAAAAAAAAATTTTTTTTTTCCCCCCCCCCGGGGGGGGGG", "A", "C", "T"],
-            "alt": ["T", "C", "AAAAAAAAAATTTTTTTTTTCCCCCCCCCCGGGGGGGGGG", "G", "C"],
+            "chr": ["2", "1", "X", "3", "22", "2"],
+            "pos": [19910, 3322992, 1292939, 399941, 11111, 16424],
+            "ref": ["A", "AAAAAAAAAATTTTTTTTTTCCCCCCCCCCGGGGGGGGGG", "A", "C", "T", "A"],
+            "alt": ["T", "C", "AAAAAAAAAATTTTTTTTTTCCCCCCCCCCGGGGGGGGGG", "G", "C", "*"],
         },
         schema_overrides={"pos": polars.UInt64},
     )
@@ -54,12 +54,15 @@ def test_id() -> None:
 
     df = normalization.add_variant_id(df.lazy(), chr2len.lazy()).collect()
 
+    print("{}", df)
+
     assert df.get_column("id").to_list() == [
         344281486070906886,
         114177135718957217,
-        17793944462439896137,
+        13604463283740165373,
         359057238721036295,
         4468882925680590853,
+        12704027001632293257,
     ]
 
 
@@ -72,4 +75,4 @@ def test_partition() -> None:
 
     df = normalization.add_id_part(df.lazy()).collect()
 
-    assert df.get_column("id_part").to_list() == [9, 3, 255, 9, 124]
+    assert df.get_column("id_part").to_list() == [9, 3, 255, 9, 124, 255]

@@ -63,7 +63,7 @@ class Vcf:
             separator="\t",
             comment_prefix="#",
             has_header=False,
-            schema=Vcf.schema(),
+            schema_overrides=Vcf.schema(),
             new_columns=list(Vcf.schema().keys())
         )
 
