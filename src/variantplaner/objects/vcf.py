@@ -76,7 +76,7 @@ class Vcf:
         self.lf = normalization.add_variant_id(self.lf, chr2len.lf)
 
         if behavior == VcfParsingBehavior.MANAGE_SV:
-            self.lf = self.lf.drop("SVTYPE", "SVLEN")
+            self.lf = self.lf.drop("SVTYPE", "SVLEN", strict=False)
 
     def variants(self) -> Variants:
         """Get variants of vcf."""
