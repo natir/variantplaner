@@ -126,19 +126,20 @@ def test_show_help_parquet2vcf() -> None:
   Convert variant parquet in vcf.
 
 Options:
-  -v, --variants-path FILE   Path to variant parquet.  [required]
-  -o, --output-path FILE     Path where the vcf is written.  [required]
-  -g, --genotypes-path FILE  Path to genotype parquet.
-  -H, --headers-path FILE    Path to vcf header.
-  -c, --chromosome TEXT      Name of chromosome column.  [default: chr]
-  -p, --position TEXT        Name of position column.  [default: pos]
-  -I, --identifier TEXT      Name of identity column.  [default: id]
-  -r, --reference TEXT       Name of reference column.  [default: ref]
-  -a, --alternative TEXT     Name of alternative column.  [default: alt]
-  -q, --quality TEXT         Name of quality column.
-  -f, --filter TEXT          Name of filter column.
-  -F, --format TEXT          Value of format column.
-  -h, --help                 Show this message and exit.
+  -v, --variants-path FILE      Path to variant parquet.  [required]
+  -o, --output-path FILE        Path where the vcf is written.  [required]
+  -g, --genotypes-path FILE     Path to genotype parquet.
+  -H, --headers-path FILE       Path to vcf header.
+  -s, --select-chromosome TEXT  Output only record where chromosome match target
+  -c, --chromosome TEXT         Name of chromosome column.  [default: chr]
+  -p, --position TEXT           Name of position column.  [default: pos]
+  -I, --identifier TEXT         Name of identity column.  [default: id]
+  -r, --reference TEXT          Name of reference column.  [default: ref]
+  -a, --alternative TEXT        Name of alternative column.  [default: alt]
+  -q, --quality TEXT            Name of quality column.
+  -f, --filter TEXT             Name of filter column.
+  -F, --format TEXT             Value of format column.
+  -h, --help                    Show this message and exit.
 """
     )
 

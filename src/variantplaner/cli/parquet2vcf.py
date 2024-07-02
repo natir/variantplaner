@@ -60,6 +60,12 @@ from variantplaner import Genotypes, Variants, Vcf, cli, io
     ),
 )
 @click.option(
+    "-s",
+    "--select-chromosome",
+    help="Output only record where chromosome match target",
+    type=str,
+)
+@click.option(
     "-c",
     "--chromosome",
     help="Name of chromosome column.",
@@ -122,6 +128,7 @@ def parquet2vcf(
     output_path: pathlib.Path,
     genotypes_path: pathlib.Path | None = None,
     headers_path: pathlib.Path | None = None,
+    select_chromosome: str | None = None,
     chromosome: str = "chr",
     position: str = "pos",
     identifier: str = "id",
@@ -140,7 +147,11 @@ def parquet2vcf(
 
     vcf = Vcf()
 
-    vcf.set_variants(Variants(polars.scan_parquet(variants_path)))
+    lf = polars.scan_parquet(variants_path)
+    if select_chromosome is not None:
+        lf = lf.filter(polars.col(chromosome) == select_chromosome)
+
+    vcf.set_variants(Variants(lf))
 
     if headers_path:
         vcf.header.from_files(headers_path)

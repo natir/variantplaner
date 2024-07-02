@@ -54,8 +54,6 @@ def test_id() -> None:
 
     df = normalization.add_variant_id(df.lazy(), chr2len.lazy()).collect()
 
-    print("{}", df)
-
     assert df.get_column("id").to_list() == [
         344281486070906886,
         114177135718957217,

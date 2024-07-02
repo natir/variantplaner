@@ -60,7 +60,6 @@ def __concat_uniq(paths: list[pathlib.Path], output: pathlib.Path) -> None:
     Returns:
         None
     """
-
     lf = polars.concat([polars.scan_parquet(path) for path in paths])
 
     lf = lf.unique(subset=("chr", "pos", "ref", "alt"))
