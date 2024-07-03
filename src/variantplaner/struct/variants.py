@@ -91,7 +91,7 @@ def merge(
     multi_threads = max(all_threads // polars_threads, 1)
     os.environ["POLARS_MAX_THREADS"] = str(polars_threads)
 
-    inputs = paths
+    inputs = list(paths)
     if append:
         inputs.append(output)
 
