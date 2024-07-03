@@ -26,9 +26,9 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-    "polars[pyarrow]>=0.20",
-    "click>=8.1.3",
-    "typing-extensions>=4.5.0",
+    "polars[pyarrow]>=1",
+    "click>=8",
+    "typing-extensions>=4",
     "variantplaner-rs @ file:///${PROJECT_ROOT}/variantplaner_rs",
 ]
 
@@ -51,48 +51,16 @@ plugins = [
 [tool.pdm.build]
 package-dir = "src"
 editable-backend = "editables"
-
-[tool.pdm.dev-dependencies]
-duty = ["duty>=0.10"]
-#ci-quality = ["variantplaner[duty,docs,quality,typing,security]"]
-#ci-tests = ["variantplaner[duty,tests]"]
-docs = [
-    "markdown-callouts>=0.3",
-    "markdown-exec>=1.6",
-    "mkdocs-coverage>=0.2",
-    "mkdocs-gen-files>=0.5",
-    "mkdocs-git-committers-plugin-2>=1",
-    "mkdocs-literate-nav>=0.6",
-    "mkdocs-material>=9",
-    "mkdocs-minify-plugin>=0.6",
-    "mkdocs-section-index>=0.3",
-    "mkdocs>=1",
-    "mkdocstrings[python]>=0.22",
-    "ruff>=0.1",
-    "toml>=0.10",
-    "altair>=5",
-]
-maintain = [
-    "blacken-docs>=1",
-    "git-changelog>=2",
-    "ruff>=0.1",
-]
-quality = [
-    "ruff>=0.1",
-]
-tests = [
-    "pytest-benchmark[histogram]>=4",
-    "pytest-cov>=4",
-    "pytest-randomly>=3",
-    "pytest-xdist>=3",
-    "pytest>=7",
-]
-typing = [
-    "mypy>=1",
-    "types-markdown>=3",
-    "types-pyyaml>=6",
-    "types-toml>=0.10",
-]
-security = [
-    "safety>=2.3",
+excludes = ["**/.pytest_cache"]
+source-includes = [
+    "config",
+    "docs",
+    "scripts",
+    "share",
+    "tests",
+    "devdeps.txt",
+    "duties.py",
+    "mkdocs.yml",
+    "*.md",
+    "LICENSE",
 ]

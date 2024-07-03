@@ -66,7 +66,7 @@ def transmission(
     Raises:
         NoGTError: if genotypes_lf not containts gt column.
     """
-    genotypes_column = list(genotypes_lf.columns[2:])
+    genotypes_column = list(genotypes_lf.collect_schema().names()[2:])
     if "gt" not in genotypes_column:
         raise NoGTError("genotype polars.LazyFrame")
 
@@ -111,9 +111,9 @@ def transmission(
 
     transmission_lf = transmission_lf.with_columns(
         polars.concat_str(
-            polars.col("index_gt").replace(gt2chr, default="~", return_dtype=polars.Utf8),
-            polars.col("mother_gt").fill_null(94).replace(gt2chr, default="~", return_dtype=polars.Utf8),
-            polars.col("father_gt").fill_null(94).replace(gt2chr, default="~", return_dtype=polars.Utf8),
+            polars.col("index_gt").replace_strict(gt2chr, default="~", return_dtype=polars.Utf8),
+            polars.col("mother_gt").fill_null(94).replace_strict(gt2chr, default="~", return_dtype=polars.Utf8),
+            polars.col("father_gt").fill_null(94).replace_strict(gt2chr, default="~", return_dtype=polars.Utf8),
         ).alias("origin"),
     )
 

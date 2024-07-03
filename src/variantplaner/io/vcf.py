@@ -158,13 +158,14 @@ def lazyframe_in_vcf(
         select_column.append("FORMAT")
 
     if renaming["FORMAT"] and renaming["sample"]:
+        schema = lf.collect_schema()
         for sample_name in renaming["sample"]:
             lf = lf.with_columns(
                 [
                     __lazy2format(
                         sample_name,
                         renaming["FORMAT"],
-                        dict(zip(lf.columns, lf.dtypes)),
+                        dict(zip(schema.names(), schema.dtypes())),
                     ).alias(sample_name),
                 ],
             )
@@ -244,7 +245,8 @@ def __generate_header(
     header = """##fileformat=VCFv4.3
 ##source=VariantPlanner
 """
-    col2type = dict(zip(lf.columns, lf.dtypes))
+    schema = lf.collect_schema()
+    col2type = dict(zip(schema.names(), schema.dtypes()))
 
     if vcfinfo2parquet_name:
         for vcf_name, col_name in vcfinfo2parquet_name:

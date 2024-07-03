@@ -3,7 +3,7 @@ name: Bug report
 about: Create a bug report to help us improve.
 title: "bug: "
 labels: unconfirmed
-assignees: [natir]
+assignees: [pawamoy]
 ---
 
 ### Description of the bug
@@ -52,7 +52,8 @@ PASTE TRACEBACK HERE
 ```bash
 variantplaner --debug-info  # | xclip -selection clipboard
 ```
-PASTE OUTPUT HERE
+
+PASTE MARKDOWN OUTPUT HERE
 
 ### Additional context
 <!-- Add any other relevant context about the problem here,

@@ -1,6 +1,6 @@
 import pathlib
 import polars
-from polars.type_aliases import IntoExpr
+from polars._typing import IntoExpr
 from polars.plugins import register_plugin_function
 
 @polars.api.register_expr_namespace("variant_id")

@@ -36,9 +36,11 @@ def add_variant_id(lf: polars.LazyFrame, chrom2length: polars.LazyFrame) -> pola
     """
     real_pos_max = chrom2length.select([polars.col("length").sum()]).collect().get_column("length").max()
 
-    large_variant_len = f"{real_pos_max:064b}".index("1") // 2
+#    print(real_pos_max, type(real_pos_max), bin(real_pos_max))
+    large_variant_len = (64 - len(format(real_pos_max, "b")) - 2) // 2
 
-    if "SVTYPE" in lf.columns and "SVLEN" in lf.columns:
+    col_names = lf.collect_schema().names()
+    if "SVTYPE" in col_names and "SVLEN" in col_names:
         lf = lf.with_columns(
             alt=polars.when(
                 polars.col("alt").str.replace("<(?<type>[^:]+).*>", "$type") == polars.col("SVTYPE"),

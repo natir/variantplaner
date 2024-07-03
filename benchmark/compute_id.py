@@ -14,14 +14,14 @@ if typing.TYPE_CHECKING:  # pragma: no cover
     import pytest_benchmark
 
 # project import
-from variantplaner import VcfHeader
-from variantplaner.io import csv as io_csv
+from variantplaner import ContigsLength, VcfHeader
 from variantplaner.normalization import add_variant_id as __default_add_id
 
 from benchmark import __generate_vcf
 
 DATA_DIR = pathlib.Path(__file__).parent.parent / "tests" / "data"
-chrom2length = io_csv.chr2length_into_lazyframe(DATA_DIR / "grch38.92.csv")
+chrom2length = ContigsLength()
+chrom2length.from_path(DATA_DIR / "grch38.92.csv")
 
 
 def __custom_vcf_parsing(input_path: pathlib.Path) -> polars.LazyFrame:
@@ -36,7 +36,7 @@ def __custom_vcf_parsing(input_path: pathlib.Path) -> polars.LazyFrame:
         separator="\t",
         comment_prefix="#",
         has_header=False,
-        dtypes={"column_1": polars.Utf8, "column_2": polars.UInt64},
+        schema_overrides={"column_1": polars.Utf8, "column_2": polars.UInt64},
         ignore_errors=True,
     )
 
@@ -62,9 +62,9 @@ def __hash_add_id(lf: polars.LazyFrame) -> polars.LazyFrame:
 
 def __rust_add_id(lf: polars.LazyFrame) -> polars.LazyFrame:
     """Add column id of variant by use rust code."""
-    real_pos_max = chrom2length.select([polars.col("length").sum()]).collect().get_column("length").max()
+    real_pos_max = chrom2length.lf.select([polars.col("length").sum()]).collect().get_column("length").max()
 
-    lf = lf.join(chrom2length, on="chr", how="left")
+    lf = lf.join(chrom2length.lf, on="chr", how="left")
     lf = lf.with_columns(real_pos=polars.col("pos") + polars.col("offset"))
 
     return lf.with_columns(
@@ -137,7 +137,7 @@ def __generate_id_default(
         lf = __custom_vcf_parsing(input_path)
 
         benchmark(
-            lambda: __default_add_id(lf, chrom2length).collect(),
+            lambda: __default_add_id(lf, chrom2length.lf).collect(),
         )
 
     inner.__doc__ = f"""Compute default id of {number_of_line} variant"""

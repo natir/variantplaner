@@ -64,10 +64,11 @@ class Vcf:
             comment_prefix="#",
             has_header=False,
             schema_overrides=Vcf.schema(),
-            new_columns=list(Vcf.schema().keys())
+            new_columns=list(Vcf.schema().keys()),
         )
 
-        self.lf = self.lf.rename(dict(zip(self.lf.columns, self.header.column_name(self.lf.width))))
+        schema = self.lf.collect_schema()
+        self.lf = self.lf.rename(dict(zip(schema.names(), self.header.column_name(schema.len()))))
         self.lf = self.lf.cast(Vcf.schema())
 
         if behavior == VcfParsingBehavior.MANAGE_SV:
@@ -88,13 +89,16 @@ class Vcf:
 
     def genotypes(self, format_str: str = "GT:AD:DP:GQ") -> Genotypes:
         """Get genotype of vcf."""
-        if "format" not in self.lf.columns:
+        schema = self.lf.collect_schema()
+
+        if "format" not in schema.names():
             raise NoGenotypeError
 
-        lf = self.lf.select([*self.lf.columns[self.lf.columns.index("format") :]])
+        lf = self.lf.select([*schema.names()[schema.names().index("format") :]])
+        schema = lf.collect_schema()
 
         # Clean bad variant
-        lf = lf.filter(polars.col("format").str.starts_with(format_str)).select(*lf.columns[1:])
+        lf = lf.filter(polars.col("format").str.starts_with(format_str)).select(*schema.names()[1:])
 
         # Found index of genotype value
         col_index = {
@@ -106,7 +110,7 @@ class Vcf:
 
         # Pivot value
         genotypes = Genotypes()
-        genotypes.lf = lf.melt(id_vars=["id"]).with_columns(
+        genotypes.lf = lf.unpivot(index=["id"]).with_columns(
             [
                 polars.col("id"),
                 polars.col("variable").alias("sample"),
@@ -124,7 +128,7 @@ class Vcf:
         # Select intrusting column
         genotypes.lf = genotypes.lf.select(["id", "sample", *[col.lower() for col in col_index]])
 
-        if "gt" in genotypes.lf.columns:
+        if "gt" in schema.names():
             genotypes.lf = genotypes.lf.filter(polars.col("gt") != 0)
 
         return genotypes
@@ -135,7 +139,7 @@ class Vcf:
             geno2sample = (
                 genotypes_lf.lf.filter(polars.col("sample") == sample)
                 .rename(
-                    {col: f"{sample}_{col}" for col in genotypes_lf.lf.columns[2:]},
+                    {col: f"{sample}_{col}" for col in genotypes_lf.lf.collect_schema().names()[2:]},
                 )
                 .drop("sample")
             )
@@ -149,7 +153,7 @@ class Vcf:
         return lf.drop("chr", "pos", "ref", "alt", "format", "info")
 
     @classmethod
-    def schema(cls) -> collections.abc.Mapping[polars.type_aliases.ColumnNameOrSelector, polars.type_aliases.PolarsDataType]:
+    def schema(cls) -> collections.abc.Mapping[polars._typing.ColumnNameOrSelector, polars._typing.PolarsDataType]:
         """Get schema of Vcf polars.LazyFrame."""
         return {
             "chr": polars.String,

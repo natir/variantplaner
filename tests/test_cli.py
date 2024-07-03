@@ -113,11 +113,11 @@ def test_vcf2parquet(tmp_path: pathlib.Path) -> None:
         )
     except OverflowError:  # pragma: no cover
         # TODO remove this
-        truth = polars.scan_parquet(DATA_DIR / "no_info.genotypes.parquet")
-        lf = polars.scan_parquet(genotypes_path)
-        assert truth.columns == lf.columns
-        assert truth.dtypes == lf.dtypes
-        assert truth.width == lf.width
+        truth = polars.scan_parquet(DATA_DIR / "no_info.genotypes.parquet").collect_schema()
+        lf = polars.scan_parquet(genotypes_path).collect_schema()
+        assert truth.names() == lf.names()
+        assert truth.dtypes() == lf.dtypes()
+        assert truth.len() == lf.len()
 
 
 def test_vcf2parquet_ask_annotations(tmp_path: pathlib.Path) -> None:
@@ -440,7 +440,7 @@ def test_annotations_vcf(tmp_path: pathlib.Path) -> None:
     assert result.exit_code == 0, result.output
 
     lf = polars.scan_parquet(annotations_path)
-    assert lf.columns == [
+    assert lf.collect_schema().names() == [
         "vid",
         "id",
         "AF_ESP",
@@ -514,7 +514,7 @@ def test_annotations_vcf_select(tmp_path: pathlib.Path) -> None:
     assert result.exit_code == 0, result.output
 
     lf = polars.scan_parquet(annotations_path)
-    assert lf.columns == ["vid", "id", "AF_ESP", "CLNSIG"]
+    assert lf.collect_schema().names() == ["vid", "id", "AF_ESP", "CLNSIG"]
 
 
 def test_annotations_vcf_select_rename_id(tmp_path: pathlib.Path) -> None:
@@ -544,7 +544,7 @@ def test_annotations_vcf_select_rename_id(tmp_path: pathlib.Path) -> None:
     assert result.exit_code == 0, result.output
 
     lf = polars.scan_parquet(annotations_path)
-    assert set(lf.columns) == {"annot_id", "id", "AF_ESP", "CLNSIG"}
+    assert set(lf.collect_schema().names()) == {"annot_id", "id", "AF_ESP", "CLNSIG"}
 
 
 def test_metadata_json(tmp_path: pathlib.Path) -> None:

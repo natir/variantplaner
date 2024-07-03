@@ -7,8 +7,7 @@ import sys
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from duty import duty
-from duty.callables import coverage, lazy, mkdocs, mypy, pytest, ruff, safety
+from duty import duty, tools
 
 if TYPE_CHECKING:
     from duty.context import Context
@@ -30,15 +29,13 @@ def pyprefix(title: str) -> str:  # noqa: D103
 
 
 @duty
-def changelog(ctx: Context) -> None:
+def changelog(ctx: Context, bump: str = "") -> None:
     """Update the changelog in-place with latest commits.
 
     Parameters:
         ctx: The context instance (passed automatically).
     """
-    from git_changelog.cli import main as git_changelog
-
-    ctx.run(git_changelog, args=[[]], title="Updating changelog")
+    ctx.run(tools.git_changelog(bump=bump or None), title="Updating changelog")
 
 
 @duty(
@@ -66,30 +63,8 @@ def check_quality(ctx: Context) -> None:
         ctx: The context instance (passed automatically).
     """
     ctx.run(
-        ruff.check(*PY_SRC_LIST, config="config/ruff.toml"),
+        tools.ruff.check(*PY_SRC_LIST, config="config/ruff.toml"),
         title=pyprefix("Checking code quality"),
-        command=f"ruff check --config config/ruff.toml {PY_SRC}",
-    )
-
-
-@duty
-def check_dependencies(ctx: Context) -> None:
-    """Check for vulnerabilities in dependencies.
-
-    Parameters:
-        ctx: The context instance (passed automatically).
-    """
-    # retrieve the list of dependencies
-    requirements = ctx.run(
-        ["pdm", "export", "-f", "requirements", "--without-hashes"],
-        title="Exporting dependencies as requirements",
-        allow_overrides=False,
-    )
-
-    ctx.run(
-        safety.check(requirements),
-        title="Checking dependencies",
-        command="pdm export -f requirements --without-hashes | safety check --stdin",
     )
 
 
@@ -107,7 +82,7 @@ def check_docs(ctx: Context) -> None:
     Path(".benchmarks/tmp.json").touch(exist_ok=True)
 
     ctx.run(
-        mkdocs.build(strict=True, verbose=True),
+        tools.mkdocs.build(strict=True, verbose=True),
         title=pyprefix("Building documentation"),
         command="mkdocs build -vs",
     )
@@ -121,26 +96,17 @@ def check_types(ctx: Context) -> None:
         ctx: The context instance (passed automatically).
     """
     ctx.run(
-        mypy.run(*PY_SRC_LIST, config_file="config/mypy.ini", warn_unused_configs=False),
+        tools.mypy(*PY_SRC_LIST, config_file="config/mypy.ini"),
         title=pyprefix("Type-checking"),
-        command=f"mypy --config-file config/mypy.ini {PY_SRC}",
     )
 
 
 @duty
-def check_api(ctx: Context) -> None:
-    """Check for API breaking changes.
-
-    Parameters:
-        ctx: The context instance (passed automatically).
-    """
-    from griffe.cli import check as g_check
-
-    griffe_check = lazy(g_check, name="griffe.check")
+def check_api(ctx: Context, *cli_args: str) -> None:
+    """Check for API breaking changes."""
     ctx.run(
-        griffe_check("variantplaner", search_paths=["src"]),
+        tools.griffe.check("variantplaner", search=["src"], color=True).add_args(*cli_args),
         title="Checking for API breaking changes",
-        command="griffe check -ssrc variantplaner",
         nofail=True,
     )
 
@@ -166,18 +132,11 @@ def clean(ctx: Context) -> None:
 
 
 @duty
-def docs(ctx: Context, host: str = "127.0.0.1", port: int = 8000) -> None:
-    """Serve the documentation (localhost:8000).
-
-    Parameters:
-        ctx: The context instance (passed automatically).
-        host: The host to serve the docs from.
-        port: The port to serve the docs on.
-    """
+def docs(ctx: Context) -> None:
+    """Check if the documentation builds correctly."""
     ctx.run(
-        mkdocs.serve(dev_addr=f"{host}:{port}"),
-        title="Serving documentation",
-        capture=False,
+        tools.mkdocs.build(strict=True, verbose=True),
+        title=pyprefix("Building documentation"),
     )
 
 
@@ -189,7 +148,7 @@ def docs_deploy(ctx: Context) -> None:
         ctx: The context instance (passed automatically).
     """
     os.environ["DEPLOY"] = "true"
-    ctx.run(mkdocs.gh_deploy(force=True), title="Deploying documentation")
+    ctx.run(tools.mkdocs.gh_deploy(force=True), title="Deploying documentation")
 
 
 @duty
@@ -200,14 +159,37 @@ def format(ctx: Context) -> None:
         ctx: The context instance (passed automatically).
     """
     ctx.run(
-        ruff.check(*PY_SRC_LIST, config="config/ruff.toml", fix_only=True, exit_zero=True),
+        tools.ruff.check(*PY_SRC_LIST, config="config/ruff.toml", fix_only=True, exit_zero=True),
         title="Auto-fixing code",
     )
-    ctx.run(ruff.format(*PY_SRC_LIST, config="config/ruff.toml"), title="Formatting code")
+    ctx.run(tools.ruff.format(*PY_SRC_LIST, config="config/ruff.toml"), title="Formatting code")
 
 
-@duty(post=["docs-deploy"])
-def release(ctx: Context, version: str) -> None:
+@duty
+def build(ctx: Context) -> None:
+    """Build source and wheel distributions."""
+    ctx.run(
+        tools.build(),
+        title="Building source and wheel distributions",
+        pty=PTY,
+    )
+
+
+@duty
+def publish(ctx: Context) -> None:
+    """Publish source and wheel distributions to PyPI."""
+    if not Path("dist").exists():
+        ctx.run("false", title="No distribution files found")
+    dists = [str(dist) for dist in Path("dist").iterdir()]
+    ctx.run(
+        tools.twine.upload(*dists, skip_existing=True),
+        title="Publishing source and wheel distributions to PyPI",
+        pty=PTY,
+    )
+
+
+@duty(post=["build", "publish", "docs-deploy"])
+def release(ctx: Context, version: str = "") -> None:
     """Release a new Python package.
 
     Parameters:
@@ -227,23 +209,18 @@ def release(ctx: Context, version: str) -> None:
     ctx.run(f"git tag {version}", title="Tagging commit", pty=PTY)
     ctx.run("git push", title="Pushing commits", pty=False)
     ctx.run("git push --tags", title="Pushing tags", pty=False)
-    ctx.run("pdm build", title="Building dist/wheel", pty=PTY)
 
 
-@duty(silent=True, aliases=["coverage"])
-def cov(ctx: Context) -> None:
-    """Report coverage as text and HTML.
-
-    Parameters:
-        ctx: The context instance (passed automatically).
-    """
-    ctx.run(coverage.combine, nofail=True)
-    ctx.run(coverage.report(rcfile="config/coverage.ini"), capture=False)
-    ctx.run(coverage.html(rcfile="config/coverage.ini"))
+@duty(silent=True, aliases=["cov"])
+def coverage(ctx: Context) -> None:
+    """Report coverage as text and HTML."""
+    ctx.run(tools.coverage.combine(), nofail=True)
+    ctx.run(tools.coverage.report(rcfile="config/coverage.ini"), capture=False)
+    ctx.run(tools.coverage.html(rcfile="config/coverage.ini"))
 
 
 @duty
-def test(ctx: Context, match: str = "") -> None:
+def test(ctx: Context, *cli_args: str, match: str = "") -> None:
     """Run the test suite.
 
     Parameters:
@@ -253,16 +230,13 @@ def test(ctx: Context, match: str = "") -> None:
     py_version = f"{sys.version_info.major}{sys.version_info.minor}"
     os.environ["COVERAGE_FILE"] = f".coverage.{py_version}"
     ctx.run(
-        pytest.run(
-            "-n",
-            "auto",
+        tools.pytest(
             "tests",
             config_file="config/pytest.ini",
             select=match,
             color="yes",
-        ),
+        ).add_args("-n", "auto", *cli_args),
         title=pyprefix("Running tests"),
-        command=f"pytest -c config/pytest.ini -n auto -k{match!r} --color=yes tests",
     )
 
 
@@ -275,7 +249,7 @@ def bench(ctx: Context, match: str = "") -> None:
         match: A pytest expression to filter selected tests.
     """
     ctx.run(
-        pytest.run("benchmark", config_file="config/benchmark.ini", select=match),
+        tools.pytest("benchmark", config_file="config/benchmark.ini", select=match),
         title=pyprefix("Running benchmark"),
         command=f"pytest -c config/benchmark -n auto -k{match!r} --color=yes benchmark",
     )

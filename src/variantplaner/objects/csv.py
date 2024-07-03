@@ -30,7 +30,7 @@ if typing.TYPE_CHECKING:  # pragma: no cover
         comment_prefix: str | None
         quote_char: str | None
         skip_rows: int
-        schema_overrides: polars.type_aliases.SchemaDict | Sequence[polars.type_aliases.PolarsDataType] | None
+        schema_overrides: polars._typing.SchemaDict | Sequence[polars._typing.PolarsDataType] | None
         null_values: str | Sequence[str] | dict[str, str] | None
         missing_utf8_is_empty_string: bool
         ignore_errors: bool
@@ -38,7 +38,7 @@ if typing.TYPE_CHECKING:  # pragma: no cover
         with_column_names: typing.Callable[[list[str]], list[str]] | None
         infer_schema_length: int | None
         n_rows: int | None
-        encoding: polars.type_aliases.CsvEncoding
+        encoding: polars._typing.CsvEncoding
         low_memory: bool
         rechunk: bool
         skip_rows_after_header: int
