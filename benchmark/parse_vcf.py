@@ -28,7 +28,7 @@ def __worker(input_path: pathlib.Path) -> polars.LazyFrame:
 
     vcf_df.from_path(input_path, DATA_DIR / "grch38.92.csv", behavior=VcfParsingBehavior.MANAGE_SV)
 
-    return vcf_df.variants().lf
+    return vcf_df.variants()
 
 
 def __generate_parse_vcf(

@@ -194,7 +194,7 @@ def render_plot() -> str:
     name2func = {name: globals().get(f"{name}_func", nothing) for name in df.get_column("benchmark").unique().to_list()}
 
     bench2plot = {}
-    for name, data in df.group_by("benchmark"):
+    for (name, *_), data in df.group_by("benchmark"):
         bench2plot[name] = create_plot(data, str(name), name2func)
 
     template_data = {"bench2plot": bench2plot}

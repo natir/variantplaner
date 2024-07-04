@@ -64,7 +64,7 @@ def __rust_add_id(lf: polars.LazyFrame) -> polars.LazyFrame:
     """Add column id of variant by use rust code."""
     real_pos_max = chrom2length.lf.select([polars.col("length").sum()]).collect().get_column("length").max()
 
-    lf = lf.join(chrom2length.lf, on="chr", how="left")
+    lf = lf.join(chrom2length.lf, left_on="chr", right_on="contig", how="left")
     lf = lf.with_columns(real_pos=polars.col("pos") + polars.col("offset"))
 
     return lf.with_columns(

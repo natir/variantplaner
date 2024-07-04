@@ -45,7 +45,7 @@ def __hive_worker(lfs: tuple[polars.LazyFrame], basename: str, output_prefix: pa
         df.write_parquet(output_prefix / f"id_part={fix_name}" / f"{basename}.parquet")
 
 
-def __merge_file(prefix: pathlib.Path, basenames: list[str], append: bool) -> None: # noqa: FBT001
+def __merge_file(prefix: pathlib.Path, basenames: list[str], append: bool) -> None:  # noqa: FBT001
     """Subprocess that merge file generate by __id_spliting.
 
     Args:

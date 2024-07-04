@@ -77,8 +77,7 @@ def transmission(
     genotypes_df = genotypes_lf.collect()
 
     index_df = (
-        genotypes_df
-        .filter(polars.col("sample") == index_name)
+        genotypes_df.filter(polars.col("sample") == index_name)
         .rename({colname: f"index_{colname}" for colname in genotypes_column})
         .drop("sample")
     )
@@ -87,33 +86,21 @@ def transmission(
         mother_df = polars.DataFrame(schema=genotypes_df.schema)
     else:
         mother_df = genotypes_df.filter(polars.col("sample") == mother_name)
-    mother_df = (
-        mother_df
-        .rename({colname: f"mother_{colname}" for colname in genotypes_column})
-        .drop("sample")
-    )
+    mother_df = mother_df.rename({colname: f"mother_{colname}" for colname in genotypes_column}).drop("sample")
 
     if father_name is None:
         father_df = polars.DataFrame(schema=genotypes_df.schema)
     else:
         father_df = genotypes_df.filter(polars.col("sample") == father_name)
-    father_df = (
-        father_df
-        .rename({colname: f"father_{colname}" for colname in genotypes_column})
-        .drop("sample")
-    )
+    father_df = father_df.rename({colname: f"father_{colname}" for colname in genotypes_column}).drop("sample")
 
     parent_df = mother_df.join(father_df, on="id", how="full")
     transmission_df = index_df.join(parent_df, on="id", how="left").drop("id_right")
 
     if father_name is not None:
-        transmission_df = transmission_df.with_columns(
-            father_gt = polars.col("father_gt").fill_null(strategy="zero")
-        )
+        transmission_df = transmission_df.with_columns(father_gt=polars.col("father_gt").fill_null(strategy="zero"))
     if mother_name is not None:
-        transmission_df = transmission_df.with_columns(
-            mother_gt = polars.col("mother_gt").fill_null(strategy="zero")
-        )
+        transmission_df = transmission_df.with_columns(mother_gt=polars.col("mother_gt").fill_null(strategy="zero"))
 
     return transmission_df.with_columns(
         polars.concat_str(

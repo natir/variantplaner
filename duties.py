@@ -18,7 +18,7 @@ PY_SRC = " ".join(PY_SRC_LIST)
 CI = os.environ.get("CI", "0") in {"1", "true", "yes", ""}
 WINDOWS = os.name == "nt"
 PTY = not WINDOWS and not CI
-MULTIRUN = os.environ.get("PDM_MULTIRUN", "0") == "1"
+MULTIRUN = os.environ.get("MULTIRUN", "0") == "1"
 
 
 def pyprefix(title: str) -> str:  # noqa: D103
@@ -249,11 +249,6 @@ def bench(ctx: Context, *cli_args: str, match: str = "") -> None:
         match: A pytest expression to filter selected tests.
     """
     ctx.run(
-        tools.pytest(
-            "benchmark",
-            config_file="config/benchmark.ini",
-            select=match,
-            color="yes"
-        ).add_args(*cli_args),
+        tools.pytest("benchmark", config_file="config/benchmark.ini", select=match, color="yes").add_args(*cli_args),
         title=pyprefix("Running benchmark"),
     )

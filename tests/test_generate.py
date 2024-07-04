@@ -110,9 +110,7 @@ def test_transmission_missing_mother() -> None:
     genotypes_lf = polars.scan_parquet(DATA_DIR / "no_info.genotypes.parquet")
 
     pedigree_lf = polars.scan_parquet(DATA_DIR / "sample.parquet")
-    pedigree_lf = pedigree_lf.with_columns(
-        mother_id = polars.lit(None)
-    )
+    pedigree_lf = pedigree_lf.with_columns(mother_id=polars.lit(None))
 
     transmission = generate.transmission_ped(genotypes_lf, pedigree_lf)
 
@@ -166,7 +164,6 @@ def test_transmission_nogt(tmp_path: pathlib.Path) -> None:
         generate.transmission_ped(genotypes_lf, pedigree_lf)
 
 
-
 def test_transmission_father_no_variant() -> None:
     """Check transmission computation no father."""
     genotypes_lf = polars.scan_parquet(DATA_DIR / "no_info.genotypes.parquet")
@@ -218,9 +215,7 @@ def test_transmission_missing_father() -> None:
     genotypes_lf = polars.scan_parquet(DATA_DIR / "no_info.genotypes.parquet")
 
     pedigree_lf = polars.scan_parquet(DATA_DIR / "sample.parquet")
-    pedigree_lf = pedigree_lf.with_columns(
-        father_id = polars.lit(None)
-    )
+    pedigree_lf = pedigree_lf.with_columns(father_id=polars.lit(None))
 
     transmission = generate.transmission_ped(genotypes_lf, pedigree_lf)
 
