@@ -1,5 +1,6 @@
 actions = \
 	allrun \
+	bench \
 	changelog \
 	check \
 	check-api \

@@ -241,7 +241,7 @@ def test(ctx: Context, *cli_args: str, match: str = "") -> None:
 
 
 @duty
-def bench(ctx: Context, match: str = "") -> None:
+def bench(ctx: Context, *cli_args: str, match: str = "") -> None:
     """Run the benchmark test suite.
 
     Parameters:
@@ -249,7 +249,11 @@ def bench(ctx: Context, match: str = "") -> None:
         match: A pytest expression to filter selected tests.
     """
     ctx.run(
-        tools.pytest("benchmark", config_file="config/benchmark.ini", select=match),
+        tools.pytest(
+            "benchmark",
+            config_file="config/benchmark.ini",
+            select=match,
+            color="yes"
+        ).add_args(*cli_args),
         title=pyprefix("Running benchmark"),
-        command=f"pytest -c config/benchmark -n auto -k{match!r} --color=yes benchmark",
     )

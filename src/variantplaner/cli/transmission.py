@@ -71,10 +71,10 @@ def transmission(
     if pedigree_path:
         pedigree_lf = io.ped.into_lazyframe(pedigree_path)
         transmission_lf = generate.transmission_ped(genotypes_lf, pedigree_lf)
-    elif index and mother and father:
+    elif index:
         transmission_lf = generate.transmission(genotypes_lf, index, mother, father)
     else:
-        logging.error("You must specify ped file or index, mother and father sample name")
+        logging.error("You must specify ped file or index almost sample name")
         sys.exit(31)
 
     transmission_lf.write_parquet(output_path)

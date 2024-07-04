@@ -59,20 +59,7 @@ def test_transmission_missing_ad(tmp_path: pathlib.Path) -> None:
     ]
 
 
-def test_transmission_nogt(tmp_path: pathlib.Path) -> None:
-    """Check transmission computation no gt."""
-    tmp_path / "transmission.parquet"
-
-    genotypes_lf = polars.scan_parquet(DATA_DIR / "no_info.genotypes.parquet")
-    pedigree_lf = polars.scan_parquet(DATA_DIR / "sample.parquet")
-
-    genotypes_lf = genotypes_lf.drop("gt")
-
-    with pytest.raises(exception.NoGTError):
-        generate.transmission_ped(genotypes_lf, pedigree_lf)
-
-
-def test_transmission_missing_mother() -> None:
+def test_transmission_mother_no_variant() -> None:
     """Check transmission computation no mother."""
     genotypes_lf = polars.scan_parquet(DATA_DIR / "no_info.genotypes.parquet")
     genotypes_lf = genotypes_lf.filter(polars.col("sample") != "sample_3")
@@ -81,7 +68,53 @@ def test_transmission_missing_mother() -> None:
 
     transmission = generate.transmission_ped(genotypes_lf, pedigree_lf)
 
-    polars.Config.set_tbl_cols(500)
+    assert transmission.get_column("mother_gt").to_list() == [
+        0,
+        0,
+        0,
+        0,
+        0,
+    ]
+    assert transmission.get_column("mother_ad").to_list() == [
+        None,
+        None,
+        None,
+        None,
+        None,
+    ]
+    assert transmission.get_column("mother_dp").to_list() == [
+        None,
+        None,
+        None,
+        None,
+        None,
+    ]
+    assert transmission.get_column("mother_gq").to_list() == [
+        None,
+        None,
+        None,
+        None,
+        None,
+    ]
+    assert transmission.get_column("origin").to_list() == [
+        "#!!",
+        "#!!",
+        "#!!",
+        "#!!",
+        "#!!",
+    ]
+
+
+def test_transmission_missing_mother() -> None:
+    """Check transmission computation no mother."""
+    genotypes_lf = polars.scan_parquet(DATA_DIR / "no_info.genotypes.parquet")
+
+    pedigree_lf = polars.scan_parquet(DATA_DIR / "sample.parquet")
+    pedigree_lf = pedigree_lf.with_columns(
+        mother_id = polars.lit(None)
+    )
+
+    transmission = generate.transmission_ped(genotypes_lf, pedigree_lf)
 
     assert transmission.get_column("mother_gt").to_list() == [
         None,
@@ -112,15 +145,29 @@ def test_transmission_missing_mother() -> None:
         None,
     ]
     assert transmission.get_column("origin").to_list() == [
-        '#~"',
-        '#~"',
-        '#~"',
-        '#~"',
-        '#~"',
+        "#~!",
+        "#~!",
+        "#~!",
+        "#~!",
+        "#~!",
     ]
 
 
-def test_transmission_missing_father() -> None:
+def test_transmission_nogt(tmp_path: pathlib.Path) -> None:
+    """Check transmission computation no gt."""
+    tmp_path / "transmission.parquet"
+
+    genotypes_lf = polars.scan_parquet(DATA_DIR / "no_info.genotypes.parquet")
+    pedigree_lf = polars.scan_parquet(DATA_DIR / "sample.parquet")
+
+    genotypes_lf = genotypes_lf.drop("gt")
+
+    with pytest.raises(exception.NoGTError):
+        generate.transmission_ped(genotypes_lf, pedigree_lf)
+
+
+
+def test_transmission_father_no_variant() -> None:
     """Check transmission computation no father."""
     genotypes_lf = polars.scan_parquet(DATA_DIR / "no_info.genotypes.parquet")
     genotypes_lf = genotypes_lf.filter(polars.col("sample") != "sample_2")
@@ -129,7 +176,53 @@ def test_transmission_missing_father() -> None:
 
     transmission = generate.transmission_ped(genotypes_lf, pedigree_lf)
 
-    polars.Config.set_tbl_cols(500)
+    assert transmission.get_column("father_gt").to_list() == [
+        0,
+        0,
+        0,
+        0,
+        0,
+    ]
+    assert transmission.get_column("father_ad").to_list() == [
+        None,
+        None,
+        None,
+        None,
+        None,
+    ]
+    assert transmission.get_column("father_dp").to_list() == [
+        None,
+        None,
+        None,
+        None,
+        None,
+    ]
+    assert transmission.get_column("father_gq").to_list() == [
+        None,
+        None,
+        None,
+        None,
+        None,
+    ]
+    assert transmission.get_column("origin").to_list() == [
+        "##!",
+        "##!",
+        "##!",
+        "##!",
+        "##!",
+    ]
+
+
+def test_transmission_missing_father() -> None:
+    """Check transmission computation no father."""
+    genotypes_lf = polars.scan_parquet(DATA_DIR / "no_info.genotypes.parquet")
+
+    pedigree_lf = polars.scan_parquet(DATA_DIR / "sample.parquet")
+    pedigree_lf = pedigree_lf.with_columns(
+        father_id = polars.lit(None)
+    )
+
+    transmission = generate.transmission_ped(genotypes_lf, pedigree_lf)
 
     assert transmission.get_column("father_gt").to_list() == [
         None,
@@ -187,11 +280,11 @@ def test_transmission_all_mother_gt_null() -> None:
     transmission = generate.transmission_ped(genotypes_lf, pedigree_lf).sort(by="id")
 
     assert transmission.get_column("mother_gt").to_list() == [
-        None,
-        None,
-        None,
-        None,
-        None,
+        0,
+        0,
+        0,
+        0,
+        0,
     ]
     assert transmission.get_column("mother_ad").to_list() == [
         [0, 4560],

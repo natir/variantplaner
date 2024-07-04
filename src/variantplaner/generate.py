@@ -34,7 +34,7 @@ def transmission_ped(
     Raises:
         NoGTError: If genotypes_lf not contains gt column.
     """
-    pedigree_lf = pedigree_lf.filter(polars.col("father_id") != "unknow").filter(polars.col("mother_id") != "unknow")
+    pedigree_lf = pedigree_lf.filter((polars.col("father_id") != "unknow") | (polars.col("mother_id") != "unknow"))
 
     familly_info = pedigree_lf.collect().row(0, named=True)
 
@@ -49,8 +49,8 @@ def transmission_ped(
 def transmission(
     genotypes_lf: polars.LazyFrame,
     index_name: str,
-    mother_name: str,
-    father_name: str,
+    mother_name: str | None = None,
+    father_name: str | None = None,
 ) -> polars.DataFrame:
     """Compute how each variant are transmite to index case.
 
@@ -74,47 +74,51 @@ def transmission(
 
     logger.debug(f"{samples=}")
 
-    group_lf = genotypes_lf.group_by("id").all().collect()
+    genotypes_df = genotypes_lf.collect()
 
-    group_lf = group_lf.filter(polars.col("sample").list.contains(index_name))
-
-    # I assume sample order is all time the same but I'm not sure
-    sample2index = {sample: idx for idx, sample in enumerate(samples, start=0)}
-
-    logger.debug(f"{index_name=} {mother_name=} {father_name=}")
-    logger.debug(f"{sample2index}")
-
-    transmission_lf = group_lf.with_columns(
-        [polars.col(col).list.get(sample2index[index_name]).alias(f"index_{col}") for col in genotypes_column],
+    index_df = (
+        genotypes_df
+        .filter(polars.col("sample") == index_name)
+        .rename({colname: f"index_{colname}" for colname in genotypes_column})
+        .drop("sample")
     )
 
-    if mother_name in sample2index:
-        transmission_lf = transmission_lf.with_columns(
-            [polars.col(col).list.get(sample2index[mother_name]).alias(f"mother_{col}") for col in genotypes_column],
-        )
+    if mother_name is None:
+        mother_df = polars.DataFrame(schema=genotypes_df.schema)
     else:
-        transmission_lf = transmission_lf.with_columns(
-            [polars.lit(None).alias(f"mother_{col}") for col in genotypes_column],
-        )
+        mother_df = genotypes_df.filter(polars.col("sample") == mother_name)
+    mother_df = (
+        mother_df
+        .rename({colname: f"mother_{colname}" for colname in genotypes_column})
+        .drop("sample")
+    )
 
-    if father_name in sample2index:
-        transmission_lf = transmission_lf.with_columns(
-            [polars.col(col).list.get(sample2index[father_name]).alias(f"father_{col}") for col in genotypes_column],
-        )
+    if father_name is None:
+        father_df = polars.DataFrame(schema=genotypes_df.schema)
     else:
-        transmission_lf = transmission_lf.with_columns(
-            [polars.lit(None).alias(f"father_{col}") for col in genotypes_column],
+        father_df = genotypes_df.filter(polars.col("sample") == father_name)
+    father_df = (
+        father_df
+        .rename({colname: f"father_{colname}" for colname in genotypes_column})
+        .drop("sample")
+    )
+
+    parent_df = mother_df.join(father_df, on="id", how="full")
+    transmission_df = index_df.join(parent_df, on="id", how="left").drop("id_right")
+
+    if father_name is not None:
+        transmission_df = transmission_df.with_columns(
+            father_gt = polars.col("father_gt").fill_null(strategy="zero")
+        )
+    if mother_name is not None:
+        transmission_df = transmission_df.with_columns(
+            mother_gt = polars.col("mother_gt").fill_null(strategy="zero")
         )
 
-    polars.Config.set_tbl_width_chars(1000)
-    polars.Config.set_tbl_cols(65)
-
-    transmission_lf = transmission_lf.with_columns(
+    return transmission_df.with_columns(
         polars.concat_str(
             polars.col("index_gt").replace_strict(gt2chr, default="~", return_dtype=polars.Utf8),
             polars.col("mother_gt").fill_null(94).replace_strict(gt2chr, default="~", return_dtype=polars.Utf8),
             polars.col("father_gt").fill_null(94).replace_strict(gt2chr, default="~", return_dtype=polars.Utf8),
         ).alias("origin"),
     )
-
-    return transmission_lf.drop(["sample", *genotypes_column])

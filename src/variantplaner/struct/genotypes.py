@@ -45,7 +45,7 @@ def __hive_worker(lfs: tuple[polars.LazyFrame], basename: str, output_prefix: pa
         df.write_parquet(output_prefix / f"id_part={fix_name}" / f"{basename}.parquet")
 
 
-def __merge_file(prefix: pathlib.Path, basenames: list[str]) -> None:
+def __merge_file(prefix: pathlib.Path, basenames: list[str], append: bool) -> None: # noqa: FBT001
     """Subprocess that merge file generate by __id_spliting.
 
     Args:
@@ -66,7 +66,10 @@ def __merge_file(prefix: pathlib.Path, basenames: list[str]) -> None:
     logging.info(f"{lfs=}")
     if lfs:
         logging.info(f"Merge multiple file in {prefix / '0.parquet'}")
-        polars.concat(lfs).sink_parquet(prefix / "0.parquet", maintain_order=False)
+        lf = polars.concat(lfs)
+        if append:
+            lf = lf.unique(subset=["id", "sample", "gt"])
+        lf.sink_parquet(prefix / "0.parquet", maintain_order=False)
 
     for path in paths:
         logging.info(f"Remove file {path}.parquet")
@@ -125,9 +128,9 @@ def hive(
         )
 
         if append:
-            basenames.extend([str(output_prefix / f"id_part={id_part}.parquet") for id_part in range(pow(2, NUMBER_OF_BITS))])
+            basenames.extend([str(output_prefix / f"id_part={id_part}/0.parquet") for id_part in range(pow(2, NUMBER_OF_BITS))])
 
         pool.starmap(
             __merge_file,
-            [(output_prefix / f"id_part={id_part}", basenames) for id_part in range(pow(2, NUMBER_OF_BITS))],
+            [(output_prefix / f"id_part={id_part}", basenames, append) for id_part in range(pow(2, NUMBER_OF_BITS))],
         )
