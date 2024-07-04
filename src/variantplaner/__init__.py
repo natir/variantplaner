@@ -8,12 +8,13 @@ But also build a file struct to get a fast variant database interrogations time.
 from __future__ import annotations
 
 from variantplaner import extract, generate, normalization, struct
-from variantplaner.objects import Annotations, ContigsLength, Genotypes, Variants, Vcf, VcfHeader, VcfParsingBehavior
+from variantplaner.objects import Annotations, ContigsLength, Genotypes, Pedigree, Variants, Vcf, VcfHeader, VcfParsingBehavior
 
 __all__: list[str] = [
     "Annotations",
     "ContigsLength",
     "Genotypes",
+    "Pedigree",
     "Variants",
     "Vcf",
     "VcfHeader",

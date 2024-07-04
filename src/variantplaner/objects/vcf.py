@@ -69,7 +69,7 @@ class Vcf:
 
         schema = self.lf.collect_schema()
         self.lf = self.lf.rename(dict(zip(schema.names(), self.header.column_name(schema.len()))))
-        self.lf = self.lf.cast(Vcf.schema()) # type: ignore # noqa: PGH003  polars 1.0 typing stuff
+        self.lf = self.lf.cast(Vcf.schema())  # type: ignore # noqa: PGH003  polars 1.0 typing stuff
 
         if behavior == VcfParsingBehavior.MANAGE_SV:
             self.lf = self.lf.with_columns(self.header.info_parser({"SVTYPE", "SVLEN"}))

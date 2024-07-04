@@ -12,7 +12,7 @@ import click
 import polars
 
 # project import
-from variantplaner import cli, generate, io
+from variantplaner import Pedigree, cli, generate
 
 
 @cli.main.command("transmission")  # type: ignore[has-type]
@@ -69,8 +69,9 @@ def transmission(
     genotypes_lf = polars.scan_parquet(genotypes_path)
 
     if pedigree_path:
-        pedigree_lf = io.ped.into_lazyframe(pedigree_path)
-        transmission_lf = generate.transmission_ped(genotypes_lf, pedigree_lf)
+        pedigree = Pedigree()
+        pedigree.from_path(pedigree_path)
+        transmission_lf = generate.transmission_ped(genotypes_lf, pedigree.lf)
     elif index:
         transmission_lf = generate.transmission(genotypes_lf, index, mother, father)
     else:

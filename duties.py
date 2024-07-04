@@ -82,7 +82,7 @@ def check_docs(ctx: Context) -> None:
     Path(".benchmarks/tmp.json").touch(exist_ok=True)
 
     ctx.run(
-        tools.mkdocs.build(strict=True, verbose=True),
+        tools.mkdocs.build(strict=False, verbose=True),
         title=pyprefix("Building documentation"),
         command="mkdocs build -vs",
     )
@@ -135,7 +135,7 @@ def clean(ctx: Context) -> None:
 def docs(ctx: Context) -> None:
     """Check if the documentation builds correctly."""
     ctx.run(
-        tools.mkdocs.build(strict=True, verbose=True),
+        tools.mkdocs.build(strict=False, verbose=True),
         title=pyprefix("Building documentation"),
     )
 

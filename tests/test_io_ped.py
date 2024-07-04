@@ -12,25 +12,27 @@ import polars
 import polars.testing
 
 # project import
-from variantplaner import io
+from variantplaner import Pedigree
 
 DATA_DIR = pathlib.Path(__file__).parent / "data"
 
 
 def test_into_lazyframe() -> None:
     """Check into_lazyframe."""
-    ped_lf = io.ped.into_lazyframe(DATA_DIR / "sample.ped").collect()
+    ped = Pedigree()
+    ped.from_path(DATA_DIR / "sample.ped")
 
     truth = polars.read_parquet(DATA_DIR / "sample.parquet")
 
-    polars.testing.assert_frame_equal(truth, ped_lf)
+    polars.testing.assert_frame_equal(truth, ped.lf.collect())
 
 
 def test_from_lazyframe(tmp_path: pathlib.Path) -> None:
     """Check from_lazyframe."""
     output_path = tmp_path / "sample.ped"
-    ped_lf = polars.scan_parquet(DATA_DIR / "sample.parquet")
+    ped = Pedigree()
+    ped.lf = polars.scan_parquet(DATA_DIR / "sample.parquet")
 
-    io.ped.from_lazyframe(ped_lf, output_path)
+    ped.to_path(output_path)
 
     filecmp.cmp(output_path, DATA_DIR / "sample.ped")
