@@ -128,7 +128,7 @@ class Vcf:
         # Select intrusting column
         genotypes.lf = genotypes.lf.select(["id", "sample", *[col.lower() for col in col_index]])
 
-        if "gt" in schema.names():
+        if "gt".upper() in col2expr:
             genotypes.lf = genotypes.lf.filter(polars.col("gt") != 0)
 
         return genotypes
