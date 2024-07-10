@@ -92,7 +92,7 @@ def merge(
     os.environ["POLARS_MAX_THREADS"] = str(polars_threads)
 
     inputs = list(paths)
-    if append:
+    if append and output.exists():
         inputs.append(output)
 
     temp_files = []
