@@ -128,7 +128,7 @@ def hive(
         )
 
         if append:
-            for id_part in in range(pow(2, NUMBER_OF_BITS)):
+            for id_part in range(pow(2, NUMBER_OF_BITS)):
                 path = output_prefix / f"id_part={id_part}/0.parquet"
                 if path.exists():
                     basenames.push(path)

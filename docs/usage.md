@@ -25,6 +25,7 @@ Requirements list:
 - [pqrs](https://github.com/manojkarthick/pqrs) (only for transmission computation, otherwise optional)
 
 Optional:
+
 - gnu-parallel
 
 Quering dataset:
@@ -38,14 +39,13 @@ Quering dataset:
 ```bash
 mkdir -p vp_tuto/vcf/
 cd vp_tuto
-curl https://raw.githubusercontent.com/natir/variantplaner/main/tests/data/grch38.92.csv > grch38.92.csv
 URI_ROOT="https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/release"
-curl ${URI_ROOT}/NA12878_HG001/latest/GRCh38/HG001_GRCh38_1_22_v4.2.1_benchmark.vcf.gz | gunzip - | sed 's/^chr//' > vcf/HG001.vcf
-curl ${URI_ROOT}/AshkenazimTrio/HG002_NA24385_son/latest/GRCh38/HG002_GRCh38_1_22_v4.2.1_benchmark.vcf.gz | gunzip -  | sed 's/^chr//' > vcf/HG002.vcf
-curl ${URI_ROOT}/AshkenazimTrio/HG003_NA24149_father/latest/GRCh38/HG003_GRCh38_1_22_v4.2.1_benchmark.vcf.gz | gunzip -  | sed 's/^chr//' > vcf/HG003.vcf
-curl ${URI_ROOT}/AshkenazimTrio/HG004_NA24143_mother/latest/GRCh38/HG004_GRCh38_1_22_v4.2.1_benchmark.vcf.gz | gunzip -  | sed 's/^chr//' > vcf/HG004.vcf
-curl ${URI_ROOT}/ChineseTrio/HG006_NA24694_father/latest/GRCh38/HG006_GRCh38_1_22_v4.2.1_benchmark.vcf.gz | gunzip -  | sed 's/^chr//' > vcf/HG006.vcf
-curl ${URI_ROOT}/ChineseTrio/HG007_NA24695_mother/latest/GRCh38/HG007_GRCh38_1_22_v4.2.1_benchmark.vcf.gz | gunzip -  | sed 's/^chr//' > vcf/HG007.vcf
+curl ${URI_ROOT}/NA12878_HG001/latest/GRCh38/HG001_GRCh38_1_22_v4.2.1_benchmark.vcf.gz | gunzip - > vcf/HG001.vcf
+curl ${URI_ROOT}/AshkenazimTrio/HG002_NA24385_son/latest/GRCh38/HG002_GRCh38_1_22_v4.2.1_benchmark.vcf.gz | gunzip - > vcf/HG002.vcf
+curl ${URI_ROOT}/AshkenazimTrio/HG003_NA24149_father/latest/GRCh38/HG003_GRCh38_1_22_v4.2.1_benchmark.vcf.gz | gunzip - > vcf/HG003.vcf
+curl ${URI_ROOT}/AshkenazimTrio/HG004_NA24143_mother/latest/GRCh38/HG004_GRCh38_1_22_v4.2.1_benchmark.vcf.gz | gunzip - > vcf/HG004.vcf
+curl ${URI_ROOT}/ChineseTrio/HG006_NA24694_father/latest/GRCh38/HG006_GRCh38_1_22_v4.2.1_benchmark.vcf.gz | gunzip - > vcf/HG006.vcf
+curl ${URI_ROOT}/ChineseTrio/HG007_NA24695_mother/latest/GRCh38/HG007_GRCh38_1_22_v4.2.1_benchmark.vcf.gz | gunzip - > vcf/HG007.vcf
 ```
 
 ## Variant planner presentation
@@ -60,14 +60,15 @@ Usage: variantplaner [OPTIONS] COMMAND [ARGS]...
 Options:
   -t, --threads INTEGER RANGE  Number of threads usable  [default: 1; x>=0]
   -v, --verbose                Verbosity level  [0<=x<=4]
-  --help                       Show this message and exit.
+  --debug-info                 Get debug information
+  -h, --help                   Show this message and exit.
 
 Commands:
-  annotations  Convert an annotation variation file in parquet.
-  metadata     Convert an metadata file in parquet.
-  parquet2vcf  Convert parquet in vcf.
-  struct       Struct operation on parquet file.
-  vcf2parquet  Convert a vcf in parquet.
+  metadata      Convert metadata file in parquet file.
+  parquet2vcf   Convert variant parquet in vcf.
+  struct        Subcommand to made struct operation on parquet file.
+  transmission  Generate transmission of a genotype set.
+  vcf2parquet   Convert a vcf in parquet.
 ```
 
 
@@ -87,8 +88,8 @@ do
     sample_name=$(basename ${vcf_path} .vcf)
     variantplaner -t 4 vcf2parquet -i ${vcf_path} \
     -c grch38.92.csv \
-    -v variants/${sample_name}.parquet \
-    -g genotypes/samples/${sample_name}.parquet \
+    variants -o variants/${sample_name}.parquet \
+    genotypes -o genotypes/samples/${sample_name}.parquet \
     -f GT:PS:DP:ADALL:AD:GQ
 done
 ```
@@ -99,7 +100,7 @@ We iterate over all vcf, variants are store in `variants/{sample_name}.parquet`,
 ```bash
 find vcf -type f -name *.vcf -exec basename {} .vcf \; | \
 parallel variantplaner -t 2 vcf2parquet -c grch38.92.csv -i vcf/{}.vcf \
--v variants/{}.parquet -g genotypes/samples/{}.parquet -f GT:PS:DP:ADALL:AD:GQ
+variants -o variants/{}.parquet genotypes -o genotypes/samples/{}.parquet -f GT:PS:DP:ADALL:AD:GQ
 ```
 ///
 
@@ -114,7 +115,7 @@ Parquet variants file contains 5 column:
 /// details | variants parquet file content
 You can inspect content of parquet file generate with pqrs
 ```bash
-pqrs head variants/samples/HG001.parquet
+pqrs head variants/HG001.parquet
 {id: 17886044532216650390, chr: 1, pos: 783006, ref: "A", alt: "G"}
 {id: 7513336577790240873, chr: 1, pos: 783175, ref: "T", alt: "C"}
 {id: 17987040642944149052, chr: 1, pos: 784860, ref: "T", alt: "C"}
@@ -136,7 +137,7 @@ Parquet genotypes file contains column:
 /// details | genotypes parquet file content
 You can inspect content of parquet file generate with pqrs
 ```bash
-pqrs head genotypes/HG001.parquet
+pqrs head genotypes/samples/HG001.parquet
 {id: 17886044532216650390, sample: "HG001", gt: 2, ps: null, dp: 652, adall: [16, 234], ad: [0, 82], gq: 312}
 {id: 7513336577790240873, sample: "HG001", gt: 2, ps: null, dp: 639, adall: [0, 218], ad: [0, 84], gq: 194}
 {id: 17987040642944149052, sample: "HG001", gt: 2, ps: null, dp: 901, adall: [105, 406], ad: [0, 74], gq: 301}
@@ -152,11 +153,10 @@ pqrs head genotypes/HG001.parquet
 We can now aggregate all variant present in our dataset to perform this operation we use divide to conquer merge method by generate temporary file. By default, file are written in `/tmp` but you can control where these files are written by set `TMPDIR`, `TEMP` or `TMP` directory.
 
 ```bash
-input=$(ls variants/ | xargs -I {} -x echo "-i variants/"{} | tr '\n' ' ')
-variantplaner -t 8 struct $(echo $input) variants -o variants.parquet
+variantplaner -t 8 struct -i variants/*.parquet -- variants -o variants.parquet
 ```
 
-File `variants.parquet` contains all unique variants present in dataset.
+File `variants.parquet` contains all unique variants present in dataset, `--` after last input path are mandatory.
 
 ### Genotypes structuration
 
@@ -174,8 +174,7 @@ Here, we'll organize the genotypes information by variants to make it easier to 
 
 ```bash
 mkdir -p genotypes/variants/
-input=$(ls genotypes/samples/ | xargs -I {} -x echo "-i genotypes/samples/"{} | tr '\n' ' ')
-variantplaner -t 8 struct $(echo $input) genotypes -p genotypes/variants
+variantplaner -t 8 struct -i genotypes/samples/*.parquet -- genotypes -p genotypes/variants
 ```
 
 All genotypes information are split in [hive like structure](https://duckdb.org/docs/data/partitioning/hive_partitioning) to optimize request on data.
@@ -189,7 +188,7 @@ For these step, we need to concatenate all genotypes of a AshkenazimTrio in one 
 ```bash
 pqrs merge -i genotypes/samples/HG002.parquet genotypes/samples/HG003.parquet genotypes/samples/HG004.parquet -o genotypes/samples/AshkenazimTrio.parquet
 mkdir -p genotypes/transmissions/
-variantplaner generate transmission -i genotypes/samples/AshkenazimTrio.parquet -I HG002 -m HG003 -f HG004 -t genotypes/transmissions/AshkenazimTrio.parquet
+variantplaner transmission -g genotypes/samples/AshkenazimTrio.parquet -i HG002 -m HG003 -f HG004 -o genotypes/transmissions/AshkenazimTrio.parquet
 ```
 
 `-I` parameter is use for index sample, `-m` parameter is use for mother sample, `-f` parameter is use for father sample only the index sample is mandatory if mother sample or father sample isn't present command work, you could also use a pedigree file with parameter `-p`.
@@ -222,7 +221,7 @@ Maximal genotype value is 92, which corresponds to the character `}`, `~` match 
 
 ## Add annotations
 
-To work on your variant, you probably need and annotations.
+To work on your variant, you probably need variants annotations.
 
 ### Snpeff annotations
 
@@ -238,7 +237,7 @@ Next annotate this `variants.vcf` [with snpeff](https://pcingola.github.io/SnpEf
 To convert annotated vcf in parquet, keep 'ANN' info column and rename vcf id column in snpeff\_id you can run:
 ```bash
 mkdir -p annotations
-variantplaner -t 8 annotations -c grch38.92.csv -i variants.snpeff.vcf -o annotations/snpeff.parquet vcf -i ANN -r snpeff_id
+variantplaner -t 8 vcf2parquet -c grch38.92.csv -i variants.snpeff.vcf annotations -o annotations/snpeff.parquet vcf -i ANN -r snpeff_id
 ```
 
 If you didn't set any value of option `-i` in vcf subsubcommand all info column are keep.
@@ -253,10 +252,40 @@ curl https://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh38/clinvar.vcf.gz \
 | gunzip - > annotations/clinvar.vcf
 ```
 
+Because clinvar's vcf file header does not contain information on contigs, you should create file `grch38.92.csv` with this content:
+```
+contig,length
+chr1,248956422
+chr10,133797422
+chr11,135086622
+chr12,133275309
+chr13,114364328
+chr14,107043718
+chr15,101991189
+chr16,90338345
+chr17,83257441
+chr18,80373285
+chr19,58617616
+chr2,242193529
+chr20,64444167
+chr21,46709983
+chr22,50818468
+chr3,198295559
+chr4,190214555
+chr5,181538259
+chr6,170805979
+chr7,159345973
+chr8,145138636
+chr9,138394717
+chrMT,16569
+chrX,156040895
+chrY,57227415
+```
+
 Convert clinvar vcf file in parquet file:
 
 ```bash
-variantplaner annotations -c grch38.92.csv -i annotations/clinvar.vcf -o annotations/clinvar.parquet vcf -r clinvar_id
+variantplaner vcf2parquet -c grch38.92.csv -i annotations/clinvar.vcf annotations -o annotations/clinvar.parquet -r clinvar_id
 ```
 
 Parquet file produce contains many columns:
@@ -281,7 +310,7 @@ pqrs head annotations/clinvar.parquet
 With option of subcommand vcf `-i` you can select which column are included in parquet file
 For example command:
 ```bash
-variantplaner annotations -i annotations/clinvar.vcf -o annotations/clinvar.parquet vcf -r clinvar_id -i ALLELEID -i CLNDN -i AF_ESP -i GENEINFO
+variantplaner vcf2parquet -c grch38.92.csv -i annotations/clinvar.vcf annotations -o annotations/clinvar.parquet -r clinvar_id -i ALLELEID -i CLNDN -i AF_ESP -i GENEINFO
 ```
 
 Produce a `annotations/clinvar.parquet` with columns:
@@ -303,6 +332,58 @@ Produce a `annotations/clinvar.parquet` with columns:
 ```
 ///
 
+### Split snpeff annotations in parquet column
+
+After annotate your vcf with snpeff in `ann` mode and write result in file `snpeff_annotations.vcf` you could run a script similar to this to generate `snpeff_annotations.parquet`:
+```python
+from variantplaner import Vcf
+
+vcf = Vcf()
+try:
+    vcf.from_path("snpeff_annotations.vcf", "grch38.92.csv")
+except variantplaner.exception.NotAVCFError:
+    print("snpeff_annotations.vcf seems to have error")
+    return 1
+except variantplaner.exception.NoContigsLengthInformationError:
+    print("snpeff_annotations.vcf header seems not contain contig information")
+    return 2
+
+lf = vcf.lf.with_columns(vcf.header.info_parser())
+lf = lf.drop(["chr", "pos", "ref", "alt", "filter", "qual", "info"])
+lf = lf.rename({"vid": "id"})
+
+lf = lf.with_columns(
+    [
+        polars.col("ANN")
+        .list.get(0)
+        .str.split("|")
+        .cast(polars.List(polars.Utf8()))
+        .alias("ann"),
+    ]
+).drop("ANN")
+
+lf = lf.with_columns(
+    [
+        polars.col("ann").list.get(1).alias("effect"),
+        polars.col("ann").list.get(2).alias("impact"),
+        polars.col("ann").list.get(3).alias("gene"),
+        polars.col("ann").list.get(4).alias("geneid"),
+        polars.col("ann").list.get(5).alias("feature"),
+        polars.col("ann").list.get(6).alias("feature_id"),
+        polars.col("ann").list.get(7).alias("bio_type"),
+        polars.col("ann").list.get(8).alias("rank"),
+        polars.col("ann").list.get(9).alias("hgvs_c"),
+        polars.col("ann").list.get(10).alias("hgvs_p"),
+        polars.col("ann").list.get(11).alias("cdna_pos"),
+        polars.col("ann").list.get(12).alias("cdna_len"),
+        polars.col("ann").list.get(13).alias("cds_pos"),
+        polars.col("ann").list.get(14).alias("cvs_len"),
+        polars.col("ann").list.get(15).alias("aa_pos"),
+    ]
+).drop("ann")
+
+lf.sink_parquet("snpeff_annotations.parquet")
+```
 
 ## Querying
 
