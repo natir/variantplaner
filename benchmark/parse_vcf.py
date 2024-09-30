@@ -15,9 +15,8 @@ if typing.TYPE_CHECKING:  # pragma: no cover
 
 
 # project import
-from variantplaner import Vcf, VcfParsingBehavior
-
 from benchmark import __generate_vcf
+from variantplaner import Vcf, VcfParsingBehavior
 
 DATA_DIR = pathlib.Path(__file__).parent.parent / "tests" / "data"
 

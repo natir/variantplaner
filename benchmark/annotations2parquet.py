@@ -14,9 +14,8 @@ if typing.TYPE_CHECKING:  # pragma: no cover
     import pytest_benchmark
 
 # project import
-from variantplaner import Vcf, VcfHeader
-
 from benchmark import __generate_info, __generate_vcf
+from variantplaner import Vcf, VcfHeader
 
 DATA_DIR = pathlib.Path(__file__).parent.parent / "tests" / "data"
 

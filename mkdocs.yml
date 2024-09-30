@@ -31,7 +31,7 @@ nav:
 
 theme:
   name: material
-  logo: logo.svg
+  custom_dir: docs/.overrides
   features:
     - announce.dismiss
     - content.action.edit
@@ -68,6 +68,9 @@ extra_css:
   - css/material.css
   - css/mkdocstrings.css
 
+extra_javascript:
+- js/feedback.js
+
 markdown_extensions:
   - attr_list
   - admonition
@@ -92,46 +95,60 @@ markdown_extensions:
       generic: true
 
 plugins:
-  - autorefs
-  - search
-  - markdown-exec
-  - gen-files:
-      scripts:
-        - scripts/gen_ref_nav.py
-  - literate-nav:
-      nav_file: SUMMARY.txt
-  - coverage
-  - mkdocstrings:
-      handlers:
-        python:
-          import:
-            - https://docs.python.org/3/objects.inv
-            - https://pola-rs.github.io/polars/py-polars/html/objects.inv
-            - https://click.palletsprojects.com/en/8.1.x/objects.inv
-          paths: [src]
-          options:
-            docstring_options:
-              ignore_init_summary: true
-            docstring_section_style: list
-            heading_level: 1
-            inherited_members: true
-            merge_init_into_class: true
-            separate_signature: true
-            show_root_heading: true
-            show_root_full_path: false
-            show_signature_annotations: true
-            show_symbol_type_heading: true
-            show_symbol_type_toc: true
-            signature_crossrefs: true
-            filters: ["!^_"]
-            summary: true
-  - minify:
-      minify_html: !ENV [DEPLOY, false]
+- autorefs
+- search
+- markdown-exec
+- gen-files:
+    scripts:
+    - scripts/gen_ref_nav.py
+- literate-nav:
+    nav_file: SUMMARY.md
+- coverage
+- mkdocstrings:
+    handlers:
+      python:
+        import:
+        - https://docs.python.org/3/objects.inv
+        - https://pola-rs.github.io/polars/py-polars/html/objects.inv
+        - https://click.palletsprojects.com/en/8.1.x/objects.inv
+        paths: [src]
+        options:
+          docstring_options:
+            ignore_init_summary: true
+          docstring_section_style: list
+          filters: ["!^_"]
+          heading_level: 1
+          inherited_members: true
+          merge_init_into_class: true
+          separate_signature: true
+          show_root_heading: true
+          show_root_full_path: false
+          show_signature_annotations: true
+          show_source: true
+          show_symbol_type_heading: true
+          show_symbol_type_toc: true
+          signature_crossrefs: true
+          filters: ["!^_"]
+          summary: true
+- git-revision-date-localized:
+    enabled: !ENV [DEPLOY, false]
+    enable_creation_date: true
+    type: timeago
+- minify:
+    minify_html: !ENV [DEPLOY, false]
+- group:
+    enabled: !ENV [MATERIAL_INSIDERS, false]
+    plugins:
+    - typeset
 
 extra:
   social:
-    - icon: fontawesome/brands/github
-      link: https://github.com/natir
+  - icon: fontawesome/brands/github
+    link: https://github.com/natir
+  - icon: fontawesome/brands/gitter
+    link: https://gitter.im/variantplaner/community
+  - icon: fontawesome/brands/python
+    link: https://pypi.org/project/variantplaner/
 
 extra_javascript:
   - javascripts/mathjax.js

@@ -7,7 +7,13 @@ dist/
 build/
 htmlcov/
 .coverage*
-pip-wheel-metadata/
+/.pdm-build/
+/htmlcov/
+/site/
+uv.lock
+
+# cache
+.cache/
 .pytest_cache/
 .mypy_cache/
 site/

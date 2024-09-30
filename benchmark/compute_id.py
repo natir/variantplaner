@@ -14,10 +14,9 @@ if typing.TYPE_CHECKING:  # pragma: no cover
     import pytest_benchmark
 
 # project import
+from benchmark import __generate_vcf
 from variantplaner import ContigsLength, VcfHeader
 from variantplaner.normalization import add_variant_id as __default_add_id
-
-from benchmark import __generate_vcf
 
 DATA_DIR = pathlib.Path(__file__).parent.parent / "tests" / "data"
 chrom2length = ContigsLength()

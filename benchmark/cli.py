@@ -14,9 +14,8 @@ if typing.TYPE_CHECKING:  # pragma: no cover
     import pytest_benchmark
 
 # project import
-from variantplaner import cli
-
 from benchmark import __generate_format, __generate_vcf
+from variantplaner import cli
 
 DATA_DIR = pathlib.Path(__file__).parent.parent / "tests" / "data"
 NUMBER_OF_VARIANT = 1_000
