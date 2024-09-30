@@ -11,69 +11,67 @@ defaults:
     shell: bash
 
 env:
-  LANG: "en_US.utf-8"
-  LC_ALL: "en_US.utf-8"
-  PYTHONIOENCODING: "UTF-8"
+  LANG: en_US.utf-8
+  LC_ALL: en_US.utf-8
+  PYTHONIOENCODING: UTF-8
   PYTHON_VERSIONS: ""
 
 jobs:
 
-  test-filenames:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-    - name: Test file names
-      run: bash tests/test_filenames.sh
+  quality:
 
-  test-licenses:
     runs-on: ubuntu-latest
+
     steps:
     - name: Checkout
       uses: actions/checkout@v4
-    - name: Configure Git
-      run: |
-        git config --global init.defaultBranch main
-        git config --global user.email "dev@pawamoy.fr"
-        git config --global user.name "Timothée Mazzucotelli"
+
+    - name: Fetch all tags
+      run: git fetch --depth=1 --tags
+
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
         python-version: "3.11"
-    - name: Install Jinja2
-      run: pip install jinja2
-    - name: Test licenses
-      run: python tests/test_licenses.py
 
-  test-project:
+    - name: Setup uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        enable-cache: true
+        cache-dependency-glob: pyproject.toml
+
+    - name: Install dependencies
+      run: make setup
+
+    - name: Check if the documentation builds correctly
+      run: make check-docs
+
+    - name: Check the code quality
+      run: make check-quality
+
+    - name: Check if the code is correctly typed
+      run: make check-types
+
+    - name: Check for breaking changes in the API
+      run: make check-api
+
+  tests:
     strategy:
       matrix:
         os:
         - ubuntu-latest
         - macos-latest
-        - windows-latest
         python-version:
         - "3.8"
         - "3.9"
         - "3.10"
         - "3.11"
         - "3.12"
-        - "3.13"
-
     runs-on: ${{ matrix.os }}
-    continue-on-error: ${{ matrix.python-version == '3.13'}}
 
     steps:
     - name: Checkout
       uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-
-    - name: Configure Git
-      run: |
-        git config --global init.defaultBranch main
-        git config --global user.email "dev@pawamoy.fr"
-        git config --global user.name "Timothée Mazzucotelli"
 
     - name: Setup Python
       uses: actions/setup-python@v5
@@ -85,44 +83,11 @@ jobs:
       uses: astral-sh/setup-uv@v3
       with:
         enable-cache: true
-        cache-dependency-glob: project/pyproject.toml.jinja
+        cache-dependency-glob: pyproject.toml
         cache-suffix: py${{ matrix.python-version }}
 
-    - name: Install Copier
-      run: pip install copier copier-templates-extensions
+    - name: Install dependencies
+      run: make setup
 
-    - name: Test project generation and workflow
-      run: bash tests/test_project.sh
-
-  test-project-ci:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-
-    - name: Configure Git
-      run: |
-        git config --global init.defaultBranch main
-        git config --global user.email "dev@pawamoy.fr"
-        git config --global user.name "Timothée Mazzucotelli"
-
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.12"
-
-    - name: Setup uv
-      uses: astral-sh/setup-uv@v3
-      with:
-        enable-cache: true
-        cache-dependency-glob: project/pyproject.toml.jinja
-
-    - name: Install Copier
-      run: pip install copier copier-templates-extensions
-
-    - name: Trigger and wait project's own CI
-      env:
-        GH_TOKEN: ${{ secrets.TESTING_PUSH_TOKEN }}
-      run: bash tests/wait_ci.sh
+    - name: Run the test suite
+      run: make test
