@@ -55,7 +55,10 @@ class Vcf:
                 raise NotAVCFError(path) from e
 
         chr2len = ContigsLength()
-        if chr2len.from_vcf_header(self.header) == 0 and (chr2len_path is None or chr2len.from_path(chr2len_path) == 0):
+        if chr2len_path is not None:
+            if chr2len.from_path(chr2len_path) == 0 and chr2len.from_vcf_header(self.header) == 0:
+                raise NoContigsLengthInformationError
+        elif chr2len.from_vcf_header(self.header) == 0:
             raise NoContigsLengthInformationError
 
         self.lf = polars.scan_csv(
