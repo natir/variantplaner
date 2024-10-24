@@ -17,7 +17,7 @@ import polars
 # project import
 from variantplaner import normalization
 
-logger = logging.getLogger("struct.genotypes")
+logger = multiprocessing.get_logger()
 
 
 NUMBER_OF_BITS = 8

@@ -3,7 +3,6 @@
 # std import
 from __future__ import annotations
 
-import logging
 import multiprocessing
 import os
 import pathlib
@@ -16,7 +15,7 @@ import polars
 
 # project import
 
-logger = logging.getLogger("struct.variants")
+logger = multiprocessing.get_logger()
 
 
 def __chunk_by_memory(
@@ -60,6 +59,8 @@ def __concat_uniq(paths: list[pathlib.Path], output: pathlib.Path) -> None:
     Returns:
         None
     """
+    logger.info(f"{paths=} {output=}")
+
     lf = polars.concat([polars.scan_parquet(path) for path in paths])
 
     lf = lf.unique(subset=("chr", "pos", "ref", "alt"))
