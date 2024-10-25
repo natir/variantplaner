@@ -5,17 +5,16 @@
 [![doc](https://img.shields.io/badge/docs-mkdocs%20material-blue.svg?style=flat)](https://natir.github.io/variantplaner/)
 [![pypi version](https://img.shields.io/pypi/v/variantplaner.svg)](https://pypi.org/project/variantplaner/)
 
+
 A toolkit to manage many variants from many samples, with limited resources.
 
 ## Installation
-
-With `pip`:
 
 ```bash
 pip install git+https://github.com/natir/variantplaner.git@0.2.4#egg=variantplaner
 ```
 
-With [`pipx`](https://github.com/pipxproject/pipx):
+With [`uv`](https://docs.astral.sh/uv/):
 
 
 ```bash

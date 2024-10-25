@@ -25,14 +25,14 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
-
-    - name: Fetch all tags
-      run: git fetch --depth=1 --tags
+      with:
+        fetch-depth: 0
+        fetch-tags: true
 
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
-        python-version: "3.11"
+        python-version: "3.12"
 
     - name: Setup uv
       uses: astral-sh/setup-uv@v3
@@ -62,16 +62,23 @@ jobs:
         - ubuntu-latest
         - macos-latest
         python-version:
-        - "3.8"
         - "3.9"
         - "3.10"
         - "3.11"
         - "3.12"
+        - "3.13"
+        - "3.14"
+        resolution:
+        - lowest-direct
+
     runs-on: ${{ matrix.os }}
 
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        fetch-tags: true
 
     - name: Setup Python
       uses: actions/setup-python@v5

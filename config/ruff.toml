@@ -1,5 +1,5 @@
 target-version = "py39"
-line-length = 132
+line-length = 120
 
 exclude = [
     "fixtures",

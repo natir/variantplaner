@@ -32,15 +32,15 @@ make setup
 >
 > ```bash
 > python3 -m pip install --user pipx
-> pipx install pdm
+> pipx install uv
 > ```
 >
 > Now you can try running `make setup` again,
-> or simply `pdm install`.
+> or simply `uv sync`.
 
 You now have the dependencies installed.
 
-You can run the application with `pdm run variantplaner [ARGS...]`.
+You can run the application with `uv run variantplaner [ARGS...]`.
 
 Run `make help` to see all the available actions!
 
