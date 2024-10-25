@@ -21,4 +21,4 @@ actions = \
 
 .PHONY: $(actions)
 $(actions):
-	@python scripts/make "$@"
+	@python scripts/make $(MAKECMDGOALS)

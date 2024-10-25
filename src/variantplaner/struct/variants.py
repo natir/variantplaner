@@ -3,6 +3,7 @@
 # std import
 from __future__ import annotations
 
+import logging
 import multiprocessing
 import os
 import pathlib
@@ -15,7 +16,7 @@ import polars
 
 # project import
 
-logger = multiprocessing.get_logger()
+logger = logging.getLogger("struct.variants")
 
 
 def __chunk_by_memory(
@@ -129,4 +130,4 @@ def merge(
 
     # Call cleanup to remove all tempfile generate durring merging
     for path in temp_files[:-1]:
-        path.unlink()
+        path.unlink(missing_ok=True)

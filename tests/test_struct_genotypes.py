@@ -37,8 +37,8 @@ def test_hive(tmp_path: pathlib.Path) -> None:
     """Check partition genotype parquet."""
     struct.genotypes.hive(
         [
-            DATA_DIR / "no_info.genotypes.parquet",
-            DATA_DIR / "no_info.genotypes.parquet",
+            DATA_DIR / "one.g.parquet",
+            DATA_DIR / "two.g.parquet",
         ],
         tmp_path,
         2,
@@ -51,8 +51,52 @@ def test_hive(tmp_path: pathlib.Path) -> None:
     value = polars.concat([polars.read_parquet(path, hive_partitioning=False) for path in partition_paths]).drop("id_part")
     truth = polars.concat(
         [
-            polars.read_parquet(DATA_DIR / "no_info.genotypes.parquet"),
-            polars.read_parquet(DATA_DIR / "no_info.genotypes.parquet"),
+            polars.read_parquet(DATA_DIR / "one.g.parquet"),
+            polars.read_parquet(DATA_DIR / "two.g.parquet"),
+        ],
+    )
+
+    assert sorted(value.get_column("id").to_list()) == sorted(truth.get_column("id").to_list())
+    assert sorted(value.get_column("sample").to_list()) == sorted(truth.get_column("sample").to_list())
+    assert sorted(value.get_column("gt").to_list()) == sorted(truth.get_column("gt").to_list())
+    assert sorted(value.get_column("ad").to_list()) == sorted(truth.get_column("ad").to_list())
+    assert sorted(value.get_column("dp").to_list()) == sorted(truth.get_column("dp").to_list())
+    assert sorted(value.get_column("gq").fill_null(0).to_list()) == sorted(
+        truth.get_column("gq").fill_null(0).to_list(),
+    )
+
+
+def test_hive_append(tmp_path: pathlib.Path) -> None:
+    """Check partition genotype parquet."""
+    struct.genotypes.hive(
+        [
+            DATA_DIR / "one.g.parquet",
+            DATA_DIR / "two.g.parquet",
+        ],
+        tmp_path,
+        2,
+        1,
+        append=False,
+    )
+
+    struct.genotypes.hive(
+        [
+            DATA_DIR / "three.g.parquet",
+        ],
+        tmp_path,
+        2,
+        1,
+        append=True,
+    )
+
+    partition_paths = set(__scantree(tmp_path))
+
+    value = polars.concat([polars.read_parquet(path, hive_partitioning=False) for path in partition_paths])
+    truth = polars.concat(
+        [
+            polars.read_parquet(DATA_DIR / "one.g.parquet"),
+            polars.read_parquet(DATA_DIR / "two.g.parquet"),
+            polars.read_parquet(DATA_DIR / "three.g.parquet"),
         ],
     )
 

@@ -6,6 +6,7 @@ from __future__ import annotations
 import itertools
 import logging
 import multiprocessing
+import shutil
 import typing
 
 if typing.TYPE_CHECKING:  # pragma: no cover
@@ -17,8 +18,7 @@ import polars
 # project import
 from variantplaner import normalization
 
-logger = multiprocessing.get_logger()
-
+logger = logging.getLogger("struct.genotypes")
 
 NUMBER_OF_BITS = 8
 """Number of high weight bit used in id to perform partitioning."""
@@ -35,7 +35,7 @@ def __hive_worker(lfs: tuple[polars.LazyFrame], basename: str, output_prefix: pa
     Returns:
         None
     """
-    logging.info(f"Call hive worker {lfs=}, {basename=}, {output_prefix=}")
+    logger.info(f"Call hive worker {lfs=}, {basename=}, {output_prefix=}")
 
     lf = normalization.add_id_part(polars.concat(lf for lf in lfs if lf is not None))
 
@@ -55,24 +55,26 @@ def __merge_file(prefix: pathlib.Path, basenames: list[str], append: bool) -> No
     Returns:
         None
     """
-    logging.info(f"Call merge file {prefix=}, {basenames=}")
+    logger.info(f"Call merge file {prefix=}, {basenames=} {append=}")
 
     paths = [prefix / f"{basename}.parquet" for basename in basenames]
+    if append and (prefix / "0.parquet").is_file():
+        shutil.copyfile(prefix / "0.parquet", prefix / "0.bkp.parquet")
+        paths.append(prefix / "0.bkp.parquet")
 
-    logging.info(f"{paths=}")
+    logger.info(f"{paths=}")
 
     lfs = [polars.scan_parquet(path, hive_partitioning=False) for path in paths if path.is_file()]
 
-    logging.info(f"{lfs=}")
+    logger.info(f"{lfs=}")
     if lfs:
-        logging.info(f"Merge multiple file in {prefix / '0.parquet'}")
+        logger.info(f"Merge multiple file in {prefix / '0.parquet'}")
         lf = polars.concat(lfs)
-        if append:
-            lf = lf.unique(subset=["id", "sample", "gt"])
+        lf = lf.unique(subset=["id", "sample", "gt"])
         lf.sink_parquet(prefix / "0.parquet", maintain_order=False)
 
     for path in paths:
-        logging.info(f"Remove file {path}.parquet")
+        logger.info(f"Remove file {path}.parquet")
         path.unlink(missing_ok=True)
 
 
@@ -126,12 +128,6 @@ def hive(
             __hive_worker,
             [(lf_group, basename, output_prefix) for lf_group, basename in zip(lf_groups, basenames)],
         )
-
-        if append:
-            for id_part in range(pow(2, NUMBER_OF_BITS)):
-                path = output_prefix / f"id_part={id_part}/0.parquet"
-                if path.exists():
-                    basenames.append(str(path))
 
         pool.starmap(
             __merge_file,
