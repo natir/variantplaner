@@ -28,7 +28,7 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-    "polars[pyarrow]>=1",
+    "polars>=1",
     "click>=8",
     "typing-extensions>=4",
     "variantplaner-rs @ file:///${PROJECT_ROOT}/variantplaner_rs",

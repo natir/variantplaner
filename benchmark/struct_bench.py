@@ -111,7 +111,9 @@ def __generate_variant_merge_on_disk(
             __generate_variant().collect().write_parquet(tmp_path / f"{i}.parquet")
 
         os.environ["POLARS_MAX_THREADS"] = str(threads)
-        benchmark(lambda: struct.variants.merge(paths, tmp_path / "output.parquet", memory_limit=5_000_000, append=False))
+        benchmark(
+            lambda: struct.variants.merge(paths, tmp_path / "output.parquet", memory_limit=5_000_000, append=False)
+        )
 
     return inner
 

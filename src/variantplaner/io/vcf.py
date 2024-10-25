@@ -149,7 +149,11 @@ def lazyframe_in_vcf(
 
     select_column.append("FILTER")
 
-    lf = __rebuild_info_column(lf, renaming["INFO"]) if renaming["INFO"] else lf.with_columns(polars.lit(".").alias("INFO"))
+    lf = (
+        __rebuild_info_column(lf, renaming["INFO"])
+        if renaming["INFO"]
+        else lf.with_columns(polars.lit(".").alias("INFO"))
+    )
 
     select_column.append("INFO")
 
@@ -280,7 +284,11 @@ def __lazy2format(sample_name: str, format_string: str, col2type: dict[str, pola
         lazy_name = f"{sample_name}_{col_name.lower()}"
         if col_name == "GT":
             expression.append(
-                polars.col(lazy_name).cast(polars.Utf8).fill_null("./.").str.replace("1", "0/1").str.replace("2", "1/1"),
+                polars.col(lazy_name)
+                .cast(polars.Utf8)
+                .fill_null("./.")
+                .str.replace("1", "0/1")
+                .str.replace("2", "1/1"),
             )
         elif isinstance(col2type[lazy_name], polars.List):
             expression.append(

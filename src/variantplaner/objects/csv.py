@@ -70,7 +70,9 @@ class Csv(polars.LazyFrame):
         """Populate Csv obejct with csv file content."""
         self.lf = polars.scan_csv(path, **scan_csv_args)
 
-    def variants_from_path(self, path: pathlib.Path, col_rename: ColRename, /, **scan_csv_args: Unpack[ScanCsv]) -> None:
+    def variants_from_path(
+        self, path: pathlib.Path, col_rename: ColRename, /, **scan_csv_args: Unpack[ScanCsv]
+    ) -> None:
         """Populate Csv object with csv file."""
         self.from_path(path, **scan_csv_args)
 

@@ -95,7 +95,10 @@ def genotypes(
 
     # Split genotype column in sub value
     genotypes = genotypes.with_columns(
-        [polars.col("value").list.get(index).pipe(function=col2expr[col], name=col) for col, index in col_index.items()],  # type: ignore # noqa: PGH003
+        [
+            polars.col("value").list.get(index).pipe(function=col2expr[col], name=col)  # type: ignore # noqa: PGH003
+            for col, index in col_index.items()
+        ],
     )
 
     # Select intrusting column

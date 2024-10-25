@@ -45,7 +45,10 @@ class Vcf:
         self.header = VcfHeader()
 
     def from_path(
-        self, path: pathlib.Path, chr2len_path: pathlib.Path | None, behavior: VcfParsingBehavior = VcfParsingBehavior.NOTHING
+        self,
+        path: pathlib.Path,
+        chr2len_path: pathlib.Path | None,
+        behavior: VcfParsingBehavior = VcfParsingBehavior.NOTHING,
     ) -> None:
         """Populate Vcf object with vcf file."""
         with open(path) as fh:
@@ -125,7 +128,10 @@ class Vcf:
         col2expr = self.header.format_parser()
 
         genotypes.lf = genotypes.lf.with_columns(
-            [polars.col("value").list.get(index).pipe(function=col2expr[col], col_name=col) for col, index in col_index.items()],
+            [
+                polars.col("value").list.get(index).pipe(function=col2expr[col], col_name=col)
+                for col, index in col_index.items()
+            ],
         )
 
         # Select intrusting column

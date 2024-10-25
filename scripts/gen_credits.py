@@ -38,7 +38,8 @@ def _merge_fields(metadata: dict) -> PackageMetadata:
     for header, value in metadata.items():
         fields[header.lower()].append(value.strip())
     return {
-        field: value if len(value) > 1 or field in ("classifier", "requires-dist") else value[0] for field, value in fields.items()
+        field: value if len(value) > 1 or field in ("classifier", "requires-dist") else value[0]
+        for field, value in fields.items()
     }
 
 
