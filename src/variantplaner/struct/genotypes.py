@@ -39,10 +39,8 @@ def __hive_worker(lfs: tuple[polars.LazyFrame], basename: str, output_prefix: pa
 
     lf = normalization.add_id_part(polars.concat(lf for lf in lfs if lf is not None))
 
-    for name, df in lf.collect().group_by(polars.col("id_part")):
-        # required for python 3.11 and polars 0.20.4 wired
-        fix_name = name[0] if isinstance(name, tuple) else name
-        df.write_parquet(output_prefix / f"id_part={fix_name}" / f"{basename}.parquet")
+    for (part_name, *_), df in lf.collect().group_by(polars.col("id_part")):
+        df.write_parquet(output_prefix / f"id_part={part_name}" / f"{basename}.parquet")
 
 
 def __merge_file(prefix: pathlib.Path, basenames: list[str], append: bool) -> None:  # noqa: FBT001
@@ -70,7 +68,6 @@ def __merge_file(prefix: pathlib.Path, basenames: list[str], append: bool) -> No
     if lfs:
         logger.info(f"Merge multiple file in {prefix / '0.parquet'}")
         lf = polars.concat(lfs)
-        lf = lf.unique(subset=["id", "sample", "gt"])
         lf.sink_parquet(prefix / "0.parquet", maintain_order=False)
 
     for path in paths:
