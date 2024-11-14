@@ -13,7 +13,7 @@ import polars.testing
 import pytest
 
 # project import
-from variantplaner import exception, generate
+from variantplaner import exception, generate, Pedigree
 
 DATA_DIR = pathlib.Path(__file__).parent / "data"
 
@@ -31,6 +31,31 @@ def test_transmission(tmp_path: pathlib.Path) -> None:
     truth = DATA_DIR / "transmission.parquet"
 
     filecmp.cmp(truth, out_path)
+
+
+def test_transmissions_with_ped(tmp_path: pathlib.Path) -> None:
+    """Check transmission computation with a ped file."""
+    genotypes_lf = polars.scan_parquet(DATA_DIR / "no_info.genotypes.parquet")
+    pedigree = Pedigree()
+    pedigree.from_path(DATA_DIR / "missing_father.ped")
+
+    transmission = generate.transmission_ped(genotypes_lf, pedigree.lf)
+
+
+    assert transmission.get_column("index_gt").to_list() == [
+        2,2,2,2,2
+    ]
+
+    assert transmission.get_column("mother_gt").to_list() == [
+        1,1,1,1,1
+    ]
+    assert transmission.get_column("father_gt").to_list() == [
+        None,None,None,None,None
+    ]
+
+    assert transmission.get_column("origin").to_list() == [
+        "#\"~", "#\"~","#\"~","#\"~","#\"~"
+    ]
 
 
 def test_transmission_missing_ad(tmp_path: pathlib.Path) -> None:

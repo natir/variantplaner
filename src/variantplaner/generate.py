@@ -34,7 +34,7 @@ def transmission_ped(
     Raises:
         NoGTError: If genotypes_lf not contains gt column.
     """
-    pedigree_lf = pedigree_lf.filter((polars.col("father_id") != "unknow") | (polars.col("mother_id") != "unknow"))
+    pedigree_lf = pedigree_lf.filter(polars.col("father_id").is_not_null() | polars.col("mother_id").is_not_null())
 
     familly_info = pedigree_lf.collect().row(0, named=True)
 

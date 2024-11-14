@@ -33,7 +33,7 @@ class Pedigree(polars.LazyFrame):
             input_path,
             separator="\t",
             has_header=False,
-            null_values="None",
+            null_values=["None", "unknown"],
             new_columns=[
                 "family_id",
                 "personal_id",
