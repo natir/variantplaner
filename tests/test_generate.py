@@ -13,7 +13,7 @@ import polars.testing
 import pytest
 
 # project import
-from variantplaner import exception, generate, Pedigree
+from variantplaner import Pedigree, exception, generate
 
 DATA_DIR = pathlib.Path(__file__).parent / "data"
 
@@ -33,7 +33,7 @@ def test_transmission(tmp_path: pathlib.Path) -> None:
     filecmp.cmp(truth, out_path)
 
 
-def test_transmissions_with_ped(tmp_path: pathlib.Path) -> None:
+def test_transmissions_with_ped() -> None:
     """Check transmission computation with a ped file."""
     genotypes_lf = polars.scan_parquet(DATA_DIR / "no_info.genotypes.parquet")
     pedigree = Pedigree()
@@ -41,21 +41,12 @@ def test_transmissions_with_ped(tmp_path: pathlib.Path) -> None:
 
     transmission = generate.transmission_ped(genotypes_lf, pedigree.lf)
 
+    assert transmission.get_column("index_gt").to_list() == [2, 2, 2, 2, 2]
 
-    assert transmission.get_column("index_gt").to_list() == [
-        2,2,2,2,2
-    ]
+    assert transmission.get_column("mother_gt").to_list() == [1, 1, 1, 1, 1]
+    assert transmission.get_column("father_gt").to_list() == [None, None, None, None, None]
 
-    assert transmission.get_column("mother_gt").to_list() == [
-        1,1,1,1,1
-    ]
-    assert transmission.get_column("father_gt").to_list() == [
-        None,None,None,None,None
-    ]
-
-    assert transmission.get_column("origin").to_list() == [
-        "#\"~", "#\"~","#\"~","#\"~","#\"~"
-    ]
+    assert transmission.get_column("origin").to_list() == ['#"~', '#"~', '#"~', '#"~', '#"~']
 
 
 def test_transmission_missing_ad(tmp_path: pathlib.Path) -> None:
@@ -121,13 +112,8 @@ def test_transmission_mother_no_variant() -> None:
         None,
         None,
     ]
-    assert transmission.get_column("origin").to_list() == [
-        "#!!",
-        "#!!",
-        "#!!",
-        "#!!",
-        "#!!",
-    ]
+
+    assert transmission.get_column("origin").to_list() == ['#!"', '#!"', '#!"', '#!"', '#!"']
 
 
 def test_transmission_missing_mother() -> None:
@@ -167,13 +153,8 @@ def test_transmission_missing_mother() -> None:
         None,
         None,
     ]
-    assert transmission.get_column("origin").to_list() == [
-        "#~!",
-        "#~!",
-        "#~!",
-        "#~!",
-        "#~!",
-    ]
+
+    assert transmission.get_column("origin").to_list() == ['#~"', '#~"', '#~"', '#~"', '#~"']
 
 
 def test_transmission_nogt(tmp_path: pathlib.Path) -> None:
@@ -321,3 +302,16 @@ def test_transmission_all_mother_gt_null() -> None:
         3084,
     ]
     assert transmission.get_column("mother_gq").to_list() == [99, 99, 99, 99, 99]
+
+
+def test_31c177() -> None:
+    """Check missing father information in 31C177."""
+    pedigree = Pedigree()
+    pedigree.from_path(DATA_DIR / "31C177.ped")
+
+    genotypes_lf = polars.scan_parquet(DATA_DIR / "only_genotype_31C177.parquet")
+
+    transmission = generate.transmission_ped(genotypes_lf, pedigree.lf)
+
+    assert transmission.get_column("index_gt").to_list() == [1]
+    assert transmission.get_column("father_gt").to_list() == [1]

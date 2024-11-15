@@ -94,8 +94,8 @@ def transmission(
         father_df = genotypes_df.filter(polars.col("sample") == father_name)
     father_df = father_df.rename({colname: f"father_{colname}" for colname in genotypes_column}).drop("sample")
 
-    parent_df = mother_df.join(father_df, on="id", how="full")
-    transmission_df = index_df.join(parent_df, on="id", how="left").drop("id_right")
+    parent_df = mother_df.join(father_df, on="id", how="full", coalesce=True)
+    transmission_df = index_df.join(parent_df, on="id", how="left")
 
     if father_name is not None:
         transmission_df = transmission_df.with_columns(father_gt=polars.col("father_gt").fill_null(strategy="zero"))
