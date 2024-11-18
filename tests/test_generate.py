@@ -315,3 +315,17 @@ def test_31c177() -> None:
 
     assert transmission.get_column("index_gt").to_list() == [1]
     assert transmission.get_column("father_gt").to_list() == [1]
+
+def test_one_line_ped() -> None:
+    """Check behavior if ped file as one line."""
+
+    pedigree = Pedigree()
+    pedigree.from_path(DATA_DIR / "one_line.ped")
+
+    genotypes_lf = polars.scan_parquet(DATA_DIR / "only_genotype_31C177.parquet")
+
+    transmission = generate.transmission_ped(genotypes_lf, pedigree.lf)
+
+    assert transmission.get_column("index_gt").to_list() == [1]
+    assert transmission.get_column("father_gt").to_list() == [None]
+    assert transmission.get_column("mother_gt").to_list() == [None]

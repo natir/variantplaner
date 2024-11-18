@@ -34,16 +34,29 @@ def transmission_ped(
     Raises:
         NoGTError: If genotypes_lf not contains gt column.
     """
-    pedigree_lf = pedigree_lf.filter(polars.col("father_id").is_not_null() | polars.col("mother_id").is_not_null())
 
-    familly_info = pedigree_lf.collect().row(0, named=True)
+    pedigree_df = pedigree_lf.collect()
 
-    return transmission(
-        genotypes_lf,
-        familly_info["personal_id"],
-        familly_info["mother_id"],
-        familly_info["father_id"],
-    )
+    first_sample = pedigree_df.get_column("personal_id").to_list()[0]
+
+    pedigree_df = pedigree_df.filter(polars.col("father_id").is_not_null() | polars.col("mother_id").is_not_null())
+
+    if pedigree_df.height > 0:
+        familly_info = pedigree_df.row(0, named=True)
+        return transmission(
+            genotypes_lf,
+            familly_info["personal_id"],
+            familly_info["mother_id"],
+            familly_info["father_id"],
+        )
+    else:
+        familly_info = {"personal_id": first_sample, "mother_id": None, "father_id": None}
+        return transmission(
+            genotypes_lf,
+            first_sample,
+            None,
+            None,
+        )
 
 
 def transmission(
