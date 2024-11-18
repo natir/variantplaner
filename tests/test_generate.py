@@ -316,9 +316,9 @@ def test_31c177() -> None:
     assert transmission.get_column("index_gt").to_list() == [1]
     assert transmission.get_column("father_gt").to_list() == [1]
 
+
 def test_one_line_ped() -> None:
     """Check behavior if ped file as one line."""
-
     pedigree = Pedigree()
     pedigree.from_path(DATA_DIR / "one_line.ped")
 
