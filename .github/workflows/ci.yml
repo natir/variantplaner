@@ -97,6 +97,3 @@ jobs:
 
     - name: Run the test suite
       run: make test
-
-    - name: Deploy documentation
-      run: make docs-deploy
