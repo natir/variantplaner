@@ -1,4 +1,4 @@
-# <img src="docs/logo.svg" alt="variantplaner logo" width="15%">ariantPlaner
+# <img src="https://github.com/natir/variantplaner/raw/main/docs/logo.svg" alt="variantplaner logo" width="15%">ariantPlaner
 
 
 [![ci](https://github.com/natir/variantplaner/actions/workflows/ci.yml/badge.svg)](https://github.com/natir/variantplaner/actions/workflows/ci.yml)
