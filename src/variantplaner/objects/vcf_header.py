@@ -14,7 +14,7 @@ import polars
 from variantplaner.exception import NotVcfHeaderError
 
 # type checking block
-if typing.TYPE_CHECKING:
+if typing.TYPE_CHECKING:  # pragma: no cover
     import pathlib
 
 MINIMAL_COL_NUMBER: int = 8

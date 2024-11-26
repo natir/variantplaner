@@ -18,7 +18,7 @@ from variantplaner.objects.variants import Variants
 from variantplaner.objects.vcf_header import VcfHeader
 
 # type checking block
-if typing.TYPE_CHECKING:
+if typing.TYPE_CHECKING:  # pragma: no cover
     import collections
     import pathlib
 

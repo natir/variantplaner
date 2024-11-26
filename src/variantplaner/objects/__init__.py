@@ -20,6 +20,6 @@ __all__: list[str] = [
     "Pedigree",
     "Variants",
     "Vcf",
-    "VcfParsingBehavior",
     "VcfHeader",
+    "VcfParsingBehavior",
 ]
