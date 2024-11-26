@@ -75,7 +75,7 @@ def add_variant_id(lf: polars.LazyFrame, chrom2length: polars.LazyFrame) -> pola
     return lf.drop(["real_pos", "length", "offset"])
 
 
-def add_id_part(lf: polars.LazyFrame) -> polars.LazyFrame:
+def add_id_part(lf: polars.LazyFrame, number_of_bits: int = 8) -> polars.LazyFrame:
     """Add column id part.
 
     If id is large variant id value, id_part are set to 255, other value most weigthed position 8 bits are use.
@@ -86,4 +86,4 @@ def add_id_part(lf: polars.LazyFrame) -> polars.LazyFrame:
     Returns:
         [polars.LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html) with column id_part added
     """
-    return lf.with_columns(id_part=polars.col("id").variant_id.partition())  # type: ignore # noqa: PGH003
+    return lf.with_columns(id_part=polars.col("id").variant_id.partition(number_of_bits=number_of_bits))  # type: ignore # noqa: PGH003

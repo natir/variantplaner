@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import logging
+import math
 import pathlib
 
 # 3rd party import
@@ -111,7 +112,7 @@ def variants(
 @click.option(
     "-n",
     "--number-of-part",
-    help="Maximal number of part",
+    help="Maximal number of part, automaticly correct to next power of two",
     type=click.IntRange(min=1),
     default=256,
     show_default=True,
@@ -151,4 +152,8 @@ def genotypes(
 
     logger.debug(f"parameter: {prefix_path=} {partition_mode=} {number_of_part=} {file_per_thread=} {polars_threads=}")
 
-    vp_struct.genotypes.hive(input_paths, prefix_path, threads, file_per_thread, append=append)
+    number_of_bits = math.ceil(math.log2(number_of_part))
+
+    vp_struct.genotypes.hive(
+        input_paths, prefix_path, threads, file_per_thread, append=append, number_of_bits=number_of_bits
+    )

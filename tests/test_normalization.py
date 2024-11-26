@@ -74,3 +74,11 @@ def test_partition() -> None:
     df = normalization.add_id_part(df.lazy()).collect()
 
     assert df.get_column("id_part").to_list() == [9, 3, 255, 9, 124, 255]
+
+    df = normalization.add_id_part(df.lazy(), number_of_bits=8).collect()
+
+    assert df.get_column("id_part").to_list() == [9, 3, 255, 9, 124, 255]
+
+    df = normalization.add_id_part(df.lazy(), number_of_bits=9).collect()
+
+    assert df.get_column("id_part").to_list() == [19, 6, 511, 19, 248, 511]

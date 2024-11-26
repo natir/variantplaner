@@ -20,11 +20,10 @@ from variantplaner import normalization
 
 logger = logging.getLogger("struct.genotypes")
 
-NUMBER_OF_BITS = 8
-"""Number of high weight bit used in id to perform partitioning."""
 
-
-def __hive_worker(lfs: tuple[polars.LazyFrame], basename: str, output_prefix: pathlib.Path) -> None:
+def __hive_worker(
+    lfs: tuple[polars.LazyFrame], basename: str, output_prefix: pathlib.Path, number_of_bits: int = 8
+) -> None:
     """Concatenate several parquet files and group them according to the bits between the 63rd and 55th bits included.
 
     Args:
@@ -37,7 +36,7 @@ def __hive_worker(lfs: tuple[polars.LazyFrame], basename: str, output_prefix: pa
     """
     logger.info(f"Call hive worker {lfs=}, {basename=}, {output_prefix=}")
 
-    lf = normalization.add_id_part(polars.concat(lf for lf in lfs if lf is not None))
+    lf = normalization.add_id_part(polars.concat(lf for lf in lfs if lf is not None), number_of_bits=number_of_bits)
 
     for (part_name, *_), df in lf.collect().group_by(polars.col("id_part")):
         df.write_parquet(output_prefix / f"id_part={part_name}" / f"{basename}.parquet")
@@ -82,6 +81,7 @@ def hive(
     file_per_thread: int,
     *,
     append: bool,
+    number_of_bits: int = 8,
 ) -> None:
     r"""Read all genotypes parquet file and use information to generate a hive like struct, based on 63rd and 55th bits included of variant id with genotype information.
 
@@ -103,7 +103,7 @@ def hive(
     if len(paths) == 0:
         return
 
-    for i in range(pow(2, NUMBER_OF_BITS)):
+    for i in range(pow(2, number_of_bits)):
         (output_prefix / f"id_part={i}").mkdir(parents=True, exist_ok=True)
 
     path_groups: typing.Iterable[typing.Iterable[pathlib.Path]] = list(
@@ -128,5 +128,5 @@ def hive(
 
         pool.starmap(
             __merge_file,
-            [(output_prefix / f"id_part={id_part}", basenames, append) for id_part in range(pow(2, NUMBER_OF_BITS))],
+            [(output_prefix / f"id_part={id_part}", basenames, append) for id_part in range(pow(2, number_of_bits))],
         )
