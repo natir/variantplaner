@@ -28,7 +28,14 @@ lf = lf.with_columns(
 
 lf = lf.with_columns(
     part = polars.col("id")
-    .variant_id.partition()
+    .variant_id.partition(8)
+)
+
+print(lf.collect())
+
+lf = lf.with_columns(
+    part = polars.col("id")
+    .variant_id.partition(9)
 )
 
 print(lf.collect())

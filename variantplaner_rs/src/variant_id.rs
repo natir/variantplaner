@@ -79,22 +79,27 @@ fn compute(inputs: &[Series]) -> PolarsResult<Series> {
     local_compute(real_pos, ref_seq, alt_seq, max_pos)
 }
 
-fn local_part(id: &UInt64Chunked) -> PolarsResult<Series> {
+fn local_part(id: &UInt64Chunked, number_of_bits: u8) -> PolarsResult<Series> {
     Ok(id
         .into_iter()
         .map(|i| match i {
-            Some(i) if i >> 63 == 0b1 => Some(255),
-            Some(i) => Some((i << 1) >> 56),
+            Some(i) if i >> 63 == 0b1 => Some((1 << number_of_bits) - 1),
+            Some(i) => Some((i << 1) >> (64 - number_of_bits)),
             _ => None,
         })
         .collect())
 }
 
+#[derive(serde::Deserialize)]
+struct PartitionsKwargs {
+    number_of_bits: u8,
+}
+
 #[polars_expr(output_type=UInt64)]
-fn partition(inputs: &[Series]) -> PolarsResult<Series> {
+fn partition(inputs: &[Series], kwargs: PartitionsKwargs) -> PolarsResult<Series> {
     let id = inputs[0].u64()?;
 
-    local_part(id)
+    local_part(id, kwargs.number_of_bits)
 }
 
 #[cfg(test)]
@@ -199,7 +204,7 @@ mod tests {
         alt_seq.extend(&StringChunked::full_null("", 1));
 
         let id = local_compute(&real_pos, &ref_seq, &alt_seq, 326512443305).unwrap();
-        let partition = local_part(id.u64().unwrap()).unwrap();
+        let partition = local_part(id.u64().unwrap(), 8).unwrap();
 
         assert_eq!(
             partition,
@@ -212,6 +217,26 @@ mod tests {
                     AnyValue::UInt64(152),
                     AnyValue::UInt64(152),
                     AnyValue::UInt64(255),
+                    AnyValue::Null,
+                ],
+                &DataType::UInt64,
+                false
+            )
+            .unwrap()
+        );
+
+        let partition = local_part(id.u64().unwrap(), 9).unwrap();
+        assert_eq!(
+            partition,
+            Series::from_any_values_and_dtype(
+                "",
+                &[
+                    AnyValue::UInt64(0),
+                    AnyValue::UInt64(0),
+                    AnyValue::UInt64(0),
+                    AnyValue::UInt64(304),
+                    AnyValue::UInt64(304),
+                    AnyValue::UInt64(511),
                     AnyValue::Null,
                 ],
                 &DataType::UInt64,

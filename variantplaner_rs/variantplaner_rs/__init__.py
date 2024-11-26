@@ -15,13 +15,16 @@ class VariantId:
             args=[self._expr, ref, alt, max_pos],
         )
 
-    def partition(self) -> polars.Expr:
+    def partition(self, number_of_bits: int = 8) -> polars.Expr:
         return register_plugin_function(
             plugin_path=pathlib.Path(__file__).parent,
             function_name="partition",
             args=[self._expr],
+            kwargs={
+                "number_of_bits": number_of_bits,
+            }
         )
 
 
-__version__: str = "0.3.0"
+__version__: str = "0.5.0"
 __all__: list[str] = ["VariantId"]
