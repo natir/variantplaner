@@ -87,7 +87,7 @@ def hive(
 
     Real number of threads use are equal to $min(threads, len(paths))$.
 
-    Output format look like: `{output_prefix}/id_part=[0..255]/0.parquet`.
+    Output format look like: `{output_prefix}/id_part=[0..2.pow(number_of_bits)]/0.parquet`.
 
     Args:
         paths: list of file you want reorganize
@@ -98,7 +98,7 @@ def hive(
     Returns:
         None
     """
-    logger.info(f"{paths=} {output_prefix=}, {threads=}, {file_per_thread=}, {append=}")
+    logger.info(f"{paths=} {output_prefix=}, {threads=}, {file_per_thread=}, {append=} {number_of_bits=}")
 
     if len(paths) == 0:
         return
@@ -123,7 +123,7 @@ def hive(
     with multiprocessing.get_context("spawn").Pool(threads) as pool:
         pool.starmap(
             __hive_worker,
-            [(lf_group, basename, output_prefix) for lf_group, basename in zip(lf_groups, basenames)],
+            [(lf_group, basename, output_prefix, number_of_bits) for lf_group, basename in zip(lf_groups, basenames)],
         )
 
         pool.starmap(
