@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import logging
 import math
+import os
 import pathlib
 
 # 3rd party import
@@ -128,7 +129,7 @@ def variants(
 @click.option(
     "-P",
     "--polars-threads",
-    help="Number of threads use to merge one block of file",
+    help="Number of threads use by polars task",
     type=click.IntRange(1),
     default=4,
     show_default=True,
@@ -149,6 +150,8 @@ def genotypes(
     input_paths = ctx.obj["input_paths"]
     threads = ctx.obj["threads"]
     append = ctx.obj["append"]
+
+    os.environ["POLARS_MAX_THREADS"] = str(polars_threads)
 
     logger.debug(f"parameter: {prefix_path=} {partition_mode=} {number_of_part=} {file_per_thread=} {polars_threads=}")
 
