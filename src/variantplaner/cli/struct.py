@@ -88,7 +88,7 @@ def variants(
     input_paths = ctx.obj["input_paths"]
     append = ctx.obj["append"]
 
-    logger.debug(f"parameter: {output_prefix=} {chunk_size}")
+    logger.debug(f"parameter: {output_prefix=} {chunk_size=}")
 
     vp_struct.variants.merge(input_paths, output_prefix, chunk_size, polars_threads, append=append)
 
