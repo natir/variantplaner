@@ -106,7 +106,7 @@ def test_concat_uniq(tmp_path: pathlib.Path) -> None:
     """Check concat_uniq_by_id."""
     tmp_file = tmp_path / "merge_by_id.parquet"
 
-    struct.variants.__concat_uniq(
+    struct.variants.__merge_unique(
         [
             DATA_DIR / "no_genotypes.variants.parquet",
             DATA_DIR / "no_info.variants.parquet",
@@ -121,7 +121,7 @@ def test_concat_uniq(tmp_path: pathlib.Path) -> None:
 
 def test_merge(tmp_path: pathlib.Path) -> None:
     """Check merge."""
-    tmp_file = tmp_path / "merge_parquet.parquet"
+    out_prefix = tmp_path / "merge_parquet"
 
     os.environ["POLARS_MAX_THREADS"] = str(2)
 
@@ -130,18 +130,18 @@ def test_merge(tmp_path: pathlib.Path) -> None:
             DATA_DIR / "no_genotypes.variants.parquet",
             DATA_DIR / "no_info.variants.parquet",
         ],
-        tmp_file,
+        out_prefix,
         append=False,
     )
 
-    lf = polars.scan_parquet(tmp_file)
+    lf = polars.concat([polars.scan_parquet(entry.path) for entry in os.scandir(out_prefix) if entry.is_file()])
 
     assert set(lf.collect().get_column("id").to_list()) == MERGE_IDS
 
 
 def test_merge_append(tmp_path: pathlib.Path) -> None:
     """Check merge append."""
-    tmp_file = tmp_path / "merge_parquet.parquet"
+    out_prefix = tmp_path / "merge_parquet"
 
     os.environ["POLARS_MAX_THREADS"] = str(2)
 
@@ -150,11 +150,11 @@ def test_merge_append(tmp_path: pathlib.Path) -> None:
             DATA_DIR / "no_genotypes.variants.parquet",
             DATA_DIR / "no_info.variants.parquet",
         ],
-        tmp_file,
+        out_prefix,
         append=False,
     )
 
-    lf = polars.scan_parquet(tmp_file)
+    lf = polars.concat([polars.scan_parquet(entry.path) for entry in os.scandir(out_prefix) if entry.is_file()])
 
     assert set(lf.collect().get_column("id").to_list()) == MERGE_IDS
 
@@ -162,13 +162,13 @@ def test_merge_append(tmp_path: pathlib.Path) -> None:
         [
             DATA_DIR / "sv.variants.parquet",
         ],
-        tmp_file,
+        out_prefix,
         append=True,
     )
 
     lf_sv = polars.scan_parquet(DATA_DIR / "sv.variants.parquet")
     sv_merge = MERGE_IDS | set(lf_sv.collect().get_column("id").to_list())
 
-    lf = polars.scan_parquet(tmp_file)
+    lf = polars.concat([polars.scan_parquet(entry.path) for entry in os.scandir(out_prefix) if entry.is_file()])
 
     assert set(lf.collect().get_column("id").to_list()) == sv_merge

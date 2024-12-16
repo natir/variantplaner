@@ -50,8 +50,8 @@ def struct(ctx: click.Context, input_paths: list[pathlib.Path], *, append: bool)
 @click.pass_context
 @click.option(
     "-o",
-    "--output-path",
-    help="Path where unique variants will be written.",
+    "--output-prefix",
+    help="Prefix added before file where unique variants will be written.",
     type=click.Path(writable=True, path_type=pathlib.Path),
     required=True,
 )
@@ -73,7 +73,7 @@ def struct(ctx: click.Context, input_paths: list[pathlib.Path], *, append: bool)
 )
 def variants(
     ctx: click.Context,
-    output_path: pathlib.Path,
+    output_prefix: pathlib.Path,
     chunk_size: int,
     polars_threads: int,
 ) -> None:
@@ -88,9 +88,9 @@ def variants(
     input_paths = ctx.obj["input_paths"]
     append = ctx.obj["append"]
 
-    logger.debug(f"parameter: {output_path=} {chunk_size}")
+    logger.debug(f"parameter: {output_prefix=} {chunk_size}")
 
-    vp_struct.variants.merge(input_paths, output_path, chunk_size, polars_threads, append=append)
+    vp_struct.variants.merge(input_paths, output_prefix, chunk_size, polars_threads, append=append)
 
 
 @struct.command("genotypes")
