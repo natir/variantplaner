@@ -6,6 +6,23 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [0.3.1](https://github.com/natir/variantplaner/releases/tag/0.3.1) - 2024-12-16
+
+<small>[Compare with 0.3.1](https://github.com/natir/variantplaner/compare/0.3.0...0.3.1)</small>
+
+### Features
+
+- struct unique variant split variants by chromosome ([ae7eb65](https://github.com/natir/variantlaner/commit/ae7eb6599927e022122c0464164657019784ff47) by Pierre Marijon).
+- struct genotype polars threads parameter have an effect ([6419e02](https://github.com/natir/variantlaner/commit/6419e02570fff59713623db0baf02ee7c27f4f46) by Pierre Marijon).
+- use new functionality of variantplaner_rs in variantplaner cli ([f986213](https://github.com/natir/variantlaner/commit/f9862139554027d8558562696b604628e2fdef30) by Pierre Marijon).
+- variantplaner_rs partitions could be parameterize ([8b2066e](https://github.com/natir/variantplaner/commit/8b2066ebf96e5ba7dc34181359a1d13121253048) by Pierre Marijon).
+
+### Bug Fixes
+
+- use number of bit ask by user in partitions ([4409d8c](https://github.com/natir/variantplaner/commit/4409d8c6934fd6b5131376d41a515d5fa36ee9b2) by Pierre Marijon).
+- readd documentation generation ([6467ee2](https://github.com/natir/variantplaner/commit/6467ee2d38b0885676ba0d17ed299869252c57b3) by Pierre Marijon).
+- transmission generation not failled if ped file contain only one line ([58ee926](https://github.com/natir/variantplaner/commit/58ee926c11cf62a289645acd59b32e3281e5852b) by Pierre Marijon).
+
 ## [0.3.0](https://github.com/natir/variantplaner/releases/tag/0.3.0) - 2024-09-30
 
 <small>[Compare with 0.2.4](https://github.com/natir/variantplaner/compare/0.2.4...0.3.0)</small>

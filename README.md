@@ -11,7 +11,7 @@ A toolkit to manage many variants from many samples, with limited resources.
 ## Installation
 
 ```bash
-pip install git+https://github.com/natir/variantplaner.git@0.3.0
+pip install git+https://github.com/natir/variantplaner.git@0.3.1
 ```
 
 With [`uv`](https://docs.astral.sh/uv/):
@@ -19,7 +19,7 @@ With [`uv`](https://docs.astral.sh/uv/):
 
 ```bash
 python -m pip install --user pipx
-pipx install git+https://github.com/natir/variantplaner.git@0.3.0
+pipx install git+https://github.com/natir/variantplaner.git@0.3.1
 ```
 
 ## Usage
