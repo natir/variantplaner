@@ -45,7 +45,8 @@ def __chunk_by_memory(
             ret = []
             total_bytes = 0
 
-    yield ret
+    if len(ret) > 0:
+        yield ret
 
 
 def __merge_split_unique(paths: list[pathlib.Path], out_prefix: pathlib.Path) -> set[str]:
