@@ -7,6 +7,8 @@ But also build a file struct to get a fast variant database interrogations time.
 
 from __future__ import annotations
 
+import base64
+
 from variantplaner import extract, generate, normalization, struct
 from variantplaner.objects import (
     Annotations,
@@ -18,6 +20,17 @@ from variantplaner.objects import (
     VcfHeader,
     VcfParsingBehavior,
 )
+
+
+def int2string(value: int) -> str:
+    return base64.urlsafe_b64encode(
+        value.to_bytes(
+            (value.bit_length() + 7) // 8,
+            byteorder="little",
+            signed=True,
+        )
+    ).decode("utf-8")
+
 
 __all__: list[str] = [
     "Annotations",

@@ -158,5 +158,10 @@ def genotypes(
     number_of_bits = math.ceil(math.log2(number_of_part))
 
     vp_struct.genotypes.hive(
-        input_paths, prefix_path, threads, file_per_thread, append=append, number_of_bits=number_of_bits
+        input_paths,
+        prefix_path,
+        threads,
+        file_per_thread,
+        append=append,
+        number_of_bits=number_of_bits,
     )

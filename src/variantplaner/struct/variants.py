@@ -15,6 +15,7 @@ import typing
 import polars
 
 # project import
+import variantplaner
 
 logger = logging.getLogger("struct.variants")
 
@@ -108,14 +109,14 @@ def merge(
     os.environ["POLARS_MAX_THREADS"] = str(polars_threads)
     output_prefix.mkdir(parents=True, exist_ok=True)
 
-    temp_prefix = pathlib.Path(tempfile.gettempdir()) / "variantplaner" / str(hash(output_prefix))
+    temp_prefix = pathlib.Path(tempfile.gettempdir()) / "variantplaner" / variantplaner.int2string(hash(output_prefix))
     temp_prefix.mkdir(parents=True, exist_ok=True)
 
     # merge file -> split by chromosome perform unique
     logger.debug("Start split first file")
     base_inputs_outputs: list[tuple[list[pathlib.Path], pathlib.Path]] = []
     for input_chunk in __chunk_by_memory(paths, bytes_limit=memory_limit):
-        local_out_prefix = temp_prefix / str(hash(tuple(input_chunk)))
+        local_out_prefix = temp_prefix / variantplaner.int2string(hash(tuple(input_chunk)))
         local_out_prefix.mkdir(parents=True, exist_ok=True)
 
         base_inputs_outputs.append((input_chunk, local_out_prefix))
@@ -156,7 +157,9 @@ def merge(
                 if len(input_chunk) == 1:
                     new_inputs.append(input_chunk[0])
                 elif len(input_chunk) > 1:
-                    temp_output = chr_temp_prefix / str(hash(tuple(input_chunk))) / f"{chr_name}.parquet"
+                    temp_output = (
+                        chr_temp_prefix / variantplaner.int2string(hash(tuple(input_chunk))) / f"{chr_name}.parquet"
+                    )
                     temp_output.parent.mkdir(parents=True, exist_ok=True)
 
                     new_inputs.append(temp_output)

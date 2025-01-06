@@ -60,7 +60,9 @@ class Pedigree(polars.LazyFrame):
         self.lf.collect().write_csv(output_path, include_header=False, separator="\t")
 
     @classmethod
-    def minimal_schema(cls) -> collections.abc.Mapping[str, polars._typing.PolarsDataType]:
+    def minimal_schema(
+        cls,
+    ) -> collections.abc.Mapping[str, polars._typing.PolarsDataType]:
         """Get schema of variants polars.LazyFrame."""
         return {
             "family_id": polars.String,

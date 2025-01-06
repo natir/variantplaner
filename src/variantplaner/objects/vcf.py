@@ -11,7 +11,12 @@ import polars
 
 # project import
 from variantplaner import normalization
-from variantplaner.exception import NoContigsLengthInformationError, NoGenotypeError, NotAVCFError, NotVcfHeaderError
+from variantplaner.exception import (
+    NoContigsLengthInformationError,
+    NoGenotypeError,
+    NotAVCFError,
+    NotVcfHeaderError,
+)
 from variantplaner.objects.contigs_length import ContigsLength
 from variantplaner.objects.genotypes import Genotypes
 from variantplaner.objects.variants import Variants

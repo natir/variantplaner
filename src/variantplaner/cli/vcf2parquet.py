@@ -70,7 +70,7 @@ def vcf2parquet(
         logging.error(f"Path {input_path} seems not contains Vcf.")  # noqa: TRY400  we are in cli exception isn't readable
         sys.exit(12)
     except exception.NoContigsLengthInformationError:
-        logging.error("Vcf didn't contains contigs length information you could use chrom2length-path argument.")  # noqa: TRY400  we are in cli exception isn't readable
+        logging.exception("Vcf didn't contains contigs length information you could use chrom2length-path argument.")
         sys.exit(13)
     logger.debug("End read vcf")
 

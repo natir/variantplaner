@@ -22,7 +22,10 @@ logger = logging.getLogger("struct.genotypes")
 
 
 def __hive_worker(
-    lfs: tuple[polars.LazyFrame], basename: str, output_prefix: pathlib.Path, number_of_bits: int = 8
+    lfs: tuple[polars.LazyFrame],
+    basename: str,
+    output_prefix: pathlib.Path,
+    number_of_bits: int = 8,
 ) -> None:
     """Concatenate several parquet files and group them according to the bits between the 63rd and 55th bits included.
 
