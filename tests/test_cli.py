@@ -571,7 +571,8 @@ def test_metadata_json(tmp_path: pathlib.Path) -> None:
             str(DATA_DIR / "metadata.json"),
             "-o",
             str(metadata_path),
-            "-t" "json",
+            "-t",
+            "json",
         ],
     )
 

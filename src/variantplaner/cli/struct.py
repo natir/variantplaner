@@ -1,5 +1,7 @@
 """Module contains struct subcommand entry point function."""
 
+# ruff: noqa: A005
+
 # std import
 from __future__ import annotations
 

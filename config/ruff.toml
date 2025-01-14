@@ -57,8 +57,6 @@ select = [
 ]
 ignore = [
     "A001",  # Variable is shadowing a Python builtin
-    "ANN101",  # Missing type annotation for self
-    "ANN102",  # Missing type annotation for cls
     "ANN204",  # Missing return type annotation for special method __str__
     "ANN401",  # Dynamically typed expressions (typing.Any) are disallowed
     "ARG005",  # Unused lambda argument
