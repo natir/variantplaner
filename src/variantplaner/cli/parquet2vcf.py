@@ -142,7 +142,7 @@ def parquet2vcf(
     logger = logging.getLogger("vcf2parquet")
 
     logger.debug(
-        f"parameter: {variants_path} {output_path} {genotypes_path} {headers_path} {chromosome} {position} {identifier} {reference} {alternative} {quality} {filter_col} {format_str}"
+        f"parameter: {variants_path=} {output_path=} {genotypes_path=} {headers_path=} {chromosome=} {position=} {identifier=} {reference=} {alternative=} {quality=} {filter_col=} {format_str=}"
     )
 
     vcf = Vcf()

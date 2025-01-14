@@ -15,7 +15,7 @@ This tutorial suggests an organization of files, but you're under no obligation 
 
 ## Setup
 
-This tutorial assume you are on unix like system, you have python setup and you [install variantplaner](https://github.com/natir/variantplaner#installation)
+This tutorial assume you are on unix like system, you have python setup and you [install variantplaner](https://github.com/SeqOIA-IT/variantplaner#installation)
 
 
 Requirements list:

@@ -42,7 +42,7 @@ Commands:
 
 
 @pytest.mark.skipif(
-    os.environ.get("GITHUB_REPOSITORY", default="") == "natir/variantplaner",
+    os.environ.get("GITHUB_REPOSITORY", default="") == "SeqOIA-IT/variantplaner",
     reason="this test failled in github action",
 )
 def test_show_help_struct() -> None:

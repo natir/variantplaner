@@ -1,8 +1,8 @@
-# <img src="https://github.com/natir/variantplaner/raw/main/docs/logo.svg" alt="variantplaner logo" width="15%">ariantPlaner
+# <img src="https://github.com/SeqOIA-IT/variantplaner/raw/main/docs/logo.svg" alt="variantplaner logo" width="15%">ariantPlaner
 
 
-[![ci](https://github.com/natir/variantplaner/actions/workflows/ci.yml/badge.svg)](https://github.com/natir/variantplaner/actions/workflows/ci.yml)
-[![doc](https://img.shields.io/badge/docs-mkdocs%20material-blue.svg?style=flat)](https://natir.github.io/variantplaner/)
+[![ci](https://github.com/SeqOIA-IT/variantplaner/actions/workflows/ci.yml/badge.svg)](https://github.com/SeqOIA-IT/variantplaner/actions/workflows/ci.yml)
+[![doc](https://img.shields.io/badge/docs-mkdocs%20material-blue.svg?style=flat)](https://seqoia-it.github.io/variantplaner/)
 [![pypi version](https://img.shields.io/pypi/v/variantplaner.svg)](https://pypi.org/project/variantplaner/)
 
 
@@ -11,7 +11,7 @@ A toolkit to manage many variants from many samples, with limited resources.
 ## Installation
 
 ```bash
-pip install git+https://github.com/natir/variantplaner.git@0.3.1
+pip install git+https://github.com/SeqOIA-IT/variantplaner.git@0.3.1
 ```
 
 With [`uv`](https://docs.astral.sh/uv/):
@@ -19,12 +19,12 @@ With [`uv`](https://docs.astral.sh/uv/):
 
 ```bash
 python -m pip install --user pipx
-pipx install git+https://github.com/natir/variantplaner.git@0.3.1
+pipx install git+https://github.com/SeqOIA-IT/variantplaner.git@0.3.1
 ```
 
 ## Usage
 
-This section presents basic usage. For a more complete exemple checkout our [usage page](https://natir.github.io/variantplaner/usage/).
+This section presents basic usage. For a more complete exemple checkout our [usage page](https://seqoia-it.github.io/variantplaner/usage/).
 
 !!! warning
     `variantplaner` doesn't support compressed VCFs. This is a downstream trouble we are aware of and sorry about.
@@ -187,4 +187,4 @@ variantplaner generate transmission -i genotypes.parquet -p family.ped -t transm
 
 ## Contribution
 
-All contributions are welcome, [see our "How to contribute" page.](https://natir.github.io/variantplaner/contributing/)
+All contributions are welcome, [see our "How to contribute" page.](https://seqoia-it.github.io/variantplaner/contributing/)

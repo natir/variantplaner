@@ -36,11 +36,11 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://natir.github.io/variantplaner"
-Documentation = "https://natir.github.io/variantplaner"
-Changelog = "https://natir.github.io/variantplaner/changelog"
-Repository = "https://github.com/natir/variantplaner"
-Issues = "https://github.com/natir/variantplaner/issues"
+Homepage = "https://seqoia-it.github.io/variantplaner"
+Documentation = "https://seqoia-it.github.io/variantplaner"
+Changelog = "https://seqoia-it.github.io/variantplaner/changelog"
+Repository = "https://github.com/SeqOIA-IT/variantplaner"
+Issues = "https://github.com/SeqOIA-IT/variantplaner/issues"
 
 [project.scripts]
 variantplaner = "variantplaner.cli:main"

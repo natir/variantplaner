@@ -378,7 +378,7 @@ def test_struct_variants(tmp_path: pathlib.Path) -> None:
 
 
 @pytest.mark.skipif(
-    os.environ.get("GITHUB_REPOSITORY", default="") == "natir/variantplaner",
+    os.environ.get("GITHUB_REPOSITORY", default="") == "SeqOIA-IT/variantplaner",
     reason="this test failled in github action",
 )
 def test_struct_genotypes(tmp_path: pathlib.Path) -> None:
@@ -403,7 +403,7 @@ def test_struct_genotypes(tmp_path: pathlib.Path) -> None:
 
 
 @pytest.mark.skipif(
-    os.environ.get("GITHUB_REPOSITORY", default="") == "natir/variantplaner",
+    os.environ.get("GITHUB_REPOSITORY", default="") == "SeqOIA-IT/variantplaner",
     reason="this test failled in github action",
 )
 def test_struct_genotypes_threads(tmp_path: pathlib.Path) -> None:
