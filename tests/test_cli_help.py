@@ -111,6 +111,7 @@ Options:
   -c, --chrom2length-path FILE  CSV file that associates a chromosome name with
                                 its size.
   -a, --append                  Switch in append mode.
+  -s, --keep-star BOOLEAN       Keep variant with * in alt.
   -h, --help                    Show this message and exit.
 
 Commands:

@@ -45,24 +45,36 @@ logger = logging.getLogger("__name__")
     type=bool,
     is_flag=True,
 )
+@click.option(
+    "-s",
+    "--keep-star",
+    help="Keep variant with * in alt.",
+    type=bool,
+    is_flag=False,
+)
 def vcf2parquet(
     ctx: click.Context,
     input_path: pathlib.Path,
     chrom2length_path: pathlib.Path | None,
     *,
     append: bool,
+    keep_star: bool,
 ) -> None:
     """Convert a vcf in parquet."""
     logger = logging.getLogger("vcf2parquet")
 
-    logger.debug(f"parameter: {input_path=} {chrom2length_path=} {append=}")
+    logger.debug(f"parameter: {input_path=} {chrom2length_path=} {append=} {keep_star=}")
 
     lf = Vcf()
 
     # Read vcf and manage structural variant
     logger.debug("Start read vcf")
     try:
-        lf.from_path(input_path, chrom2length_path, behavior=VcfParsingBehavior.MANAGE_SV)
+        beahvior = VcfParsingBehavior.MANAGE_SV
+        if keep_star:
+            beahvior |= VcfParsingBehavior.KEEP_STAR
+
+        lf.from_path(input_path, chrom2length_path, behavior=beahvior)
     except exception.NotVcfHeaderError:
         logging.error(f"Path {input_path} seems not contains Vcf.")  # noqa: TRY400  we are in cli exception isn't readable
         sys.exit(11)

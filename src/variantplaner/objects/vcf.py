@@ -30,14 +30,17 @@ if typing.TYPE_CHECKING:  # pragma: no cover
     from variantplaner import Annotations
 
 
-class VcfParsingBehavior(enum.Enum):
+class VcfParsingBehavior(enum.IntFlag):
     """Enumeration use to control behavior of IntoLazyFrame."""
 
-    NOTHING = 0
+    NOTHING = enum.auto()
     """into_lazyframe not have any specific behavior"""
 
-    MANAGE_SV = 1
+    MANAGE_SV = enum.auto()
     """into_lazyframe try to avoid structural variant id collision, SVTYPE/SVLEN info value must be present."""
+
+    KEEP_STAR = enum.auto()
+    """Keep star variant."""
 
 
 class Vcf:
@@ -82,12 +85,15 @@ class Vcf:
         self.lf = self.lf.rename(dict(zip(schema.names(), self.header.column_name(schema.len()))))
         self.lf = self.lf.cast(Vcf.schema())  # type: ignore # noqa: PGH003  polars 1.0 typing stuff
 
-        if behavior == VcfParsingBehavior.MANAGE_SV:
+        if behavior & VcfParsingBehavior.MANAGE_SV:
             self.lf = self.lf.with_columns(self.header.info_parser({"SVTYPE", "SVLEN"}))
+
+        if behavior & VcfParsingBehavior.KEEP_STAR:
+            self.lf = self.lf.filter(polars.col("alt") != "*")
 
         self.lf = normalization.add_variant_id(self.lf, chr2len.lf)
 
-        if behavior == VcfParsingBehavior.MANAGE_SV:
+        if behavior & VcfParsingBehavior.MANAGE_SV:
             self.lf = self.lf.drop("SVTYPE", "SVLEN", strict=False)
 
     def variants(self) -> Variants:
